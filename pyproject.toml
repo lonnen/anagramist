@@ -1,0 +1,28 @@
+[project]
+name = "fundament"
+version = "0.1"
+description = "a solver for dinocomics 1663-style cryptoanagrams"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{name = "lonnen"}]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = [
+
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://github.com/lonnen/fundament"
+Changelog = "https://github.com/lonnen/fundament/releases"
+Issues = "https://github.com/lonnen/fundament/issues"
+CI = "https://github.com/lonnen/fundament/actions"
+
+
+[project.optional-dependencies]
+test = ["pytest"]
