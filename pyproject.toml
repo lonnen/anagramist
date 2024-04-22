@@ -34,6 +34,8 @@ Changelog = "https://github.com/lonnen/fundament/releases"
 Issues = "https://github.com/lonnen/fundament/issues"
 CI = "https://github.com/lonnen/fundament/actions"
 
+[project.scripts]
+fundament = "fundament.cli:cli"
 
 [project.optional-dependencies]
 test = ["pytest"]
