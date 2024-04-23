@@ -9,9 +9,17 @@ license = {text = "Apache-2.0"}
 classifiers = [
     "License :: OSI Approved :: Apache Software License"
 ]
-dependencies = [
+dynamic = ["dependencies"]
 
-]
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+exclude=["data"]
 
 [tool.ruff]
 # Enable pycodestyle (E), pyflakes (F), and bugbear (B) rules
@@ -23,10 +31,6 @@ target-version = "py311"
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
-
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
 
 [project.urls]
 Homepage = "https://github.com/lonnen/fundament"
