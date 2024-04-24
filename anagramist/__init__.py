@@ -36,7 +36,7 @@ def generate_text(
     if fp16:
         model.half()
 
-    #prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding fundamental discoveries into word games anymore."""
+    #prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
     prompt_text = ""
 
     inputs = tokenizer(prompt_text, return_tensors="pt", add_special_tokens=False)

@@ -1,5 +1,5 @@
 [project]
-name = "fundament"
+name = "anagramist"
 version = "0.1"
 description = "a solver for dinocomics 1663-style cryptoanagrams"
 readme = "README.md"
@@ -33,13 +33,13 @@ target-version = "py311"
 docstring-quotes = "double"
 
 [project.urls]
-Homepage = "https://github.com/lonnen/fundament"
-Changelog = "https://github.com/lonnen/fundament/releases"
-Issues = "https://github.com/lonnen/fundament/issues"
-CI = "https://github.com/lonnen/fundament/actions"
+Homepage = "https://github.com/lonnen/anagramist"
+Changelog = "https://github.com/lonnen/anagramist/releases"
+Issues = "https://github.com/lonnen/anagramist/issues"
+CI = "https://github.com/lonnen/anagramist/actions"
 
 [project.scripts]
-fundament = "fundament.cli:cli"
+anagramist = "anagramist.cli:cli"
 
 [project.optional-dependencies]
 test = ["pytest"]
