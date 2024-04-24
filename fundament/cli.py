@@ -1,5 +1,6 @@
-import click
+from . import generate_text
 
+import click
 
 @click.group()
 @click.version_option()
@@ -27,5 +28,5 @@ def cli():
     is_flag=True,
     help="Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit",
 )
-def solve(letters, model_name_or_path):
-    pass
+def solve(letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16):
+    generate_text(letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16)
