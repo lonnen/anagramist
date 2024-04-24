@@ -2,6 +2,7 @@ from . import generate_text
 
 import click
 
+
 @click.group()
 @click.version_option()
 def cli():
@@ -15,7 +16,9 @@ def cli():
 )  # should be required, needs a default fallback
 @click.option("--k", type=int, default=0, help="Top-k parameter used for generation.")
 @click.option("--penalty_alpha", type=float, default=0.0)
-@click.option("--p", type=float, default=0.9, help="Top P parameter used for nucles sampling")
+@click.option(
+    "--p", type=float, default=0.9, help="Top P parameter used for nucles sampling"
+)
 @click.option("--seed", type=int, default=42, help="random seed for initialization")
 @click.option(
     "--use_cpu",
