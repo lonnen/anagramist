@@ -43,7 +43,7 @@ def generate_text(
 
     output_sequences = model.generate(
         **inputs,
-         # tokens ~= 4 english chars, and valid answers must use all the letters
+         # tokens ~= 4 english chars, and valid answers must use exactly all the letters
         max_length=(len(letters) / 3) + len(inputs["input_ids"][0]),
         penalty_alpha=penalty_alpha,
         top_k=k,
