@@ -12,8 +12,8 @@ def cli():
 @click.command()
 @click.argument("letters")  # nee prompt
 @click.option(
-    "-m", "--model_name_or_path", type=click.Path()
-)  # should be required, needs a default fallback
+    "-m", "--model_name_or_path", default="mistralai/Mistral-7B-v0.1", type=click.Path()
+)
 @click.option("--k", type=int, default=0, help="Top-k parameter used for generation.")
 @click.option("--penalty_alpha", type=float, default=0.0)
 @click.option(
