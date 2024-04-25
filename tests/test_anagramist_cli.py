@@ -4,6 +4,7 @@ from anagramist.cli import cli
 
 from click.testing import CliRunner
 
+
 def test_version():
     runner = CliRunner()
     with runner.isolated_filesystem():
