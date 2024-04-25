@@ -1,6 +1,5 @@
 import pytest
 
-import anagramist
 from anagramist.cli import cli
 
 from click.testing import CliRunner
