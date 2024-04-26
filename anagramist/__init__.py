@@ -19,15 +19,15 @@ class Solver:
         model_name_or_path,
         k,
         p,
-        penalty_alpha=0.6,
-        seed=None,
-        use_cpu=True,
-        fp16=False,
+        penalty_alpha: float = 0.6,
+        seed: int = None,
+        use_cpu: bool = True,
+        fp16: bool = False,
     ) -> None:
         self.distributed_state = PartialState(cpu=use_cpu)
 
         logger.warning(
-            f"device: {self.distributed_state.device}, 16-bits inference: {self.fp16}"
+            f"device: {self.distributed_state.device}, 16-bits inference: {fp16}"
         )
 
         # Initialize the model and tokenizer
@@ -36,20 +36,19 @@ class Solver:
         # tokenizer = GPT2Tokenizer.from_pretrained(args.model_name_or_path)
         # model = OPTForCausalLM.from_pretrained(args.model_name_or_path)
 
+        # Set the model to the right device
+        self.model.to(self.distributed_state.device)
+
         self.seed = seed
         if seed is not None:
             set_seed(seed)
-
-        # Set the model to the right device
-        self.model.to(self.distributed_state.device)
 
         self.fp16 = fp16
         if fp16:
             self.model.half()
 
         self.penalty_alpha = penalty_alpha
-        self.k = k
-        self.p = p
+        self.k = k # how many words are considered at each step
         self.use_cpu = use_cpu
 
     def generate_solutions(self, letters):
