@@ -32,4 +32,8 @@ def cli():
     help="Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit",
 )
 def solve(letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16):
+    l = "".join(i for i in sorted(letters) if not i.isspace())
+    click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
     generate_text(letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16)
+
+cli.add_command(solve)
