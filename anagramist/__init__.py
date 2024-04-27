@@ -53,7 +53,7 @@ class Solver:
 
     def generate_solutions(self, letters):
         # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
-        prompt_text = ""
+        prompt_text = " "
 
         inputs = self.tokenizer(
             prompt_text, return_tensors="pt", add_special_tokens=False
@@ -102,7 +102,7 @@ class Solver:
 
 
 def generate_text(
-    letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16
+    letters, model_name_or_path, k, penalty_alpha, p, seed, use_gpu, fp16
 ):
-    solver = Solver(model_name_or_path, k, p, penalty_alpha, seed, use_cpu, fp16)
-    solver.generate_solutions()
+    solver = Solver(model_name_or_path, k, p, penalty_alpha, seed, (not use_gpu), fp16)
+    solver.generate_solutions(letters)
