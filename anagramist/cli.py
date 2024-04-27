@@ -17,23 +17,22 @@ def cli():
 @click.option("--k", type=int, default=0, help="Top-k parameter used for generation.")
 @click.option("--penalty_alpha", type=float, default=0.0)
 @click.option(
-    "--p", type=float, default=0.9, help="Top P parameter used for nucles sampling"
+    "--p", type=float, default=0.9, help="Top P parameter used for nucleus sampling"
 )
 @click.option("--seed", type=int, default=42, help="random seed for initialization")
 @click.option(
-    "--use_cpu",
+    "--use_gpu",
     is_flag=True,
-    help="Whether or not to use cpu. If set to False, "
-    "we will use gpu/npu or mps device if available",
+    help="Whether or not to use cpu.",
 )
 @click.option(
     "--fp16",
     is_flag=True,
     help="Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit",
 )
-def solve(letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16):
+def solve(letters, model_name_or_path, k, penalty_alpha, p, seed, use_gpu, fp16):
     l = "".join(i for i in sorted(letters) if not i.isspace())
     click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
-    generate_text(letters, model_name_or_path, k, penalty_alpha, p, seed, use_cpu, fp16)
+    generate_text(letters, model_name_or_path, k, penalty_alpha, p, seed, use_gpu, fp16)
 
 cli.add_command(solve)
