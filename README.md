@@ -15,7 +15,9 @@ pip install anagramist
 ```
 ## Usage
 
-Don't.
+```bash
+python -m anagramist solve --c1663 "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,\!\!"
+```
 
 ## Development
 
