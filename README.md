@@ -5,7 +5,7 @@
 [![Changelog](https://img.shields.io/github/v/release/lonnen/anagramist?include_prereleases&label=changelog)](https://github.com/lonnen/anagramist/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/lonnen/anagramist/blob/main/LICENSE)
 
-a solver for dinocomics 1663-style cryptoanagrams
+a solver for [dinocomics 1663](https://qwantz.com/index.php?comic=1663)-style cryptoanagrams
 
 ## Installation
 
