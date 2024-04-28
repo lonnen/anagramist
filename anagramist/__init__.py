@@ -17,9 +17,6 @@ class Solver:
     def __init__(
         self,
         model_name_or_path,
-        k,
-        p,
-        penalty_alpha: float = 0.6,
         seed: int = None,
         use_cpu: bool = True,
         fp16: bool = False,
@@ -47,8 +44,6 @@ class Solver:
         if fp16:
             self.model.half()
 
-        self.penalty_alpha = penalty_alpha
-        self.k = k # how many words are considered at each step
         self.use_cpu = use_cpu
 
     def generate_solutions(self, letters):
@@ -67,8 +62,7 @@ class Solver:
             **inputs,
             # tokens ~= 4 english chars, and valid answers must use exactly all the letters
             max_length=(len(letters) / 3) + len(inputs["input_ids"][0]),
-            penalty_alpha=self.penalty_alpha,
-            top_k=self.k,
+
         )
 
         generated_sequences = []
@@ -102,7 +96,7 @@ class Solver:
 
 
 def generate_text(
-    letters, model_name_or_path, k, penalty_alpha, p, seed, use_gpu, fp16
+    letters, model_name_or_path, seed, use_gpu, fp16
 ):
-    solver = Solver(model_name_or_path, k, p, penalty_alpha, seed, (not use_gpu), fp16)
+    solver = Solver(model_name_or_path, seed, (not use_gpu), fp16)
     solver.generate_solutions(letters)
