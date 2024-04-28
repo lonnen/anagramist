@@ -12,7 +12,7 @@ def cli():
 @click.command()
 @click.argument("letters")  # nee prompt
 @click.option(
-    "-m", "--model_name_or_path", default="openai-community/gpt2", type=click.Path()
+    "-m", "--model_name_or_path", default="microsoft/phi-1_5", type=click.Path()
 )
 @click.option("--seed", type=int, default=42, help="random seed for initialization")
 @click.option(
