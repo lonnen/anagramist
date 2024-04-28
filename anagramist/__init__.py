@@ -1,4 +1,5 @@
 import logging
+from os import PathLike
 
 from accelerate import PartialState
 from accelerate.utils import set_seed
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Solver:
     def __init__(
         self,
-        model_name_or_path,
+        model_name_or_path: str | PathLike[str],
         seed: int = None,
         use_cpu: bool = True,
         fp16: bool = False,
@@ -96,7 +97,7 @@ class Solver:
 
 
 def generate_text(
-    letters, model_name_or_path, seed, use_gpu, fp16
+    letters: str, model_name_or_path: str | PathLike[str], seed: int, use_gpu: bool = False, fp16: bool = False, c1663: bool = False
 ):
     solver = Solver(model_name_or_path, seed, (not use_gpu), fp16)
     solver.generate_solutions(letters)
