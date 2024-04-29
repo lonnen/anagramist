@@ -52,49 +52,31 @@ class Solver:
         # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
         prompt_text = " "
 
-        inputs = self.tokenizer(
-            prompt_text, return_tensors="pt", add_special_tokens=False
-        )
-        inputs = {
-            key: value.to(self.distributed_state.device)
-            for key, value in inputs.items()
-        }
+        inputs = self.tokenizer(prompt_text, return_tensors="pt", add_special_tokens=False)
 
         output_sequences = self.model.generate(
-            **inputs,
+            inputs.input_ids,
+            # BEAM search params
+            num_beams=10,
+            num_return_sequences=1,
+            no_repeat_ngram_size=1,
+            remove_invalid_values=True,
             # tokens ~= 4 english chars, and valid answers must use exactly all the letters
-            max_length=(len(letters) / 3) + len(inputs["input_ids"][0]),
+            max_length=int(len(letters) / 3) + len(inputs["input_ids"][0]),
+        )[0]
+        
+    
+        print(f"=== CANDIDATE SOLUTION ===")
 
+        # Decode text
+        text = self.tokenizer.decode(
+            output_sequences,
+            clean_up_tokenization_spaces=True,
+            add_special_tokens=False,
         )
 
-        generated_sequences = []
-        for generated_sequence_idx, generated_sequence in enumerate(output_sequences):
-            print(f"=== GENERATED SEQUENCE {generated_sequence_idx + 1} ===")
-            generated_sequence = generated_sequence.tolist()
-
-            # Decode text
-            text = self.tokenizer.decode(
-                generated_sequence,
-                clean_up_tokenization_spaces=True,
-                add_special_tokens=False,
-            )
-
-            # Add the prompt at the beginning of the sequence. Remove the excess text that was used for pre-processing
-            total_sequence = (
-                prompt_text
-                + text[
-                    len(
-                        self.tokenizer.decode(
-                            inputs["input_ids"][0], clean_up_tokenization_spaces=True
-                        )
-                    ) :
-                ]
-            )
-
-            generated_sequences.append(total_sequence)
-            print(total_sequence)
-
-        return generated_sequences
+        print(text + "\n")
+        return text
 
 
 def generate_text(
