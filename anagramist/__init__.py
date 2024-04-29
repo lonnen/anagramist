@@ -45,14 +45,15 @@ class Solver:
         if seed is not None:
             set_seed(seed)
 
-
         self.use_cpu = use_cpu
 
     def generate_solutions(self, letters):
         # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
         prompt_text = " "
 
-        inputs = self.tokenizer(prompt_text, return_tensors="pt", add_special_tokens=False)
+        inputs = self.tokenizer(
+            prompt_text, return_tensors="pt", add_special_tokens=False
+        )
 
         output_sequences = self.model.generate(
             inputs.input_ids,
@@ -64,8 +65,7 @@ class Solver:
             # tokens ~= 4 english chars, and valid answers must use exactly all the letters
             max_length=int(len(letters) / 3) + len(inputs["input_ids"][0]),
         )[0]
-        
-    
+
         print(f"=== CANDIDATE SOLUTION ===")
 
         # Decode text
@@ -80,7 +80,12 @@ class Solver:
 
 
 def generate_text(
-    letters: str, model_name_or_path: str | PathLike[str], seed: int, use_gpu: bool = False, fp16: bool = False, c1663: bool = False
+    letters: str,
+    model_name_or_path: str | PathLike[str],
+    seed: int,
+    use_gpu: bool = False,
+    fp16: bool = False,
+    c1663: bool = False,
 ):
     solver = Solver(model_name_or_path, seed, (not use_gpu), fp16)
     solver.generate_solutions(letters)
