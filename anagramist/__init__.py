@@ -37,13 +37,14 @@ class Solver:
         # Set the model to the right device
         self.model.to(self.distributed_state.device)
 
+        self.fp16 = fp16
+        if fp16:
+            self.model.half()
+
         self.seed = seed
         if seed is not None:
             set_seed(seed)
 
-        self.fp16 = fp16
-        if fp16:
-            self.model.half()
 
         self.use_cpu = use_cpu
 
