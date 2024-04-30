@@ -4,7 +4,11 @@ from os import PathLike
 from accelerate import PartialState
 from accelerate.utils import set_seed
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    LogitsProcessorList,
+)
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
