@@ -1,13 +1,16 @@
 import logging
+from collections import Counter
 from os import PathLike
 
 from accelerate import PartialState
 from accelerate.utils import set_seed
 
+from torch import FloatTensor, LongTensor, gather
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     LogitsProcessorList,
+    LogitsProcessor,
 )
 
 logging.basicConfig(
@@ -61,7 +64,9 @@ class Solver:
             prompt_text, return_tensors="pt", add_special_tokens=False
         )
 
-        logits = LogitsProcessorList()
+        logits = LogitsProcessorList([
+            LetterBankLogitsProcessor(letters, self.tokenizer.eos_token_id, self.tokenizer.decode),
+        ])
         if self.c1663:
             logits.extend(LogitsProcessorList())
 
@@ -101,3 +106,33 @@ def generate_text(
 ):
     solver = Solver(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     solver.generate_solutions(letters)
+
+
+class LetterBankLogitsProcessor(LogitsProcessor):
+    r"""
+    [`LetterBankLogitsProcessor`] restricts sampling to ensure output can be assembled out of letters in the bank.
+
+    Args:
+        letter_bank (`List[]`)
+    """
+
+    def __init__(self, letter_bank: str, eos_token_id: int, decode_function):
+        self.letter_bank = Counter(letter_bank)
+        # ensure eos_token_id is not suppressed
+        self.eos_token_id = eos_token_id
+        self.decode = decode_function
+
+    def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
+        print("==SCORES==")
+        for tokens in input_ids.tolist():
+            # calculate letters used by current input_ids
+            candidate = self.decode(tokens)
+            candidate_letters = Counter(candidate)
+            candidate_letters[' '] = 0 # remove empty spaces
+            subset = self.letter_bank < candidate_letters
+            print(r"{}: {}".format(subset, candidate.strip()))
+            print(tokens)
+            
+        # calculate letters used in proposed tokens
+        # calculate which ones fit in the remaining letters
+        return scores
