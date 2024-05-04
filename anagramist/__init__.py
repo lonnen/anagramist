@@ -57,15 +57,17 @@ class Solver:
         self.c1663 = c1663
 
     def generate_solutions(self, letters):
-        # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
         prompt_text = " "
+        # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
+        if self.c1663:
+            prompt_text = "I "
 
         inputs = self.tokenizer(
             prompt_text, return_tensors="pt", add_special_tokens=False
         )
 
         logits = LogitsProcessorList([
-            LetterBankLogitsProcessor(letters, self.tokenizer.eos_token_id, self.tokenizer.decode),
+            LetterBankLogitsProcessor(letters, self.tokenizer),
         ])
         if self.c1663:
             logits.extend(LogitsProcessorList())
@@ -91,7 +93,6 @@ class Solver:
                 clean_up_tokenization_spaces=True,
                 add_special_tokens=False,
             )
-
             print(text + "\n")
         return output_sequences
 
@@ -116,22 +117,19 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         letter_bank (`List[]`)
     """
 
-    def __init__(self, letter_bank: str, eos_token_id: int, decode_function):
+    def __init__(self, letter_bank: str, tokenizer):
         self.letter_bank = Counter(letter_bank)
-        # ensure eos_token_id is not suppressed
-        self.eos_token_id = eos_token_id
-        self.decode = decode_function
+        self.decode = tokenizer.decode
 
     def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
         print("==SCORES==")
-        for tokens in input_ids.tolist():
+        for batch in input_ids.tolist():
             # calculate letters used by current input_ids
-            candidate = self.decode(tokens)
+            candidate = self.decode(batch, clean_up_tokenization_spaces=True,).strip()
             candidate_letters = Counter(candidate)
             candidate_letters[' '] = 0 # remove empty spaces
             subset = self.letter_bank < candidate_letters
-            print(r"{}: {}".format(subset, candidate.strip()))
-            print(tokens)
+            print(r"{} | {}".format(subset, candidate))
             
         # calculate letters used in proposed tokens
         # calculate which ones fit in the remaining letters
