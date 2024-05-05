@@ -66,9 +66,11 @@ class Solver:
             prompt_text, return_tensors="pt", add_special_tokens=False
         )
 
-        logits = LogitsProcessorList([
-            LetterBankLogitsProcessor(letters, self.tokenizer),
-        ])
+        logits = LogitsProcessorList(
+            [
+                LetterBankLogitsProcessor(letters, self.tokenizer),
+            ]
+        )
         if self.c1663:
             logits.extend(LogitsProcessorList())
 
@@ -125,12 +127,15 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         print("==SCORES==")
         for batch in input_ids.tolist():
             # calculate letters used by current input_ids
-            candidate = self.decode(batch, clean_up_tokenization_spaces=True,).strip()
+            candidate = self.decode(
+                batch,
+                clean_up_tokenization_spaces=True,
+            ).strip()
             candidate_letters = Counter(candidate)
-            candidate_letters[' '] = 0 # remove empty spaces
+            candidate_letters[" "] = 0  # remove empty spaces
             subset = self.letter_bank < candidate_letters
             print(r"{} | {}".format(subset, candidate))
-            
+
         # calculate letters used in proposed tokens
         # calculate which ones fit in the remaining letters
         return scores
