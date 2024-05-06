@@ -122,6 +122,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
     def __init__(self, letter_bank: str, tokenizer):
         self.letter_bank = Counter(letter_bank)
         self.decode = tokenizer.decode
+        self.token_to_letter = {token_id:tokenizer.decode(token_id) for token_id in range(tokenizer.vocab_size)}
 
     def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
         print("==SCORES==")
