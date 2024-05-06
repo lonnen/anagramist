@@ -1,4 +1,5 @@
 import logging
+import sys
 from collections import Counter
 from os import PathLike
 
@@ -123,20 +124,33 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         self.letter_bank = Counter(letter_bank)
         self.decode = tokenizer.decode
         self.token_to_letter = {token_id:tokenizer.decode(token_id) for token_id in range(tokenizer.vocab_size)}
+        self.eos_token_id = tokenizer.eos_token_id
+        self.bos_token_id = tokenizer.bos_token_id
 
     def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
         print("==SCORES==")
         for batch in input_ids.tolist():
+            tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
             # calculate letters used by current input_ids
             candidate = self.decode(
-                batch,
+                [token for token in batch if token not in tokens_to_ignore],
                 clean_up_tokenization_spaces=True,
             ).strip()
             candidate_letters = Counter(candidate)
             candidate_letters[" "] = 0  # remove empty spaces
-            subset = self.letter_bank < candidate_letters
+
+            # is the batch possible to produce with the letter bank?
+            if not candidate_letters < self.letter_bank:
+                missing_letters = self.letter_bank.copy()
+                missing_letters.subtract(candidate_letters)
+                print(r"Batch {} contains letter not in the letter bank ({})".format(candidate, -missing_letters))
+                print(batch)
+                print(" ")
+
+            subset = candidate_letters < self.letter_bank
+            # calculate letters used in proposed tokens
+            # calculate which ones fit in the remaining letters
+            
             print(r"{} | {}".format(subset, candidate))
 
-        # calculate letters used in proposed tokens
-        # calculate which ones fit in the remaining letters
         return scores
