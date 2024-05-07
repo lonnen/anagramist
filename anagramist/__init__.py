@@ -143,7 +143,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             if not candidate_letters < self.letter_bank:
                 missing_letters = self.letter_bank.copy()
                 missing_letters.subtract(candidate_letters)
-                logger.warn(r"Batch {} contains letter not in the letter bank ({})".format(candidate, -missing_letters))
+                logger.warn(r"Batch \"{}\" contains letter not in the letter bank ({})".format(candidate, -missing_letters))
 
             subset = candidate_letters < self.letter_bank
             # calculate letters used in proposed tokens
