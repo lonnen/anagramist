@@ -123,7 +123,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
     def __init__(self, letter_bank: str, tokenizer):
         self.letter_bank = Counter(letter_bank)
         self.decode = tokenizer.decode
-        self.token_to_letter = {token_id:tokenizer.decode(token_id) for token_id in range(tokenizer.vocab_size)}
+        self.token_id_to_letter = [x[0] for x in sorted(tokenizer.vocab.items(), key = lambda x: x[1])]
         self.eos_token_id = tokenizer.eos_token_id
         self.bos_token_id = tokenizer.bos_token_id
 
