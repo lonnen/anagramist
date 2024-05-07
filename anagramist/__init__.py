@@ -146,6 +146,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             if not candidate_letters < self.letter_bank:
                 logger.warn(r"Batch '{}' contains letters not in the letter bank ({})".format(candidate, 
                 ''.join([c * count for c, count in (-remaining_letters).items()])))
+                return
             
             for s_id, s in enumerate(batch_scores):
                 pass
