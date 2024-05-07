@@ -148,11 +148,16 @@ class LetterBankLogitsProcessor(LogitsProcessor):
                 ''.join([c * count for c, count in (-remaining_letters).items()])))
                 return
             
+            assert(len(self.token_id_to_letter) == len(batch_scores))
             for s_id, s in enumerate(batch_scores):
-                pass
+                token_letters = Counter(self.token_id_to_letter[s_id])
+                if not token_letters < remaining_letters:
+                    missing_letters = remaining_letters.copy()
+                    missing_letters.subtract(token_letters)
+                    missing_letters = -missing_letters
+                    logger.warn(r"Adding token '{}' would result in an invalid sentence".format(''.join([c * count for c, count in (missing_letters).items()])))
             # calculate letters used in proposed tokens
             # calculate which ones fit in the remaining letters
-            
             print(r"{}".format(candidate))
 
         return scores
