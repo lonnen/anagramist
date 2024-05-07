@@ -120,7 +120,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         letter_bank (`List[]`)
     """
 
-    def __init__(self, letter_bank: str, tokenizer):
+    def __init__(self, letter_bank: str, tokenizer: AutoTokenizer):
         self.letter_bank = Counter(letter_bank)
         self.decode = tokenizer.decode
         self.token_id_to_letter = [x[0] for x in sorted(tokenizer.vocab.items(), key = lambda x: x[1])]
