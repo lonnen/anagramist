@@ -129,7 +129,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
 
     def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
         print("==SCORES==")
-        for batch in input_ids.tolist():
+        for batch_scores, batch in zip(scores.tolist(), input_ids.tolist()):
             tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
             # calculate letters used by current input_ids
             candidate = self.decode(
@@ -138,17 +138,20 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             ).strip()
             candidate_letters = Counter(candidate)
             candidate_letters[" "] = 0  # remove empty spaces
-
+            
+            remaining_letters = self.letter_bank.copy()
+            remaining_letters.subtract(candidate_letters)
+            
             # is the batch possible to produce with the letter bank?
             if not candidate_letters < self.letter_bank:
-                missing_letters = self.letter_bank.copy()
-                missing_letters.subtract(candidate_letters)
-                logger.warn(r"Batch \"{}\" contains letter not in the letter bank ({})".format(candidate, -missing_letters))
-
-            subset = candidate_letters < self.letter_bank
+                logger.warn(r"Batch '{}' contains letters not in the letter bank ({})".format(candidate, 
+                ''.join([c * count for c, count in (-remaining_letters).items()])))
+            
+            for s_id, s in enumerate(batch_scores):
+                pass
             # calculate letters used in proposed tokens
             # calculate which ones fit in the remaining letters
             
-            print(r"{} | {}".format(subset, candidate))
+            print(r"{}".format(candidate))
 
         return scores
