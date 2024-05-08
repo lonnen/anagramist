@@ -164,4 +164,4 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             # calculate which ones fit in the remaining letters
             print(r"{}".format(candidate))
 
-        return scores
+        return scores_processed
