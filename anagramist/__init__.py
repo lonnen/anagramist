@@ -1,4 +1,5 @@
 import logging
+import math
 import sys
 from collections import Counter
 from os import PathLike
@@ -123,14 +124,14 @@ class LetterBankLogitsProcessor(LogitsProcessor):
     def __init__(self, letter_bank: str, tokenizer: AutoTokenizer):
         self.letter_bank = Counter(letter_bank)
         self.decode = tokenizer.decode
-        self.token_id_to_letter = [x[0] for x in sorted(tokenizer.vocab.items(), key = lambda x: x[1])]
         self.eos_token_id = tokenizer.eos_token_id
         self.bos_token_id = tokenizer.bos_token_id
 
     def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
         print("==SCORES==")
-        for batch_scores, batch in zip(scores.tolist(), input_ids.tolist()):
-            tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
+        tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
+        scores_processed = scores.clone()
+        for batch_scores, batch in zip(scores_processed, input_ids.tolist()):
             # calculate letters used by current input_ids
             candidate = self.decode(
                 [token for token in batch if token not in tokens_to_ignore],
@@ -146,16 +147,17 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             if not candidate_letters < self.letter_bank:
                 logger.warn(r"Batch '{}' contains letters not in the letter bank ({})".format(candidate, 
                 ''.join([c * count for c, count in (-remaining_letters).items()])))
-                return
+                continue
             
-            assert(len(self.token_id_to_letter) == len(batch_scores))
             for s_id, s in enumerate(batch_scores):
-                token_letters = Counter(self.token_id_to_letter[s_id])
+                token_letters = Counter(self.decode(s_id).strip())
                 if not token_letters < remaining_letters:
-                    missing_letters = remaining_letters.copy()
-                    missing_letters.subtract(token_letters)
-                    missing_letters = -missing_letters
-                    logger.warn(r"Adding token '{}' would result in an invalid sentence".format(''.join([c * count for c, count in (missing_letters).items()])))
+                    batch_scores[s_id] = -math.inf
+                    # missing_letters = remaining_letters.copy()
+                    # missing_letters.subtract(token_letters)
+                    # missing_letters = -missing_letters
+                    # logger.warn(r"Adding token '{}' would result in an invalid sentence".format(''.join([c * count for c, count in (missing_letters).items()])))
+                    
             # calculate letters used in proposed tokens
             # calculate which ones fit in the remaining letters
             print(r"{}".format(candidate))
