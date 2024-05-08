@@ -7,6 +7,7 @@ from os import PathLike
 from accelerate import PartialState
 from accelerate.utils import set_seed
 
+import torch
 from torch import FloatTensor, LongTensor, gather
 from transformers import (
     AutoModelForCausalLM,
@@ -147,6 +148,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             if not candidate_letters < self.letter_bank:
                 logger.warn(r"Batch '{}' contains letters not in the letter bank ({})".format(candidate, 
                 ''.join([c * count for c, count in (-remaining_letters).items()])))
+                batch_scores = torch.full_like(batch_scores, -math.inf)
                 continue
             
             for s_id, s in enumerate(batch_scores):
