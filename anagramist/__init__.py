@@ -160,8 +160,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
                     # missing_letters = -missing_letters
                     # logger.warn(r"Adding token '{}' would result in an invalid sentence".format(''.join([c * count for c, count in (missing_letters).items()])))
                     
-            # calculate letters used in proposed tokens
-            # calculate which ones fit in the remaining letters
-            print(r"{}".format(candidate))
+            if len(candidate.strip()) > 0:
+                print(candidate)
 
         return scores_processed
