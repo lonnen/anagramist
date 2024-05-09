@@ -12,6 +12,7 @@ from torch import FloatTensor, LongTensor, gather
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
+    ForcedBOSTokenLogitsProcessor,
     LogitsProcessorList,
     LogitsProcessor,
 )
@@ -74,8 +75,11 @@ class Solver:
                 LetterBankLogitsProcessor(letters, self.tokenizer),
             ]
         )
+
         if self.c1663:
-            logits.extend(LogitsProcessorList())
+            logits.extend(LogitsProcessorList([
+                ForcedBOSTokenLogitsProcessor(self.tokenizer.encode("I ")[0]),
+            ]))
 
         output_sequences = self.model.generate(
             inputs.input_ids,
@@ -85,6 +89,8 @@ class Solver:
             no_repeat_ngram_size=1,
             remove_invalid_values=True,
             logits_processor=logits,
+            # renormalization to 1 is recommended with beam search and heavy logits modification
+            renormalize_logits=True,
             # tokens ~= 4 english chars, and valid answers must use exactly all the letters
             max_length=int(len(letters) / 3) + len(inputs["input_ids"][0]),
         )
