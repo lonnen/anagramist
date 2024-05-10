@@ -89,7 +89,7 @@ class Solver:
             no_repeat_ngram_size=1,
             remove_invalid_values=True,
             logits_processor=logits,
-            # renormalization to 1 is recommended with beam search and heavy logits modification
+            # renormalization is recommended with beam search and heavy logits modification
             renormalize_logits=True,
             # tokens ~= 4 english chars, and valid answers must use exactly all the letters
             max_length=int(len(letters) / 3) + len(inputs["input_ids"][0]),
