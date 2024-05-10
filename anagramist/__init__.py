@@ -12,7 +12,6 @@ from torch import FloatTensor, LongTensor, gather
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    ForcedBOSTokenLogitsProcessor,
     LogitsProcessorList,
     LogitsProcessor,
 )
@@ -78,7 +77,6 @@ class Solver:
 
         if self.c1663:
             logits.extend(LogitsProcessorList([
-                # ForcedBOSTokenLogitsProcessor(self.tokenizer.encode("I ")[0]),
             ]))
 
         output_sequences = self.model.generate(
