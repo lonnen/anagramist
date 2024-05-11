@@ -63,7 +63,7 @@ class Solver:
         prompt_text = " "
         # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
         if self.c1663:
-            prompt_text = "I "
+            prompt_text = """In comparison, being an anagramist today is totally boring, as nobody is encoding fundamental discoveries into word games anymore."""
 
         inputs = self.tokenizer(
             prompt_text, return_tensors="pt", add_special_tokens=False
@@ -71,7 +71,7 @@ class Solver:
 
         logits = LogitsProcessorList(
             [
-                LetterBankLogitsProcessor(letters, self.tokenizer),
+                LetterBankLogitsProcessor(letters + prompt_text, self.tokenizer),
             ]
         )
 
@@ -102,7 +102,7 @@ class Solver:
                 clean_up_tokenization_spaces=True,
                 add_special_tokens=False,
             )
-            print(text + "\n")
+            print(text[len(prompt_text):] + "\n")
         return output_sequences
 
 
@@ -159,12 +159,8 @@ class LetterBankLogitsProcessor(LogitsProcessor):
                 token_letters = Counter(self.decode(s_id).strip())
                 if not token_letters < remaining_letters:
                     batch_scores[s_id] = -math.inf
-                    # missing_letters = remaining_letters.copy()
-                    # missing_letters.subtract(token_letters)
-                    # missing_letters = -missing_letters
-                    # logger.warn(r"Adding token '{}' would result in an invalid sentence".format(''.join([c * count for c, count in (missing_letters).items()])))
                     
             if len(candidate.strip()) > 0:
-                print(candidate)
+                print(candidate[self.prompt_length:])
 
         return scores_processed
