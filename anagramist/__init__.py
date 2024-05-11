@@ -94,7 +94,7 @@ class Solver:
         )
 
         for output in output_sequences:
-            logger.debug(f"=== CANDIDATE SOLUTION ===")
+            logger.info(f"CANDIDATE SOLUTION: ")
 
             # Decode text
             text = self.tokenizer.decode(
@@ -102,7 +102,7 @@ class Solver:
                 clean_up_tokenization_spaces=True,
                 add_special_tokens=False,
             )
-            logger.debug(text[len(prompt_text):] + "|" + text[:len(prompt_text)] + "\n")
+            logger.info(text + "\n")
         return output_sequences
 
 
