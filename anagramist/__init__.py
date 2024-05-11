@@ -19,7 +19,7 @@ from transformers import (
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
-    level=logging.INFO,
+    level=logging.DEBUG,
 )
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ class Solver:
         )
 
         for output in output_sequences:
-            print(f"=== CANDIDATE SOLUTION ===")
+            logger.debug(f"=== CANDIDATE SOLUTION ===")
 
             # Decode text
             text = self.tokenizer.decode(
@@ -102,7 +102,7 @@ class Solver:
                 clean_up_tokenization_spaces=True,
                 add_special_tokens=False,
             )
-            print(text[len(prompt_text):] + "\n")
+            logger.debug(text[len(prompt_text):] + "|" + text[:len(prompt_text)] + "\n")
         return output_sequences
 
 
@@ -133,7 +133,7 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         self.bos_token_id = tokenizer.bos_token_id
 
     def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
-        print("==SCORES==")
+        logging.debug("Begin LetterBankLogitsProcessor.__call__")
         tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
         scores_processed = scores.clone()
         for batch_scores, batch in zip(scores_processed, input_ids.tolist()):
@@ -159,8 +159,8 @@ class LetterBankLogitsProcessor(LogitsProcessor):
                 token_letters = Counter(self.decode(s_id).strip())
                 if not token_letters < remaining_letters:
                     batch_scores[s_id] = -math.inf
-                    
-            if len(candidate.strip()) > 0:
-                print(candidate[self.prompt_length:])
+            
+            logging.debug(f"Candidate: {candidate}".format(candidate))
+        logging.debug("End LetterBankLogitsProcessor.__call__")
 
         return scores_processed
