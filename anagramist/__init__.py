@@ -76,8 +76,7 @@ class Solver:
         )
 
         if self.c1663:
-            logits.extend(LogitsProcessorList([
-            ]))
+            logits.extend(LogitsProcessorList([]))
 
         output_sequences = self.model.generate(
             inputs.input_ids,
@@ -144,22 +143,28 @@ class LetterBankLogitsProcessor(LogitsProcessor):
             ).strip()
             candidate_letters = Counter(candidate)
             candidate_letters[" "] = 0  # remove empty spaces
-            
+
             remaining_letters = self.letter_bank.copy()
             remaining_letters.subtract(candidate_letters)
-            
+
             # is the batch possible to produce with the letter bank?
             if not candidate_letters < self.letter_bank:
-                logger.warn(r"Batch '{}' contains letters not in the letter bank ({})".format(candidate, 
-                ''.join([c * count for c, count in (-remaining_letters).items()])))
+                logger.warn(
+                    r"Batch '{}' contains letters not in the letter bank ({})".format(
+                        candidate,
+                        "".join(
+                            [c * count for c, count in (-remaining_letters).items()]
+                        ),
+                    )
+                )
                 batch_scores = torch.full_like(batch_scores, -math.inf)
                 continue
-            
+
             for s_id, s in enumerate(batch_scores):
                 token_letters = Counter(self.decode(s_id).strip())
                 if not token_letters < remaining_letters:
                     batch_scores[s_id] = -math.inf
-            
+
             logging.debug(f"Candidate: {candidate}".format(candidate))
         logging.debug("End LetterBankLogitsProcessor.__call__")
 
