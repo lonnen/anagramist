@@ -103,6 +103,29 @@ class Solver:
             )
             logger.info(text + "\n")
         return output_sequences
+    
+    def probability_of_candidate(self, candidates):
+        """Calculate the log probability of a given set of candidate sentences
+
+        adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
+        """
+        encoded_candidate = self.tokenizer(candidates, padding=True, return_tensors="pt")
+        outputs = self.model(encoded_candidate.input_ids)
+        probabilities = torch.log(outputs.logits.softmax(dim=-1)/100).detach()
+
+        # collect the probability of the generated token -- probability at index 0 corresponds to the token at index 1
+        probs = probs[:, :-1, :]
+        input_ids = input_ids[:, 1:]
+        gen_probs = torch.gather(probs, 2, input_ids[:, :, None]).squeeze(-1)
+
+        batch = []
+        for input_sentence, input_probs in zip(input_ids, gen_probs):
+            text_sequence = []
+            for token, p in zip(input_sentence, input_probs):
+                if token not in self.tokenizer.all_special_ids:
+                    text_sequence.append((self.tokenizer.decode(token), p.item()))
+            batch.append(text_sequence)
+        return batch
 
 
 def generate_text(
