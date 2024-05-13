@@ -1,19 +1,16 @@
+from .logits import LetterBankLogitsProcessor
+
 import logging
-import math
-import sys
-from collections import Counter
 from os import PathLike
 
 from accelerate import PartialState
 from accelerate.utils import set_seed
 
 import torch
-from torch import FloatTensor, LongTensor, gather
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     LogitsProcessorList,
-    LogitsProcessor,
 )
 
 logging.basicConfig(
@@ -103,15 +100,17 @@ class Solver:
             )
             logger.info(text + "\n")
         return output_sequences
-    
+
     def probability_of_candidate(self, candidates):
         """Calculate the log probability of a given set of candidate sentences
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
         """
-        encoded_candidate = self.tokenizer(candidates, padding=True, return_tensors="pt")
+        encoded_candidate = self.tokenizer(
+            candidates, padding=True, return_tensors="pt"
+        )
         outputs = self.model(encoded_candidate.input_ids)
-        probabilities = torch.log(outputs.logits.softmax(dim=-1)/100).detach()
+        probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
 
         # collect the probability of the generated token -- probability at index 0 corresponds to the token at index 1
         probs = probs[:, :-1, :]
@@ -138,57 +137,3 @@ def generate_text(
 ):
     solver = Solver(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     solver.generate_solutions(letters)
-
-
-class LetterBankLogitsProcessor(LogitsProcessor):
-    r"""
-    [`LetterBankLogitsProcessor`] restricts sampling to ensure output can be assembled out of letters in the bank.
-
-    Args:
-        letter_bank (`List[]`)
-    """
-
-    def __init__(self, letter_bank: str, tokenizer: AutoTokenizer):
-        self.letter_bank = Counter(letter_bank)
-        self.decode = tokenizer.decode
-        self.eos_token_id = tokenizer.eos_token_id
-        self.bos_token_id = tokenizer.bos_token_id
-
-    def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
-        logging.debug("Begin LetterBankLogitsProcessor.__call__")
-        tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
-        scores_processed = scores.clone()
-        for batch_scores, batch in zip(scores_processed, input_ids.tolist()):
-            # calculate letters used by current input_ids
-            candidate = self.decode(
-                [token for token in batch if token not in tokens_to_ignore],
-                clean_up_tokenization_spaces=True,
-            ).strip()
-            candidate_letters = Counter(candidate)
-            candidate_letters[" "] = 0  # remove empty spaces
-
-            remaining_letters = self.letter_bank.copy()
-            remaining_letters.subtract(candidate_letters)
-
-            # is the batch possible to produce with the letter bank?
-            if not candidate_letters < self.letter_bank:
-                logger.warn(
-                    r"Batch '{}' contains letters not in the letter bank ({})".format(
-                        candidate,
-                        "".join(
-                            [c * count for c, count in (-remaining_letters).items()]
-                        ),
-                    )
-                )
-                batch_scores = torch.full_like(batch_scores, -math.inf)
-                continue
-
-            for s_id, s in enumerate(batch_scores):
-                token_letters = Counter(self.decode(s_id).strip())
-                if not token_letters < remaining_letters:
-                    batch_scores[s_id] = -math.inf
-
-            logging.debug(f"Candidate: {candidate}".format(candidate))
-        logging.debug("End LetterBankLogitsProcessor.__call__")
-
-        return scores_processed
