@@ -30,6 +30,8 @@ class Solver:
         fp16: bool = False,
         c1663: bool = False,
     ) -> None:
+        
+        # Transformers Model Initialization
         self.distributed_state = PartialState(cpu=use_cpu)
 
         logger.warning(
@@ -54,11 +56,13 @@ class Solver:
         self.use_cpu = use_cpu
         self.c1663 = c1663
 
+        # Puzzle Specific Initialization
+        self.puzzle_context = ""
+        if c1663:
+            self.puzzle_context = """In comparison, being an anagramist today is totally boring, as nobody is encoding fundamental discoveries into word games anymore.""" 
+
     def generate_solutions(self, letters):
-        prompt_text = " "
-        # prompt_text = """Indeed! In comparison being an anagramist today is totally boring, as nobody is encoding anagramistal discoveries into word games anymore."""
-        if self.c1663:
-            prompt_text = """In comparison, being an anagramist today is totally boring, as nobody is encoding fundamental discoveries into word games anymore."""
+        prompt_text = self.puzzle_context
 
         inputs = self.tokenizer(
             prompt_text, return_tensors="pt", add_special_tokens=False
