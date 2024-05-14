@@ -1,6 +1,7 @@
 from .logits import LetterBankLogitsProcessor
 
 import logging
+from collections import Counter
 from os import PathLike
 
 from accelerate import PartialState
@@ -162,8 +163,47 @@ def validate_solution(
 
     return (`bool`) - does the candidate sentence satisfy the constraints of the Qwantzle puzzle
     """
+    bank = Counter(letter_bank)
+    candidate = Counter(candidate_sentence)
 
-    return False
+    # strip whitespace
+    bank[" "] = 0
+    candidate[" "] = 0
+
+    remaining_letters = self.letter_bank.copy()
+    remaining_letters.subtract(candidate_sentence)
+
+    if not candidate == bank:
+        return False
+
+    words = candidate.split()
+
+    # check that every word appears in the vocab list
+
+    if not c1663:
+        return True
+
+    # From here out, only rules specific to comic 1663
+
+    # practically this is unlikely to occur, since anything that got this far is using exactly all of the letters
+    # but it will catch an input error where somehow letter_bank is also provided as candidate_sentence
+    if len(words) < 2:
+        return False
+
+    if words[0] != "I":
+        return False
+
+    words_len = [len(w) for w in words]
+
+    longest, second_longest = sorted(words_len)[:2]
+    if longest != 11 or second_longest != 8:
+        return False
+
+    position_longest = words_len.index(11)
+    if words_len[position_longest - 1] != 8 or words_len[position_longest + 1] != 8:
+        return False
+
+    return True
 
 
 def generate_text(
