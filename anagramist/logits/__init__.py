@@ -3,14 +3,8 @@ import math
 from collections import Counter
 
 import torch
-from torch import FloatTensor, LongTensor, gather
 from transformers import AutoTokenizer, LogitsProcessor
 
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    datefmt="%m/%d/%Y %H:%M:%S",
-    level=logging.DEBUG,
-)
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +24,9 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         self.eos_token_id = tokenizer.eos_token_id
         self.bos_token_id = tokenizer.bos_token_id
 
-    def __call__(self, input_ids: LongTensor, scores: FloatTensor) -> FloatTensor:
+    def __call__(
+        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
+    ) -> torch.FloatTensor:
         logging.debug("Begin LetterBankLogitsProcessor.__call__")
         tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
         scores_processed = scores.clone()
