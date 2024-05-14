@@ -176,7 +176,21 @@ def validate_solution(
     if not candidate == bank:
         return False
 
-    words = candidate.split()
+    # partition out the sentence into words with some punctuation treated as its own words
+    words = [""]
+    for char in candidate_sentence:
+        if char in set("abcdefghijklmnopqrstuvwxyz'-"):
+            words[-1] += char
+        elif char == " ":
+            # on whitespace, ensure the next word is a fresh, empty string
+            # this is necessary for longer stretches of whitespace, or the case 
+            # of no whitespace around punctuation-that-is-itself-a-word
+            if words[-1] != "":
+                words.append("")
+        else:
+            # anything else is a word unto itself
+            words.append(char)
+            words.append("")
 
     # check that every word appears in the vocab list
 
