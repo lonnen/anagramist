@@ -39,8 +39,6 @@ class Solver:
         # Initialize the model and tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
-        # tokenizer = GPT2Tokenizer.from_pretrained(args.model_name_or_path)
-        # model = OPTForCausalLM.from_pretrained(args.model_name_or_path)
 
         # Set the model to the right device
         self.model.to(self.distributed_state.device)
