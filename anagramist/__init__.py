@@ -183,7 +183,7 @@ def validate_solution(
             words[-1] += char
         elif char == " ":
             # on whitespace, ensure the next word is a fresh, empty string
-            # this is necessary for longer stretches of whitespace, or the case 
+            # this is necessary for longer stretches of whitespace, or the case
             # of no whitespace around punctuation-that-is-itself-a-word
             if words[-1] != "":
                 words.append("")
