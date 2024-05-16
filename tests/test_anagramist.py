@@ -8,3 +8,4 @@ def test_generate_text():
 
 def test_validate_solution():
     assert validate_solution("a", "a")
+    assert validate_solution("But they were also concerned about people stealing their ideas!", "eeeeeeeeeetttttaaaaoooorrrlllsssnnniiiuuhhccddppBywbg!")
