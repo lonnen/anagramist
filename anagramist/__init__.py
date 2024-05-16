@@ -130,7 +130,7 @@ class Solver:
 
 
 def validate_solution(
-    self, letter_bank: str, candidate_sentence: str, c1663: bool = False
+    letter_bank: str, candidate_sentence: str, c1663: bool = False
 ) -> bool:
     """Answers whether the candidate_sentence satisfies the constraints of the Qwantzle puzzle. Not all constraints can be checked computationally, but
     the following are checked:
@@ -170,7 +170,7 @@ def validate_solution(
     bank[" "] = 0
     candidate[" "] = 0
 
-    remaining_letters = self.letter_bank.copy()
+    remaining_letters = bank.copy()
     remaining_letters.subtract(candidate_sentence)
 
     if not candidate == bank:
