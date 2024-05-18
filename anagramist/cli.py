@@ -31,7 +31,6 @@ def cli():
     help="Leverage additional checks specific to the cryptoanagram puzzle in Dinosaur comics 1663",
 )
 def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
-    l = "".join(i for i in sorted(letters) if not i.isspace())
     click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
     generate_text(letters, model_name_or_path, seed, use_gpu, fp16, c1663)
 
