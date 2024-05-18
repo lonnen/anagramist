@@ -171,13 +171,14 @@ def validate_solution(
     bank[" "] = 0
     candidate[" "] = 0
 
+    # first check - do they have the same numbers of specific letters?
     remaining_letters = bank.copy()
     remaining_letters.subtract(candidate_sentence)
 
     if not candidate == bank:
         return False
 
-    # partition out the sentence into words with some punctuation treated as its own words
+    # partition out the candidate sentence into words with some punctuation treated as its own words
     words = [""]
     for char in candidate_sentence:
         if char in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-"):
@@ -195,8 +196,9 @@ def validate_solution(
 
     # check that every word appears in the vocab list
     for w in words:
+        if w is '': continue
         if w not in vocab:
-            logger.debug(r"'{}' not in vocabulary".format(w))
+            print(r"'{}' not in vocabulary".format(w))
             return False
 
     if not c1663:
