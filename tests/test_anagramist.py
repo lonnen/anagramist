@@ -1,5 +1,3 @@
-import pytest
-
 from anagramist.candidate import Candidate
 
 from collections import Counter

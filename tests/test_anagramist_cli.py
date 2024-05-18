@@ -1,5 +1,3 @@
-import pytest
-
 from anagramist.cli import cli
 
 from click.testing import CliRunner
