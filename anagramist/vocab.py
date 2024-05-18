@@ -4,7 +4,7 @@ This file contains only a set containing @Jadrian's corpus of words used in Dino
 Jadrian's corpus was verified to contain all the words in the solution by Ryan North in the news post of comic 1665.
 """
 
-vocab = set(
+vocab = {
     "t-rex",
     "the",
     "i",
@@ -14930,4 +14930,4 @@ vocab = set(
     "!",
     ":",
     '"',
-)
+}
