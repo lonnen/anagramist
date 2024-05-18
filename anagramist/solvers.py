@@ -103,16 +103,16 @@ class GenerativeSolver:
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
         """
-        encoded_candidate = self.tokenizer(
+        input_ids = self.tokenizer(
             candidates, padding=True, return_tensors="pt"
-        )
-        outputs = self.model(encoded_candidate.input_ids)
+        ).input_ids
+        outputs = self.model(input_ids)
         probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
 
         # collect the probability of the generated token -- probability at index 0 corresponds to the token at index 1
-        probs = probs[:, :-1, :]
+        probabilities = probabilities[:, :-1, :]
         input_ids = input_ids[:, 1:]
-        gen_probs = torch.gather(probs, 2, input_ids[:, :, None]).squeeze(-1)
+        gen_probs = torch.gather(probabilities, 2, input_ids[:, :, None]).squeeze(-1)
 
         batch = []
         for input_sentence, input_probs in zip(input_ids, gen_probs):
