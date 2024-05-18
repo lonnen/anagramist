@@ -115,9 +115,9 @@ class GenerativeSolver:
         gen_probs = torch.gather(probabilities, 2, input_ids[:, :, None]).squeeze(-1)
 
         batch = []
-        for input_sentence, input_probs in zip(input_ids, gen_probs):
+        for input_sentence, input_probs in zip(input_ids, gen_probs, strict=True):
             text_sequence = []
-            for token, p in zip(input_sentence, input_probs):
+            for token, p in zip(input_sentence, input_probs, strict=True):
                 if token not in self.tokenizer.all_special_ids:
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
             batch.append(text_sequence)
