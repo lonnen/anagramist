@@ -30,7 +30,9 @@ class LetterBankLogitsProcessor(LogitsProcessor):
         logging.debug("Begin LetterBankLogitsProcessor.__call__")
         tokens_to_ignore = set((self.eos_token_id, self.bos_token_id))
         scores_processed = scores.clone()
-        for batch_scores, batch in zip(scores_processed, input_ids.tolist(), strict=True):
+        for batch_scores, batch in zip(
+            scores_processed, input_ids.tolist(), strict=True
+        ):
             # calculate letters used by current input_ids
             candidate = self.decode(
                 [token for token in batch if token not in tokens_to_ignore],
