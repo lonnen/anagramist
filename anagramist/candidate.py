@@ -61,11 +61,6 @@ class Candidate:
 
         # From here out, only rules specific to comic 1663
 
-        # practically this is unlikely to occur, since anything that got this far is using exactly all of the letters
-        # but it will catch an input error where somehow letter_bank is also provided as candidate_sentence
-        if len(self.sentence) < 2:
-            return False
-
         if self.sentence[0] != "I":
             return False
 
