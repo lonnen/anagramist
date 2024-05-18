@@ -1,4 +1,3 @@
-from .logits import LetterBankLogitsProcessor
 from .solvers import GenerativeSolver
 
 import logging
