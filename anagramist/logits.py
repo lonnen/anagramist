@@ -57,10 +57,10 @@ class LetterBankLogitsProcessor(LogitsProcessor):
                 batch_scores = torch.full_like(batch_scores, -math.inf)
                 continue
 
-            for s_id, s in enumerate(batch_scores):
-                token_letters = Counter(self.decode(s_id).strip())
+            for score_id, _ in enumerate(batch_scores):
+                token_letters = Counter(self.decode(score_id).strip())
                 if not token_letters < remaining_letters:
-                    batch_scores[s_id] = -math.inf
+                    batch_scores[score_id] = -math.inf
 
             logging.debug(f"Candidate: {candidate}".format(candidate))
         logging.debug("End LetterBankLogitsProcessor.__call__")
