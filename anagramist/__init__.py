@@ -1,4 +1,5 @@
 from .logits import LetterBankLogitsProcessor
+from .vocab import vocab
 
 import logging
 from collections import Counter
@@ -92,7 +93,7 @@ class Solver:
         )
 
         for output in output_sequences:
-            logger.info(f"CANDIDATE SOLUTION: ")
+            logger.info("CANDIDATE SOLUTION: ")
 
             # Decode text
             text = self.tokenizer.decode(
@@ -179,7 +180,7 @@ def validate_solution(
     # partition out the sentence into words with some punctuation treated as its own words
     words = [""]
     for char in candidate_sentence:
-        if char in set("abcdefghijklmnopqrstuvwxyz'-"):
+        if char in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-"):
             words[-1] += char
         elif char == " ":
             # on whitespace, ensure the next word is a fresh, empty string
@@ -193,6 +194,10 @@ def validate_solution(
             words.append("")
 
     # check that every word appears in the vocab list
+    for w in words:
+        if w not in vocab:
+            logger.debug(r"'{}' not in vocabulary".format(w))
+            return False
 
     if not c1663:
         return True
