@@ -1,7 +1,8 @@
-from .solvers import GenerativeSolver
-
 import logging
 from os import PathLike
+
+from .solvers import GenerativeSolver
+
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",

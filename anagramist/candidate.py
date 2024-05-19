@@ -1,7 +1,7 @@
-from .vocab import vocab
-
 from collections import Counter
 from typing import List
+
+from .vocab import vocab
 
 
 class Candidate:

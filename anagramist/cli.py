@@ -1,6 +1,6 @@
-from . import generate_text
-
 import click
+
+from . import generate_text
 
 
 @click.group()
