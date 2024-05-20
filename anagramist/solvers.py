@@ -103,8 +103,10 @@ class GenerativeSolver:
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
         """
+        # logits probabilities are all conditional on the next token
+        # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            candidates, padding=True, return_tensors="pt"
+            "   " + candidates, return_tensors="pt"
         ).input_ids
         outputs = self.model(input_ids)
         probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
