@@ -106,7 +106,7 @@ class GenerativeSolver:
         # logits probabilities are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            "   " + candidates, return_tensors="pt"
+            self.tokenizer.bos_token + candidates, return_tensors="pt"
         ).input_ids
         outputs = self.model(input_ids)
         probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
@@ -123,4 +123,6 @@ class GenerativeSolver:
                 if token not in self.tokenizer.all_special_ids:
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
             batch.append(text_sequence)
+        
+        
         return batch
