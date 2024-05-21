@@ -1,4 +1,5 @@
 import logging
+from math import fsum, e
 from os import PathLike
 
 from accelerate import PartialState
@@ -98,20 +99,20 @@ class GenerativeSolver:
             logger.info(text + "\n")
         return output_sequences
 
-    def probability_of_candidate(self, candidates):
-        """Calculate the log probability of a given set of candidate sentences
+    def score_candidates(self, candidates):
+        """Calculate the log scores of a given set of candidate sentences
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
         """
-        # logits probabilities are all conditional on the next token
+        # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            self.tokenizer.bos_token + candidates, return_tensors="pt"
+            [self.tokenizer.bos_token + c for c in candidates], return_tensors="pt"
         ).input_ids
         outputs = self.model(input_ids)
         probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
 
-        # collect the probability of the generated token -- probability at index 0 corresponds to the token at index 1
+        # collect the scores of the generated token -- score at index 0 corresponds to the token at index 1
         probabilities = probabilities[:, :-1, :]
         input_ids = input_ids[:, 1:]
         gen_probs = torch.gather(probabilities, 2, input_ids[:, :, None]).squeeze(-1)
@@ -124,5 +125,11 @@ class GenerativeSolver:
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
             batch.append(text_sequence)
         
+        batch_scores = []
+        for sequence in batch:
+            batch_scores.append((
+                fsum([log_score for _, log_score in sequence]),
+                fsum([e**log_score for _, log_score in sequence])
+            ))
         
-        return batch
+        return batch_scores

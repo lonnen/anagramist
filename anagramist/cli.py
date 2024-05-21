@@ -1,6 +1,6 @@
 import click
 
-from . import generate_text, calculate_probability
+from . import generate_text, calculate_scores
 
 
 
@@ -34,6 +34,6 @@ def cli():
 def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
     # generate_text(letters, model_name_or_path, seed, use_gpu, fp16, c1663)
-    calculate_probability("This story gets better soon, I promise!", model_name_or_path, seed, use_gpu, fp16, c1663)
+    calculate_scores(["This story gets better soon, I promise!", "This story gets better soon, I swear!", "This story gets better soon, I think!" ], model_name_or_path, seed, use_gpu, fp16, c1663)
 
 cli.add_command(solve)
