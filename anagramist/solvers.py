@@ -104,10 +104,13 @@ class GenerativeSolver:
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
         """
+        self.tokenizer.pad_token = self.tokenizer.bos_token
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            [self.tokenizer.bos_token + c for c in candidates], return_tensors="pt"
+            [self.tokenizer.bos_token + c for c in candidates],
+            padding=True,
+            return_tensors="pt",
         ).input_ids
         outputs = self.model(input_ids)
         probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
@@ -124,12 +127,18 @@ class GenerativeSolver:
                 if token not in self.tokenizer.all_special_ids:
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
             batch.append(text_sequence)
-        
+
         batch_scores = []
         for sequence in batch:
-            batch_scores.append((
-                fsum([log_score for _, log_score in sequence]),
-                fsum([e**log_score for _, log_score in sequence])
-            ))
-        
+            batch_scores.append(
+                (
+                    fsum([log_score for _, log_score in sequence]),
+                    fsum([e**log_score for _, log_score in sequence]),
+                )
+            )
+
         return batch_scores
+
+    def score_candidate(self, candidate):
+        """Calculate the log scores of a single candidate sentence"""
+        return self.score_candidates(candidate)[0]
