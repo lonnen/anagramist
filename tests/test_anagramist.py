@@ -96,22 +96,3 @@ class TestCandidate:
         c = Candidate("aaa!!!")
         assert not c.validate("aaa")
         assert not c.validate("a!aa!!")
-
-
-#     assert validate_solution(
-#         "abeeefgiklnorrssttt",
-#         "letter bank goes first"
-#     )
-#     assert not validate_solution(
-#         "letter bank goes first",
-#         "abeeefgiklnorrssttt"
-#     )
-
-#     assert not validate_solution("CAPS MATTER", "caps matter")
-#     assert not validate_solution("aaa!!!", "aaa")
-
-
-#     assert validate_solution(
-#         "eeeeeeeeeetttttaaaaoooorrrlllsssnnniiiuuhhccddppywbbg!",
-#         "but they were also concerned about people stealing their ideas!",
-#     )
