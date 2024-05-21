@@ -83,10 +83,20 @@ class TestCandidate:
         c = Candidate("okay wait suddenly I see your point")
         assert c.validate("Ioaaddeeeiiklnnooprssttuuwyyy")
 
+    def test_invalid_solution(self):
+        c = Candidate("a")
+        assert c.validate("a")
+        assert not c.validate("b")
 
-# def test_validate_solution():
-#     assert validate_solution("a", "a")
-#     assert not validate_solution("b", "a")
+    def test_caps_matter(self):
+        c = Candidate("CAPS MATTER")
+        assert not c.validate("caps matter")
+
+    def test_punctuation_matters(self):
+        c = Candidate("aaa!!!")
+        assert not c.validate("aaa")
+        assert not c.validate("a!aa!!")
+
 
 #     assert validate_solution(
 #         "abeeefgiklnorrssttt",
