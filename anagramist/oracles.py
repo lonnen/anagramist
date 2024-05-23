@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 class Oracle:
     """A wrapper around transformer.py with an api specific to cryptoanagram solving
 
-    The details of using transformers are fiddly and this particular implementation is a playing fast-and-loose with those details. Unrigorous and useful.
+    The details of using transformers are fiddly and this particular implementation is
+    playing fast-and-loose with those details. Unrigorous but useful.
     """
 
     def __init__(
@@ -60,7 +61,10 @@ class Oracle:
         # Puzzle Specific Initialization
         self.puzzle_context = ""
         if c1663:
-            self.puzzle_context = """In comparison, being an anagramist today is totally boring, as nobody is encoding fundamental discoveries into word games anymore."""
+            self.puzzle_context = """In comparison, being an anagramist today is 
+            totally boring, as nobody is encoding fundamental discoveries into word 
+            games anymore.
+            """
 
     def generate_solutions(self, letters):
         prompt_text = self.puzzle_context
@@ -86,9 +90,10 @@ class Oracle:
             no_repeat_ngram_size=1,
             remove_invalid_values=True,
             logits_processor=logits,
-            # renormalization is recommended with beam search and heavy logits modification
+            # renormalization is recommended with beam search and heavy modification
             renormalize_logits=True,
-            # tokens ~= 4 english chars, and valid answers must use exactly all the letters
+            # tokens ~= 4 english chars, and valid answers are use all the letters and
+            # a handful of whitespace
             max_length=int(len(letters) / 3) + len(inputs["input_ids"][0]),
         )
 
@@ -120,7 +125,8 @@ class Oracle:
         outputs = self.model(input_ids)
         probabilities = torch.log(outputs.logits.softmax(dim=-1) / 100).detach()
 
-        # collect the scores of the generated token -- score at index 0 corresponds to the token at index 1
+        # collect the scores of the generated token -- score at index 0 corresponds to
+        # the token at index 1
         probabilities = probabilities[:, :-1, :]
         input_ids = input_ids[:, 1:]
         gen_probs = torch.gather(probabilities, 2, input_ids[:, :, None]).squeeze(-1)

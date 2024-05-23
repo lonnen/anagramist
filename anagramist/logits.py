@@ -10,12 +10,15 @@ logger = logging.getLogger(__name__)
 
 class LetterBankLogitsProcessor(LogitsProcessor):
     r"""
-    [`LetterBankLogitsProcessor`] attempts to restrict sampling to ensure output can be assembled out of letters in the bank.
-    This can be quite expensive. Logits work over tokens, but this Processor needs to decode those in order to work in characters.
+    [`LetterBankLogitsProcessor`] attempts to restrict sampling to ensure output can be
+    assembled out of letters in the bank. This can be quite expensive. Logits work over
+    tokens, but this Processor needs to decode those in order to work in characters.
 
     Args:
-        letter_bank (`String`) - the letters that will be used as the bank of letters. Whitespace will be ignored
-        tokenizer (`AutoTokenizer`) - the tokenizer being used to encode and decode Tokens for the model
+        letter_bank (`String`) - the letters that will be used as the bank of letters.
+        Whitespace will be ignored
+        tokenizer (`AutoTokenizer`) - the tokenizer being used to encode and decode
+        Tokens for the model
     """
 
     def __init__(self, letter_bank: str, tokenizer: AutoTokenizer):

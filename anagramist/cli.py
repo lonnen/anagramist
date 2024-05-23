@@ -23,12 +23,14 @@ def cli():
 @click.option(
     "--fp16",
     is_flag=True,
-    help="Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 32-bit",
+    help="""Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 
+    32-bit""",
 )
 @click.option(
     "--c1663",
     is_flag=True,
-    help="Leverage additional checks specific to the cryptoanagram puzzle in Dinosaur comics 1663",
+    help="""Leverage additional checks specific to the cryptoanagram puzzle in Dinosaur 
+    comics 1663""",
 )
 def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
