@@ -12,6 +12,7 @@ class Fragment:
         candidate_sentence (`String`) - a single string containing a sentence fragment
         that could have come from Dinosaur Comics
     """
+
     def __init__(self, candidate_sentence: str):
         self.sentence = parse_sentence(candidate_sentence)
         self.letters = Counter(candidate_sentence)

@@ -11,11 +11,39 @@ def test_generate_text():
 class TestParseSentence:
     def test_parse_sentence(self):
         assert parse_sentence("I") == ["I"]
-        assert parse_sentence("This is a six word fragment") == ["This", "is", "a", "six", "word", "fragment"]
-        assert parse_sentence("This is a seven word fragment.") == ["This", "is", "a", "seven", "word", "fragment", "."]
-        assert parse_sentence("This fragment's count is six words") == ["This", "fragment's", "count", "is", "six", "words"]
-        assert parse_sentence("This fragment-count is five words") == ["This", "fragment-count", "is", "five", "words"]
-        
+        assert parse_sentence("This is a six word fragment") == [
+            "This",
+            "is",
+            "a",
+            "six",
+            "word",
+            "fragment",
+        ]
+        assert parse_sentence("This is a seven word fragment.") == [
+            "This",
+            "is",
+            "a",
+            "seven",
+            "word",
+            "fragment",
+            ".",
+        ]
+        assert parse_sentence("This fragment's count is six words") == [
+            "This",
+            "fragment's",
+            "count",
+            "is",
+            "six",
+            "words",
+        ]
+        assert parse_sentence("This fragment-count is five words") == [
+            "This",
+            "fragment-count",
+            "is",
+            "five",
+            "words",
+        ]
+
 
 class TestFragment:
     def test_init(self):
