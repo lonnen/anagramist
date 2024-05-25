@@ -5,7 +5,6 @@ from typing import List
 
 from .oracles import Oracle
 
-
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
@@ -44,7 +43,7 @@ def calculate_scores(
 def parse_sentence(candidate_sentence: str) -> List[str]:
     """partition a candidate sentence string into a list of words.
 
-    Characters ' and - are treated as letters in a larger word, but any other 
+    Characters ' and - are treated as letters in a larger word, but any other
     punctuation is split out as an independent word.
 
     Args:
