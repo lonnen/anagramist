@@ -1,3 +1,4 @@
+from anagramist import parse_sentence
 from anagramist.candidate import Candidate
 
 from collections import Counter
@@ -6,6 +7,13 @@ from collections import Counter
 def test_generate_text():
     pass
 
+
+class TestParseSentence:
+    def test_parse_short(self):
+        assert parse_sentence("I") == ["I"]
+        assert parse_sentence("This is a six word fragment") == ["This", "is", "a", "six", "word", "fragment"]
+        assert parse_sentence("This is a seven word fragment.") == ["This", "is", "a", "seven", "word", "fragment", "."]
+        
 
 class TestCandidate:
     def test_init(self):

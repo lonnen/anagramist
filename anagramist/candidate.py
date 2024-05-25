@@ -1,12 +1,12 @@
 from collections import Counter
-from typing import List
 
+from . import parse_sentence
 from .vocab import vocab
 
 
 class Candidate:
     def __init__(self, candidate_sentence: str):
-        self.sentence = self.parse(candidate_sentence)
+        self.sentence = parse_sentence(candidate_sentence)
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
 
@@ -87,23 +87,3 @@ class Candidate:
             return False
 
         return True
-
-    @staticmethod
-    def parse(candidate_sentence) -> List[str]:
-        # partition out the candidate sentence into words with some punctuation treated
-        # as its own words
-        words = [""]
-        for char in candidate_sentence:
-            if char in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-"):
-                words[-1] += char
-            elif char == " ":
-                # on whitespace, ensure the next word is a fresh, empty string
-                # this is necessary for longer stretches of whitespace, or the case
-                # of no whitespace around punctuation-that-is-itself-a-word
-                if words[-1] != "":
-                    words.append("")
-            else:
-                # anything else is a word unto itself
-                words.append(char)
-                words.append("")
-        return words

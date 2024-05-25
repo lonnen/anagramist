@@ -42,10 +42,10 @@ def calculate_scores(
 
 
 def parse_sentence(candidate_sentence: str) -> List[str]:
-    """partition a candidate sentence string into a list of words. 
-    
-    ' and - are treated as letters in a larger word, but any other punctuation is split
-    out as an independent word.
+    """partition a candidate sentence string into a list of words.
+
+    Characters ' and - are treated as letters in a larger word, but any other 
+    punctuation is split out as an independent word.
 
     Args:
         candidate_sentence (`String`) - a single string containing a sentence fragment
@@ -65,4 +65,6 @@ def parse_sentence(candidate_sentence: str) -> List[str]:
             # anything else is a word unto itself
             words.append(char)
             words.append("")
-    return words
+    if words[-1] != "":
+        return words
+    return words[:-1]
