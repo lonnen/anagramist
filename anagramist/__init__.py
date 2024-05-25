@@ -1,6 +1,8 @@
 import logging
 from os import PathLike
 
+from typing import List
+
 from .oracles import Oracle
 
 
@@ -37,3 +39,30 @@ def calculate_scores(
     """
     solver = Oracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     return solver.score_candidates(candidate_sentence)
+
+
+def parse_sentence(candidate_sentence: str) -> List[str]:
+    """partition a candidate sentence string into a list of words. 
+    
+    ' and - are treated as letters in a larger word, but any other punctuation is split
+    out as an independent word.
+
+    Args:
+        candidate_sentence (`String`) - a single string containing a sentence fragment
+        that could have come from Dinosaur Comics
+    """
+    words = [""]
+    for char in candidate_sentence:
+        if char in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-"):
+            words[-1] += char
+        elif char == " ":
+            # on whitespace, ensure the next word is a fresh, empty string
+            # this is necessary for longer stretches of whitespace, or the case
+            # of no whitespace around punctuation-that-is-itself-a-word
+            if words[-1] != "":
+                words.append("")
+        else:
+            # anything else is a word unto itself
+            words.append(char)
+            words.append("")
+    return words
