@@ -1,5 +1,5 @@
 from anagramist import parse_sentence
-from anagramist.candidate import Candidate
+from anagramist.fragment import Fragment
 
 from collections import Counter
 
@@ -17,14 +17,14 @@ class TestParseSentence:
         assert parse_sentence("This fragment-count is five words") == ["This", "fragment-count", "is", "five", "words"]
         
 
-class TestCandidate:
+class TestFragment:
     def test_init(self):
-        c = Candidate("a")
+        c = Fragment("a")
         assert c.sentence == ["a"]
         assert c.letters == Counter("a")
 
     def test_sentence(self):
-        c = Candidate("but they were also concerned about people")
+        c = Fragment("but they were also concerned about people")
         assert c.sentence == [
             "but",
             "they",
@@ -57,7 +57,7 @@ class TestCandidate:
         )
 
     def test_punctuation(self):
-        c = Candidate("behold! a dragon")
+        c = Fragment("behold! a dragon")
         assert c.sentence == [
             "behold",
             "!",
@@ -82,7 +82,7 @@ class TestCandidate:
         )
 
     def test_capitalization(self):
-        c = Candidate("CAPS MATTER")
+        c = Fragment("CAPS MATTER")
         assert c.sentence == [
             "CAPS",
             "MATTER",
@@ -90,19 +90,19 @@ class TestCandidate:
         assert not c.sentence == ["caps", "matter"]
 
     def test_validation(self):
-        c = Candidate("okay wait suddenly I see your point")
+        c = Fragment("okay wait suddenly I see your point")
         assert c.validate("Ioaaddeeeiiklnnooprssttuuwyyy")
 
     def test_invalid_solution(self):
-        c = Candidate("a")
+        c = Fragment("a")
         assert c.validate("a")
         assert not c.validate("b")
 
     def test_caps_matter(self):
-        c = Candidate("CAPS MATTER")
+        c = Fragment("CAPS MATTER")
         assert not c.validate("caps matter")
 
     def test_punctuation_matters(self):
-        c = Candidate("aaa!!!")
+        c = Fragment("aaa!!!")
         assert not c.validate("aaa")
         assert not c.validate("a!aa!!")
