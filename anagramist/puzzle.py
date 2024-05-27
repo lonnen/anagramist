@@ -1,8 +1,11 @@
+import logging
+from functools import cached_property
 from typing import List
 
 from .fragment import Fragment
 from .vocab import vocab
 
+logger = logging.getLogger(__name__)
 
 class Puzzle:
     """A cryptoanagram puzzle consisting of a bank of letters to be formed into a
@@ -103,4 +106,24 @@ class Puzzle:
             return False
 
         return True
-    
+
+
+class Guess:
+    vocabulary = [Fragment(word) for word in vocab]
+    letter_bank = Fragment(
+        "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"
+    )
+
+    def __init__(self, words: List[str] = []) -> None:
+        self.words
+
+    @cached_property
+    def children(self) -> dict:
+        bank = self.letter_bank.letters.copy()
+        for w in self.words:
+            bank.subtract(w)
+        return {
+            w.sentence[0]: Guess(self.words + w.sentence)
+            for w in self.vocabulary
+            if w.sentence < bank
+        }
