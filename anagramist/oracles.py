@@ -1,6 +1,8 @@
 import logging
+from abc import ABC
 from math import fsum, e
 from os import PathLike
+from typing import List
 
 from accelerate import PartialState
 from accelerate.utils import set_seed
@@ -18,12 +20,31 @@ from .logits import LetterBankLogitsProcessor
 logger = logging.getLogger(__name__)
 
 
-class Oracle:
+class Oracle(ABC):
     """A base class for objects that score potential candidate answers. This is intended
     to inform search strategies. The name "oracle" is chosen to indicate a lack of
-    transparency or rigor in how this class evaluates candidates."""
+    transparency or rigor in how this class evaluates candidates.
+    
+    An Oracle is not expected to perform validation, nor does it necessarily return 
+    probabilties. It's a heuristic. Deterministic filtering, like removing words that
+    require letters 
+    """
 
-    pass
+    def score_candidates(self, candidates: List[str]) -> List[float]:
+        """Evaluate a List of candidate answers
+        
+        Args:
+            candidates `List[str]` - a list of strings representing candidate answers
+        """
+        raise NotImplementedError(
+            f"{self.__class__} is an abstract class. Only classes inheriting this class can be called."
+        )
+
+    def score_candidate(self, candidate) -> float:
+        """Evaluate a single candidate answer"""
+        raise NotImplementedError(
+            f"{self.__class__} is an abstract class. Only classes inheriting this class can be called."
+        )
 
 
 class TransformerOracle(Oracle):
@@ -118,7 +139,7 @@ class TransformerOracle(Oracle):
             logger.info(text + "\n")
         return output_sequences
 
-    def score_candidates(self, candidates):
+    def score_candidates(self, candidates: List[str]) -> List[float]:
         """Calculate the log scores of a given set of candidate sentences
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
@@ -150,15 +171,10 @@ class TransformerOracle(Oracle):
 
         batch_scores = []
         for sequence in batch:
-            batch_scores.append(
-                (
-                    fsum([log_score for _, log_score in sequence]),
-                    fsum([e**log_score for _, log_score in sequence]),
-                )
-            )
+            batch_scores.append(fsum([log_score for _, log_score in sequence]))
 
         return batch_scores
 
-    def score_candidate(self, candidate):
+    def score_candidate(self, candidate) -> float:
         """Calculate the log scores of a single candidate sentence"""
         return self.score_candidates(candidate)[0]
