@@ -7,6 +7,7 @@ from .vocab import vocab
 
 logger = logging.getLogger(__name__)
 
+
 class Puzzle:
     """A cryptoanagram puzzle consisting of a bank of letters to be formed into a
     sentence and an optional partial solution.
@@ -114,8 +115,10 @@ class Guess:
         "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"
     )
 
-    def __init__(self, words: List[str] = []) -> None:
-        self.words
+    def __init__(self, words: List[str] = None) -> None:
+        if words is None:
+            words = []
+        self.words = words
 
     @cached_property
     def children(self) -> dict:
