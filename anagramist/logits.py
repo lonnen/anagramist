@@ -14,6 +14,13 @@ class LetterBankLogitsProcessor(LogitsProcessor):
     assembled out of letters in the bank. This can be quite expensive. Logits work over
     tokens, but this Processor needs to decode those in order to work in characters.
 
+    This version of the processor also ignores empty spaces.
+
+    Once the letter bank gets small this processor starts to exhibit unexpected behavior
+    and doesn't work particularly well. Once most of the possible next tokens are
+    illegal and set to `-Math.Inf` increasingly unlikely choices appear, like repeated
+    empty whitespace, until generation breaks and begins to generate illegal choices.
+
     Args:
         letter_bank (`String`) - the letters that will be used as the bank of letters.
         Whitespace will be ignored
