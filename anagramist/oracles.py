@@ -19,7 +19,11 @@ logger = logging.getLogger(__name__)
 
 
 class Oracle:
-    """A wrapper around transformer.py with an api specific to cryptoanagram solving
+    """An class that scores potential candidate answers. This is intended to inform
+    search strategies. The name "oracle" is chosen to indicate a lack of transparency or
+    rigor in how this class evaluates candidates.
+    
+    A wrapper around transformer.py with an api specific to cryptoanagram solving
 
     The details of using transformers are fiddly and this particular implementation is
     playing fast-and-loose with those details. Unrigorous but useful.
