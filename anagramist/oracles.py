@@ -96,49 +96,6 @@ class TransformerOracle(Oracle):
             games anymore.
             """
 
-    def generate_solutions(self, letters):
-        prompt_text = self.puzzle_context
-
-        inputs = self.tokenizer(
-            prompt_text, return_tensors="pt", add_special_tokens=False
-        )
-
-        logits = LogitsProcessorList(
-            [
-                LetterBankLogitsProcessor(letters + prompt_text, self.tokenizer),
-            ]
-        )
-
-        if self.c1663:
-            logits.extend(LogitsProcessorList([]))
-
-        output_sequences = self.model.generate(
-            inputs.input_ids,
-            # BEAM search params
-            num_beams=10,
-            num_return_sequences=5,
-            no_repeat_ngram_size=1,
-            remove_invalid_values=True,
-            logits_processor=logits,
-            # renormalization is recommended with beam search and heavy modification
-            renormalize_logits=True,
-            # tokens ~= 4 english chars, and valid answers are use all the letters and
-            # a handful of whitespace
-            max_length=int(len(letters) / 3) + len(inputs["input_ids"][0]),
-        )
-
-        for output in output_sequences:
-            logger.info("CANDIDATE SOLUTION: ")
-
-            # Decode text
-            text = self.tokenizer.decode(
-                output,
-                clean_up_tokenization_spaces=True,
-                add_special_tokens=False,
-            )
-            logger.info(text + "\n")
-        return output_sequences
-
     def score_candidates(self, candidates: List[str]) -> List[float]:
         """Calculate the log scores of a given set of candidate sentences
 

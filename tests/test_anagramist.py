@@ -4,10 +4,6 @@ from anagramist.fragment import Fragment
 from collections import Counter
 
 
-def test_generate_text():
-    pass
-
-
 class TestParseSentence:
     def test_parse_sentence(self):
         assert parse_sentence("I") == ["I"]
