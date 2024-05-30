@@ -25,12 +25,12 @@ class Oracle(ABC):
     values that satisfy the comparison function of a sort.
 
     An Oracle is a heuristic and should not be used for validation, nor does it.
-    Deterministic filtering, like forcing certain sequences to appear, should happen 
+    Deterministic filtering, like forcing certain sequences to appear, should happen
     elsewhere.
     """
 
     def score_candidates(self, candidates: List[str]) -> List[float]:
-        """Evaluate a List of candidate answers. By default this will run 
+        """Evaluate a List of candidate answers. By default this will run
         `score_candidate` in a list comprehension over the it. Override it directly for
         bulk-evaluation optimizations.
 

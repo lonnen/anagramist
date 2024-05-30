@@ -10,7 +10,7 @@ class Fragment:
 
     Args:
         candidate_sentence (`String`) - a single string containing a sentence fragment
-        that could have come from Dinosaur Comics
+            that could have come from Dinosaur Comics
     """
 
     def __init__(self, candidate_sentence: str):
@@ -53,14 +53,14 @@ class Fragment:
 
         Args:
             letter_bank (`String`) - the letters available for the anagram. Spaces are
-            ignored, so sentences may be passed directly
+                ignored, so sentences may be passed directly
             candidate_sentence (`String`) - a string to validate against the constraints
-            of the Qwantzle
+                of the Qwantzle
             c1663 (`bool`) - whether or not to apply special constraints that only apply
-            to comic 1663 "The Qwantzle"
+                to comic 1663 "The Qwantzle"
 
         return (`bool`) - does the candidate sentence satisfy the constraints of the
-        Qwantzle puzzle
+            Qwantzle puzzle
         """
         bank = Counter(letter_bank)
         bank[" "] = 0

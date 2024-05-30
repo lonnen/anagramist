@@ -23,9 +23,9 @@ class LetterBankLogitsProcessor(LogitsProcessor):
 
     Args:
         letter_bank (`String`) - the letters that will be used as the bank of letters.
-        Whitespace will be ignored
+            Whitespace will be ignored.
         tokenizer (`AutoTokenizer`) - the tokenizer being used to encode and decode
-        Tokens for the model
+            Tokens for the model.
     """
 
     def __init__(self, letter_bank: str, tokenizer: AutoTokenizer):

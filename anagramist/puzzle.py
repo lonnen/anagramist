@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import List
 
 from .fragment import Fragment
+from .oracles import TransformerOracle
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
@@ -14,13 +15,13 @@ class Puzzle:
 
     Args:
         letter_bank: (`String`) - a string containing all the characters to be used in
-        the solution. Spaces will be ignored. This may be a sentence, or a simple
-        sequence of letters
+            the solution. Spaces will be ignored. This may be a sentence, or a simple
+            sequence of letters
         candidate: (`String`) or (`Fragment`) - a possible, possibly partial, solution
-        to the puzzle
+            to the puzzle
         vocabulary: (`List[String]`) - a list of words that may be used in valid answers
         c1663: (`bool`) - whether or not to apply special constraints that only apply
-        to comic 1663 "The Qwantzle"
+            to comic 1663 "The Qwantzle"
     """
 
     def __init__(
@@ -114,6 +115,7 @@ class Guess:
     letter_bank = Fragment(
         "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"
     )
+    oracle = TransformerOracle()
 
     def __init__(self, words: List[str] = None) -> None:
         if words is None:
