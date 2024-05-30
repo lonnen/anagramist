@@ -1,6 +1,6 @@
 import logging
-from abc import ABC
-from math import fsum, e
+from abc import ABC, abstractmethod
+from math import fsum
 from os import PathLike
 from typing import List
 
@@ -11,11 +11,7 @@ import torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    LogitsProcessorList,
 )
-
-from .logits import LetterBankLogitsProcessor
-
 
 logger = logging.getLogger(__name__)
 
@@ -24,27 +20,53 @@ class Oracle(ABC):
     """A base class for objects that score potential candidate answers. This is intended
     to inform search strategies. The name "oracle" is chosen to indicate a lack of
     transparency or rigor in how this class evaluates candidates.
-    
-    An Oracle is not expected to perform validation, nor does it necessarily return 
-    probabilties. It's a heuristic. Deterministic filtering, like removing words that
-    require letters 
+
+    Oracles are expected to return scores, not necessarily probabilities, only numerical
+    values that satisfy the comparison function of a sort.
+
+    An Oracle is a heuristic and should not be used for validation, nor does it.
+    Deterministic filtering, like forcing certain sequences to appear, should happen 
+    elsewhere.
     """
 
     def score_candidates(self, candidates: List[str]) -> List[float]:
-        """Evaluate a List of candidate answers
-        
+        """Evaluate a List of candidate answers. By default this will run 
+        `score_candidate` in a list comprehension over the it. Override it directly for
+        bulk-evaluation optimizations.
+
         Args:
             candidates `List[str]` - a list of strings representing candidate answers
         """
+        return [self.score_candidate(candidate) for candidate in candidates]
+
+    @abstractmethod
+    def score_candidate(self, candidate: str) -> float:
+        """Evaluate a single candidate answer
+
+        Args:
+            candidate `str` - a string representing a candidate answer
+        """
         raise NotImplementedError(
-            f"{self.__class__} is an abstract class. Only classes inheriting this class can be called."
+            f"""{self.__class__} is an abstract class. Only classes inheriting this
+            class can be called."""
         )
 
-    def score_candidate(self, candidate) -> float:
-        """Evaluate a single candidate answer"""
-        raise NotImplementedError(
-            f"{self.__class__} is an abstract class. Only classes inheriting this class can be called."
-        )
+
+class UniversalOracle(Oracle):
+    """An oracle that assess every candidate with the same, universal probability.
+
+    Probably only useful for testing.
+    """
+
+    def score_candidate(self, candidate: str) -> float:
+        return -1.0  # math.log2(0.5)
+
+
+class LenOracle(Oracle):
+    """An oracle that assigns scores based on candidate length"""
+
+    def score_candidate(self, candidate: str) -> float:
+        return len(candidate)
 
 
 class TransformerOracle(Oracle):
