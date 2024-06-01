@@ -3,7 +3,7 @@ from functools import cached_property
 from typing import List
 
 from .fragment import Fragment
-from .oracles import TransformerOracle
+from .oracles import Oracle, TransformerOracle, UniversalOracle
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Puzzle:
     """A cryptoanagram puzzle consisting of a bank of letters to be formed into a
-    sentence and an optional partial solution.
+    sentence.
 
     Args:
         letter_bank: (`String`) - a string containing all the characters to be used in
@@ -20,6 +20,9 @@ class Puzzle:
         candidate: (`String`) or (`Fragment`) - a possible, possibly partial, solution
             to the puzzle
         vocabulary: (`List[String]`) - a list of words that may be used in valid answers
+        oracle: (`Oracle`) - a heuristic strategy for evaluating candidates during
+            search. If `None` the `UniversalOracle` will be used, which evaluates every
+            candidate as having the same, universal score.
         c1663: (`bool`) - whether or not to apply special constraints that only apply
             to comic 1663 "The Qwantzle"
     """
@@ -27,15 +30,15 @@ class Puzzle:
     def __init__(
         self,
         letter_bank: str,
-        candidate: str | Fragment = "",
         vocabulary: List[str] = vocab,
+        oracle: Oracle = None,
         c1663: bool = False,
     ) -> None:
         self.letter_bank = Fragment(letter_bank)
-        if isinstance(candidate, str):
-            self.candidate = Fragment(candidate)
+        if oracle is None:
+            self.oracle = UniversalOracle()
         else:
-            self.candidate = candidate
+            self.oracle = oracle
         self.vocabulary = vocabulary
         self.c1663 = c1663
 
@@ -108,6 +111,9 @@ class Puzzle:
             return False
 
         return True
+
+    def search(self, sentence_start: str):
+        pass
 
 
 class Guess:
