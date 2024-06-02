@@ -4,7 +4,10 @@ from typing import Optional
 
 class Heap[T]:
     """A min-heap capped at a maximum size. Once the size has been reached the smallest
-    item is removed whenever a new item is item is added.
+    item is removed whenever a new item is item is added. This wraps a list and the
+    heapq api in order to maintain some invariants when modifying the list. To access
+    the data contained in the *Heap*, consider performing read-only operations on the
+    instance property *H*, the internal list.
 
     Args:
         iterable (`list[T]`) - a list to use as the heap
@@ -12,6 +15,8 @@ class Heap[T]:
 
     derived from: https://stackoverflow.com/posts/56630485/revisions
     """
+
+    h: list[T]
 
     def __init__(self, iterable: list[T], max_size: int = None):
         self.h = iterable
@@ -89,3 +94,27 @@ class Heap[T]:
             IndexError: If Heap is empty
         """
         return heapq.heapreplace(self.h, item)
+
+    def nlargest(self, n: int, key=None) -> list[T]:
+        """Return a list with the *n* largest items from the *Heap*. This works
+        best for smaller values of *n*. For larger values it may be more
+        efficient to use the built-in `sorted()` function.
+
+        Args:
+            n (`int`) - the maximum size of the returned list
+            key - optional function of one argument that is used to extract a
+                comparison key from each element in the *Heap*
+        """
+        return heapq.nlargest(n, self.h, key)
+
+    def nsmallest(self, n: int, key=None) -> list[T]:
+        """Return a list with the *n* smallest items from the *Heap*. This works
+        best for smaller values of *n*. For larger values it may be more
+        efficient to use the built-in `sorted()` function.
+
+        Args:
+            n (`int`) - the maximum size of the returned list
+            key - optional function of one argument that is used to extract a
+                comparison key from each element in the *Heap*
+        """
+        return heapq.nsmallest(n, self.h, key)
