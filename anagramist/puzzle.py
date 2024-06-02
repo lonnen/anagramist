@@ -4,6 +4,7 @@ from typing import List
 
 from .fragment import Fragment
 from .oracles import Oracle, TransformerOracle, UniversalOracle
+from .utilities import MaxHeap
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,7 @@ class Puzzle:
         return (`bool`) - does the candidate sentence satisfy the constraints of the
         Qwantzle puzzle
         """
-        bank = self.letter_bank.letters
+        bank = Fragment(self.letter_bank.letters)
 
         # first check - do they have the same numbers of specific letters?
         if not self.candidate.letters == bank:
@@ -112,8 +113,9 @@ class Puzzle:
 
         return True
 
-    def search(self, sentence_start: str):
-        pass
+    def search(self, sentence_start: str, max_candidates: int = 1000000):
+        guess = Fragment(sentence_start)
+        candidates = MaxHeap(max_candidates)
 
 
 class Guess:
