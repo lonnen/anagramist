@@ -1,8 +1,6 @@
 from collections import Counter
 
 from . import parse_sentence
-from .vocab import vocab
-
 
 class Fragment:
     """A fragment of the puzzle, consisting of the ordered string and the letters that

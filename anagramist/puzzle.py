@@ -1,12 +1,9 @@
 import logging
 from dataclasses import dataclass
-from functools import cached_property
 from typing import List
 
-from sortedcontainers import SortedKeyList
-
 from .fragment import Fragment
-from .oracles import Oracle, TransformerOracle, UniversalOracle
+from .oracles import Oracle, UniversalOracle
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
@@ -130,22 +127,23 @@ class Puzzle:
 
     def create_guess(self, candidate: str):
         remaining = self.letter_bank.letters.copy()
-        remaining.subtract(Fragment(candidate).letters)        
-        
+        remaining.subtract(Fragment(candidate).letters)
+
         score = self.oracle.score_candidate(candidate)
 
-        return(candidate, remaining, score)
-        
+        return Guess(candidate, remaining, score)
+
 
 @dataclass(frozen=True)
 class Guess:
     """A guess at the solution"""
+
     placed: str
     remaining: str
-    score: float   
+    score: float
 
     def __lt__(self, other):
-        return self.score < other.score     
+        return self.score < other.score
 
     # @cached_property
     # def children(self) -> dict:
