@@ -1,10 +1,12 @@
 import logging
+from dataclasses import dataclass
 from functools import cached_property
 from typing import List
 
+from sortedcontainers import SortedKeyList
+
 from .fragment import Fragment
 from .oracles import Oracle, TransformerOracle, UniversalOracle
-from .utilities import MaxHeap
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
@@ -113,30 +115,45 @@ class Puzzle:
 
         return True
 
-    def search(self, sentence_start: str, max_candidates: int = 1000000):
-        guess = Fragment(sentence_start)
-        candidates = MaxHeap(max_candidates)
+    def search(self, sentence_start: str, max_candidates: int = 1000):
+        remaining = self.letter_bank.letters.copy()
+        remaining.subtract(Fragment(sentence_start).letters)
+        g = Guess(sentence_start, remaining, self.oracle.score_candidate())
+        self.max_candidates = max_candidates
+        candidates = [g]
+        while candidates.pop():
+            self.oracle.score_candidate
+            # calculate valid next words
+            # score valid next words
+            # push new candidates
+            pass
 
+    def create_guess(self, candidate: str):
+        remaining = self.letter_bank.letters.copy()
+        remaining.subtract(Fragment(candidate).letters)        
+        
+        score = self.oracle.score_candidate(candidate)
 
+        return(candidate, remaining, score)
+        
+
+@dataclass(frozen=True)
 class Guess:
-    vocabulary = [Fragment(word) for word in vocab]
-    letter_bank = Fragment(
-        "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"
-    )
-    oracle = TransformerOracle()
+    """A guess at the solution"""
+    placed: str
+    remaining: str
+    score: float   
 
-    def __init__(self, words: List[str] = None) -> None:
-        if words is None:
-            words = []
-        self.words = words
+    def __lt__(self, other):
+        return self.score < other.score     
 
-    @cached_property
-    def children(self) -> dict:
-        bank = self.letter_bank.letters.copy()
-        for w in self.words:
-            bank.subtract(w)
-        return {
-            w.sentence[0]: Guess(self.words + w.sentence)
-            for w in self.vocabulary
-            if w.sentence < bank
-        }
+    # @cached_property
+    # def children(self) -> dict:
+    #     bank = self.letter_bank.letters.copy()
+    #     for w in self.words:
+    #         bank.subtract(w)
+    #     return {
+    #         w.sentence[0]: Guess(self.words + w.sentence)
+    #         for w in self.vocabulary
+    #         if w.sentence < bank
+    #     }
