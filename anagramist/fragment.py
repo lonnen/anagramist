@@ -1,6 +1,6 @@
 from collections import Counter
+from typing import List
 
-from . import parse_sentence
 
 class Fragment:
     """A fragment of the puzzle, consisting of the ordered string and the letters that
@@ -15,3 +15,32 @@ class Fragment:
         self.sentence = parse_sentence(candidate_sentence)
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
+
+
+def parse_sentence(candidate_sentence: str) -> List[str]:
+    """partition a candidate sentence string into a list of words.
+
+    Characters ' and - are treated as letters in a larger word, but any other
+    punctuation is split out as an independent word.
+
+    Args:
+        candidate_sentence (`String`) - a single string containing a sentence fragment
+        that could have come from Dinosaur Comics
+    """
+    words = [""]
+    for char in candidate_sentence:
+        if char in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'-"):
+            words[-1] += char
+        elif char == " ":
+            # on whitespace, ensure the next word is a fresh, empty string
+            # this is necessary for longer stretches of whitespace, or the case
+            # of no whitespace around punctuation-that-is-itself-a-word
+            if words[-1] != "":
+                words.append("")
+        else:
+            # anything else is a word unto itself
+            words.append(char)
+            words.append("")
+    if words[-1] != "":
+        return words
+    return words[:-1]
