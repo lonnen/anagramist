@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import List
+from typing import List, Self
 
 from .fragment import Fragment
 from .oracles import Oracle, UniversalOracle
@@ -142,16 +142,5 @@ class Guess:
     remaining: str
     score: float
 
-    def __lt__(self, other):
+    def __lt__(self, other: Self):
         return self.score < other.score
-
-    # @cached_property
-    # def children(self) -> dict:
-    #     bank = self.letter_bank.letters.copy()
-    #     for w in self.words:
-    #         bank.subtract(w)
-    #     return {
-    #         w.sentence[0]: Guess(self.words + w.sentence)
-    #         for w in self.vocabulary
-    #         if w.sentence < bank
-    #     }
