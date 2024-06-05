@@ -31,15 +31,15 @@ class Puzzle:
         self,
         letter_bank: str,
         vocabulary: List[str] = vocab,
-        oracle: Oracle = None,
+        oracle: Oracle = None, # default: Universal
         c1663: bool = False,
     ) -> None:
         self.letter_bank = Fragment(letter_bank)
+        self.vocabulary = vocabulary
         if oracle is None:
             self.oracle = UniversalOracle()
         else:
             self.oracle = oracle
-        self.vocabulary = vocabulary
         self.c1663 = c1663
 
     @property
