@@ -1,6 +1,6 @@
 import click
 
-from . import calculate_scores
+from . import search
 
 
 @click.group()
@@ -34,12 +34,9 @@ def cli():
 )
 def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
-    calculate_scores(
-        [
-            "This story gets better soon, I promise!",
-            "This story gets better soon, I swear!",
-            "This story gets better soon, I ballast!",
-        ],
+    search(
+        "This story gets better soon, I promise!",
+        letters
         model_name_or_path,
         seed,
         use_gpu,
