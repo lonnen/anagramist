@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Fragment:
     """A fragment of the puzzle, consisting of the ordered string and the letters that
     make up that sentence (ignoring spaces, per the rules of the puzzle)
