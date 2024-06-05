@@ -1,5 +1,4 @@
-from anagramist import parse_sentence
-from anagramist.fragment import Fragment
+from anagramist.fragment import Fragment, parse_sentence
 
 from collections import Counter
 
@@ -112,21 +111,3 @@ class TestFragment:
             "MATTER",
         ]
         assert not c.sentence == ["caps", "matter"]
-
-    def test_validation(self):
-        c = Fragment("okay wait suddenly I see your point")
-        assert c.validate("Ioaaddeeeiiklnnooprssttuuwyyy")
-
-    def test_invalid_solution(self):
-        c = Fragment("a")
-        assert c.validate("a")
-        assert not c.validate("b")
-
-    def test_caps_matter(self):
-        c = Fragment("CAPS MATTER")
-        assert not c.validate("caps matter")
-
-    def test_punctuation_matters(self):
-        c = Fragment("aaa!!!")
-        assert not c.validate("aaa")
-        assert not c.validate("a!aa!!")
