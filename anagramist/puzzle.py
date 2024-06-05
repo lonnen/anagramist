@@ -118,12 +118,19 @@ class Puzzle:
         g = Guess(sentence_start, remaining, self.oracle.score_candidate())
         self.max_candidates = max_candidates
         candidates = [g]
-        while candidates.pop():
-            self.oracle.score_candidate
+        while len(candidates) > 0:
+            candidate = candidates.pop()
             # calculate valid next words
+            remaining = self.letter_bank.letters.copy()
+            remaining.subtract(Fragment(candidate).letters)
+            valid_words = [
+                word for word in self.vocabulary if Fragment(word).letters < remaining
+            ]
             # score valid next words
+            next_candidates = [candidate + " " + w for w in valid_words]
+            scores = self.oracle.score_candidates(next_candidates)
             # push new candidates
-            pass
+            candidates.extend(next_candidates)
 
     def create_guess(self, candidate: str):
         remaining = self.letter_bank.letters.copy()
