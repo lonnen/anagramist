@@ -1,5 +1,7 @@
+import heapq
 import logging
 from os import PathLike
+from typing import Iterable
 
 from .oracles import TransformerOracle
 from .puzzle import Puzzle
@@ -26,3 +28,20 @@ def search(
         oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
     )
     return puzzle.search()
+
+
+class PriorityQueue:
+    def __init__(self, iterable: Iterable = []) -> None:
+        self.pq = heapq.heapify(iterable)
+
+    def push(self, item):
+        heapq.heappush(self.pq, item)
+
+    def pop(self):
+        return heapq.heappop(self.pq)
+
+    def pushpop(self, item):
+        return heapq.heappushpop(self.pq, item)
+
+    def replace(self, item):
+        return heapq.heapreplace(self.pq, item)
