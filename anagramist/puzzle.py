@@ -31,7 +31,7 @@ class Puzzle:
         self,
         letter_bank: str,
         vocabulary: List[str] = vocab,
-        oracle: Oracle = None, # default: Universal
+        oracle: Oracle = None,  # default: Universal
         c1663: bool = False,
     ) -> None:
         self.letter_bank = Fragment(letter_bank)
