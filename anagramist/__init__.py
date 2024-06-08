@@ -32,7 +32,8 @@ def search(
 
 class PriorityQueue:
     def __init__(self, iterable: Iterable = []) -> None:
-        self.pq = heapq.heapify(iterable)
+        self.pq = iterable
+        heapq.heapify(self.pq)
 
     def push(self, item):
         heapq.heappush(self.pq, item)
