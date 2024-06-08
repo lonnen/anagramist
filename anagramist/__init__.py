@@ -1,5 +1,6 @@
 import heapq
 import logging
+from collections import UserList
 from os import PathLike
 from typing import Iterable
 
@@ -30,19 +31,25 @@ def search(
     return puzzle.search()
 
 
-class PriorityQueue:
+class PriorityQueue(UserList):
     def __init__(self, iterable: Iterable = []) -> None:
-        self.pq = iterable
-        heapq.heapify(self.pq)
+        self.data = [i for i in iterable]
+        heapq.heapify(self.data)
 
     def push(self, item):
-        heapq.heappush(self.pq, item)
+        heapq.heappush(self.data, item)
 
     def pop(self):
-        return heapq.heappop(self.pq)
+        return heapq.heappop(self.data)
 
     def pushpop(self, item):
-        return heapq.heappushpop(self.pq, item)
+        return heapq.heappushpop(self.data, item)
 
     def replace(self, item):
-        return heapq.heapreplace(self.pq, item)
+        return heapq.heapreplace(self.data, item)
+
+    def nsmallest(self, n):
+        return heapq.nsmallest(n, self.data)
+
+    def nlargest(self, n):
+        return heapq.nlargest(n, self.data)
