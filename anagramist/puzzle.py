@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Self
 
 from .fragment import Fragment
+from .heapqueue import HeapQueue
 from .oracles import Oracle, UniversalOracle
 from .vocab import vocab
 
@@ -117,7 +118,7 @@ class Puzzle:
         remaining.subtract(Fragment(sentence_start).letters)
         g = Guess(sentence_start, remaining, self.oracle.score_candidate())
         self.max_candidates = max_candidates
-        candidates = [g]
+        candidates = HeapQueue([g])
         while len(candidates) > 0:
             candidate = candidates.pop()
             # calculate valid next words
@@ -128,7 +129,7 @@ class Puzzle:
             ]
             # score valid next words
             next_candidates = [candidate + " " + w for w in valid_words]
-            scores = self.oracle.score_candidates(next_candidates)
+            # scores = self.oracle.score_candidates(next_candidates)
             # push new candidates
             candidates.extend(next_candidates)
 
@@ -141,7 +142,7 @@ class Puzzle:
         return Guess(candidate, remaining, score)
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Guess:
     """A guess at the solution"""
 
