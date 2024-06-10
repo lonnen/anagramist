@@ -31,7 +31,7 @@ def search(
     return puzzle.search()
 
 
-class PriorityQueue(UserList):
+class HeapQueue(UserList):
     def __init__(self, iterable: Iterable = []) -> None:
         self.data = [i for i in iterable]
         heapq.heapify(self.data)

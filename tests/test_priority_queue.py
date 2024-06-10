@@ -1,28 +1,28 @@
 import pytest
 from random import shuffle
 
-from anagramist import PriorityQueue
+from anagramist import HeapQueue
 
 
 class TestParseSentence:
     def test_empty(self):
-        pq = PriorityQueue()
+        pq = HeapQueue()
         assert len(pq) == 0        
 
     def test_existing(self):
-        pq = PriorityQueue(range(5))
+        pq = HeapQueue(range(5))
         assert len(pq) == 5
 
     def test_push(self):
         data = [1, 2, 3, 4, 5]
-        pq = PriorityQueue()
+        pq = HeapQueue()
         for i in data:
             pq.push(i)
         assert len(pq) == 5
         assert set(pq) == set(data)
 
     def test_pop(self):
-        pq = PriorityQueue([1, 2, 3, 4, 5])
+        pq = HeapQueue([1, 2, 3, 4, 5])
         expected = 1
         while len(pq):
             assert expected == pq.pop()
@@ -31,7 +31,7 @@ class TestParseSentence:
             pq.pop()
 
     def test_pushpop(self):
-        pq = PriorityQueue([1, 2, 3, 4, 5])
+        pq = HeapQueue([1, 2, 3, 4, 5])
         popped = []
         for i in [5, 4, 3, 2, 1]:
             popped.append(pq.pushpop(i))
@@ -39,7 +39,7 @@ class TestParseSentence:
         assert popped == [1, 2, 3, 2, 1]
     
     def test_replace(self):
-        pq = PriorityQueue([3, 3, 3, 3, 3])
+        pq = HeapQueue([3, 3, 3, 3, 3])
         assert pq.replace(2) == 3
         assert pq.replace(5) == 2
         assert pq.replace(5) == 3
@@ -52,7 +52,7 @@ class TestParseSentence:
         assert data == sorted(data)
         shuffle(data)
         assert data != sorted(data)
-        pq = PriorityQueue(data)
+        pq = HeapQueue(data)
         assert pq.nsmallest(3) == [1, 2, 3]
         assert pq.nsmallest(10) == [1, 2, 3, 4, 5]
 
@@ -61,7 +61,7 @@ class TestParseSentence:
         assert data == sorted(data)
         shuffle(data)
         assert data != sorted(data)
-        pq = PriorityQueue(data)
+        pq = HeapQueue(data)
         assert pq.nlargest(3) == [5, 4, 3]
         assert pq.nlargest(10) == [5, 4, 3, 2, 1]
 
@@ -70,7 +70,7 @@ class TestParseSentence:
         assert data == sorted(data)
         shuffle(data)
         assert data != sorted(data)
-        pq = PriorityQueue(data)
+        pq = HeapQueue(data)
         sorted_data = []
         while len(pq):
             sorted_data.append(pq.pop())
