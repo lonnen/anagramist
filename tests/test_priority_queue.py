@@ -78,7 +78,7 @@ class TestParseSentence:
         assert sorted_data == sorted(data)
 
     def test_tuple(self):
-        data = list(zip(range(5), 'abcde'))
+        data = list(zip(range(5), "abcde", strict=True))
         shuffle(data)
         assert data != sorted(data, key=lambda d: d[0])
         pq = HeapQueue(data)
