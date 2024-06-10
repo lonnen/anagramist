@@ -45,6 +45,10 @@ class HeapQueue(UserList):
     item, and `heap.sort()` maintains the heap invariant! Not that iterating over the
     `heap` directly, say, in a list comprehension, will not return items in a sorted 
     order. Repeatedly popping the heap to exhaustion will, however.
+
+    Complex records may be wrapped in a tuple (with careful though given to ties), or in
+    a custom object. See the heapq library documentation on Priority Queue 
+    implementation for more.
     """
 
     def __init__(self, iterable: Iterable = []) -> None:
