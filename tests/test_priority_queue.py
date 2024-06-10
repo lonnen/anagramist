@@ -2,6 +2,7 @@ import pytest
 from random import shuffle
 
 from anagramist.heapqueue import HeapQueue
+from anagramist.puzzle import Guess
 
 
 class TestParseSentence:
@@ -75,3 +76,27 @@ class TestParseSentence:
         while len(pq):
             sorted_data.append(pq.pop())
         assert sorted_data == sorted(data)
+
+    def test_tuple(self):
+        data = list(zip(range(5), 'abcde'))
+        shuffle(data)
+        assert data != sorted(data, key=lambda d: d[0])
+        pq = HeapQueue(data)
+        sorted_data = []
+        while len(pq):
+            sorted_data.append(pq.pop())
+        assert sorted_data == sorted(data)
+
+    def test_complex_object(self):
+        guesses = []
+        expected = [float(x) for x in range(10)]
+        for x in expected:
+            guesses.append(Guess("some", "other", x))
+        shuffle(guesses)
+        assert [g.score for g in guesses] != [g.score for g in sorted(guesses)]
+        # data is now shuffled
+        pq = HeapQueue(guesses)
+        hq_sorted = []
+        while len(pq):
+            hq_sorted.append(pq.pop().score)
+        assert hq_sorted == expected
