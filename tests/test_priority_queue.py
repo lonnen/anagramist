@@ -7,7 +7,7 @@ from anagramist import HeapQueue
 class TestParseSentence:
     def test_empty(self):
         pq = HeapQueue()
-        assert len(pq) == 0        
+        assert len(pq) == 0
 
     def test_existing(self):
         pq = HeapQueue(range(5))
@@ -37,7 +37,7 @@ class TestParseSentence:
             popped.append(pq.pushpop(i))
             assert len(pq) == 5
         assert popped == [1, 2, 3, 2, 1]
-    
+
     def test_replace(self):
         pq = HeapQueue([3, 3, 3, 3, 3])
         assert pq.replace(2) == 3
