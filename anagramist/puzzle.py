@@ -133,14 +133,6 @@ class Puzzle:
             # push new candidates
             candidates.extend(next_candidates)
 
-    def create_guess(self, candidate: str):
-        remaining = self.letter_bank.letters.copy()
-        remaining.subtract(Fragment(candidate).letters)
-
-        score = self.oracle.score_candidate(candidate)
-
-        return Guess(candidate, remaining, score)
-
 
 @dataclass()
 class Guess:
