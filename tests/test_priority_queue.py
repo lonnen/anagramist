@@ -1,7 +1,7 @@
 import pytest
 from random import shuffle
 
-from anagramist import HeapQueue
+from anagramist.heapqueue import HeapQueue
 
 
 class TestParseSentence:
