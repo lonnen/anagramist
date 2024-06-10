@@ -1,6 +1,8 @@
-from anagramist.fragment import Fragment, parse_sentence
-
 from collections import Counter
+from random import shuffle
+
+from anagramist.fragment import Fragment, parse_sentence
+from anagramist.puzzle import Guess
 
 
 class TestParseSentence:
@@ -111,3 +113,14 @@ class TestFragment:
             "MATTER",
         ]
         assert not c.sentence == ["caps", "matter"]
+
+
+class TestGuess:
+    def test_ordering(self):
+        guesses = []
+        expected = [float(x) for x in range(10)]
+        for x in expected:
+            guesses.append(Guess("some", "other", x))
+        shuffle(guesses)
+        assert [g.score for g in guesses] != [g.score for g in sorted(guesses)]
+        assert [g.score for g in sorted(guesses)] == expected

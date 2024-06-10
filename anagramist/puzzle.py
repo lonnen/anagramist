@@ -152,3 +152,18 @@ class Guess:
 
     def __lt__(self, other: Self):
         return self.score < other.score
+
+    def __le__(self, other: Self):
+        return self.score <= other.score
+
+    def __eq__(self, other: Self):
+        return self.score == other.score
+
+    def __ne__(self, other: Self):
+        return self.score != other.score
+
+    def __gt__(self, other: Self):
+        return self.score > other.score
+
+    def __ge__(self, other: Self):
+        return self.score >= other.score
