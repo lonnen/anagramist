@@ -44,3 +44,11 @@ class HeapQueue(UserList):
 
     def nlargest(self, n):
         return heapq.nlargest(n, self.data)
+    
+    @property
+    def top5(self):
+        return self.nlargest(5)
+
+    @property
+    def bottom5(self):
+        return self.nsmallest(5)
