@@ -156,4 +156,4 @@ class TransformerOracle(Oracle):
 
     def score_candidate(self, candidate) -> float:
         """Calculate the log scores of a single candidate sentence"""
-        return self.score_candidates(candidate)[0]
+        return self.score_candidates([candidate])[0]
