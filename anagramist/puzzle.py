@@ -134,7 +134,9 @@ class Puzzle:
                 g = Guess(
                     next_candidate,
                     remaining - word_letters,
-                    self.oracle.score_candidate(next_candidate)
+                    # HeapQueue is a min-queue, so we need to invert value so that
+                    # better candidates are smaller
+                    self.oracle.score_candidate(next_candidate) * -1
                 )
                 if len(candidates) >= max_candidates:
                     candidates.replace(g)
