@@ -116,23 +116,30 @@ class Puzzle:
     def search(self, sentence_start: str, max_candidates: int = 1000):
         remaining = self.letter_bank.letters.copy()
         remaining.subtract(Fragment(sentence_start).letters)
-        g = Guess(sentence_start, remaining, self.oracle.score_candidate())
+        g = Guess(sentence_start, remaining, self.oracle.score_candidate(sentence_start))
         self.max_candidates = max_candidates
         candidates = HeapQueue([g])
         while len(candidates) > 0:
-            candidate = candidates.pop()
+            candidate = candidates.pop().placed
             # calculate valid next words
             remaining = self.letter_bank.letters.copy()
             remaining.subtract(Fragment(candidate).letters)
-            valid_words = [
-                word for word in self.vocabulary if Fragment(word).letters < remaining
-            ]
-            # score valid next words
-            next_candidates = [candidate + " " + w for w in valid_words]
-            # scores = self.oracle.score_candidates(next_candidates)
-            # push new candidates
-            candidates.extend(next_candidates)
 
+            for word in self.vocabulary:
+                word_letters = Fragment(word).letters
+                if word_letters >= remaining:
+                    continue # not enough letters
+                # score valid next words
+                next_candidate = candidate + " " + word
+                g = Guess(
+                    next_candidate,
+                    remaining - word_letters,
+                    self.oracle.score_candidate(next_candidate)
+                )
+                if len(candidates) >= max_candidates:
+                    candidates.replace(g)
+                else:
+                    candidates.push(g)
 
 @dataclass()
 class Guess:
