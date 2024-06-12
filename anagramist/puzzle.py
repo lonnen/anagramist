@@ -136,6 +136,9 @@ class Puzzle:
                 # score valid next words
                 next_candidate = candidate + " " + word
 
+                next_remaining = remaining.copy()
+                next_remaining.subtract(word)
+
                 # constraints indicate we should throw out a candidate
                 constraint_violations = 0
 
@@ -180,13 +183,13 @@ class Puzzle:
 
                 # initial oracle score
                 # oracles are expensive, don't bother if this candidate cannot win
-                if constraint_violations != 0:
-                    score = float("-inf")
-                else:
+                if constraint_violations == 0:
                     score = self.oracle.score_candidate(next_candidate)
+                else:
+                    score = float("-inf")
 
                 # finally, HeapQueue is a min-queue, so better candidates should have
-                # a smaller value.
+                # a lower value. This is the opposite of oracle scoring, so flip it.
                 score *= -1
                 g = Guess(next_candidate, remaining - Fragment(word).letters, score)
                 if len(candidates) >= max_candidates:
