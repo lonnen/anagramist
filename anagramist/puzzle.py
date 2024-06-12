@@ -132,7 +132,6 @@ class Puzzle:
             remaining = c.remaining
 
             # calculate valid next words
-
             for word in self.vocabulary:
                 # score valid next words
                 next_candidate = candidate + " " + word
