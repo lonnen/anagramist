@@ -116,11 +116,16 @@ class Puzzle:
     def search(self, sentence_start: str, max_candidates: int = 1000):
         remaining = self.letter_bank.letters.copy()
         remaining.subtract(Fragment(sentence_start).letters)
-        g = Guess(
-            sentence_start, remaining, self.oracle.score_candidate(sentence_start)
-        )
         self.max_candidates = max_candidates
-        candidates = HeapQueue([g])
+        candidates = HeapQueue(
+            [
+                Guess(
+                    sentence_start,
+                    remaining,
+                    self.oracle.score_candidate(sentence_start),
+                )
+            ]
+        )
         while len(candidates) > 0:
             candidate = candidates.pop().placed
             # calculate valid next words
