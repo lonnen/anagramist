@@ -127,10 +127,11 @@ class Puzzle:
             ]
         )
         while len(candidates) > 0:
-            candidate = candidates.pop().placed
+            c = candidates.pop()
+            candidate = c.placed
+            remaining = c.remaining
+
             # calculate valid next words
-            remaining = self.letter_bank.letters.copy()
-            remaining.subtract(Fragment(candidate).letters)
 
             for word in self.vocabulary:
                 # score valid next words
