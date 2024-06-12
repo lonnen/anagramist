@@ -129,7 +129,7 @@ class Puzzle:
         while len(candidates) > 0:
             c = candidates.pop()
             candidate = c.placed
-            remaining = c.remaining
+            remaining = Fragment(c.remaining).letters
 
             # calculate valid next words
             for word in self.vocabulary:
@@ -139,17 +139,21 @@ class Puzzle:
                 next_remaining = remaining.copy()
                 next_remaining.subtract(word)
 
-                # constraints indicate we should throw out a candidate
-                constraint_violations = 0
+                # constraint violations indicate we should `continue` to throw out this
+                # candidate. A lot of constraints will be soft-violated while the
+                # solution is being assembled -- `continue` only when the candidate has
+                # crossed the point where it can no longer become a valid answer with
+                # additional letter placements
 
-                if Fragment(next_candidate).letters >= remaining:
-                    constraint_violations += 1
+                # the sentence uses only characters from the provided bank
+                if any([v < 0 for v in next_remaining.values]):
+                    continue # missing letters, abort word
 
                 # constraints that only apply to c1663
                 if self.c1663:
                     # the first word is "I"
                     if next_candidate[0] != "I":
-                        constraint_violations += 1
+                        continue
 
                     # punctuation is in the solution in the order :,!!
                     punctuation = [":", ",", "!", "!"]
@@ -180,13 +184,23 @@ class Puzzle:
                                     constraint_violations += 1
                             else:
                                 constraint_violations += 1
+                    
+                    # the final letter is "w"
+                    # so the final three characters must be "w!!"
+                    if next_remaining.total() > 3:
+                        if next_remaining["w"] == 0:
+                            continue
+                    
+                    if next_remaining.total() == 2:
+                        if next_candidate[-1] != "w":
+                            continue
+                        else:
+                            next_candidate += "!!"
+                            next_remaining = next_remaining.subtract("!!")
+                        
 
-                # initial oracle score
-                # oracles are expensive, don't bother if this candidate cannot win
-                if constraint_violations == 0:
-                    score = self.oracle.score_candidate(next_candidate)
-                else:
-                    score = float("-inf")
+                # calculate a heuristic score
+                score = self.oracle.score_candidate(next_candidate)
 
                 # finally, HeapQueue is a min-queue, so better candidates should have
                 # a lower value. This is the opposite of oracle scoring, so flip it.
