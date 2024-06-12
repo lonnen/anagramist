@@ -116,7 +116,9 @@ class Puzzle:
     def search(self, sentence_start: str, max_candidates: int = 1000):
         remaining = self.letter_bank.letters.copy()
         remaining.subtract(Fragment(sentence_start).letters)
-        g = Guess(sentence_start, remaining, self.oracle.score_candidate(sentence_start))
+        g = Guess(
+            sentence_start, remaining, self.oracle.score_candidate(sentence_start)
+        )
         self.max_candidates = max_candidates
         candidates = HeapQueue([g])
         while len(candidates) > 0:
@@ -126,22 +128,67 @@ class Puzzle:
             remaining.subtract(Fragment(candidate).letters)
 
             for word in self.vocabulary:
-                word_letters = Fragment(word).letters
-                if word_letters >= remaining:
-                    continue # not enough letters
                 # score valid next words
                 next_candidate = candidate + " " + word
-                g = Guess(
-                    next_candidate,
-                    remaining - word_letters,
-                    # HeapQueue is a min-queue, so we need to invert value so that
-                    # better candidates are smaller
-                    self.oracle.score_candidate(next_candidate) * -1
-                )
+
+                # constraints indicate we should throw out a candidate
+                constraint_violations = 0
+
+                if Fragment(next_candidate).letters >= remaining:
+                    constraint_violations += 1
+
+                # constraints that only apply to c1663
+                if self.c1663:
+                    # the first word is "I"
+                    if next_candidate[0] != "I":
+                        constraint_violations += 1
+
+                    # punctuation is in the solution in the order :,!!
+                    punctuation = [":", ",", "!", "!"]
+                    pos = 0
+                    while pos < len(next_candidate):
+                        cha = next_candidate[pos]
+                        if cha not in {
+                            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+                        }:
+                            if len(punctuation) == 0 or cha != punctuation.pop(0):
+                                constraint_violations += 1
+                        pos += 1
+
+                    # longest word is 11 characters long
+                    # second longest word is 8 characters long
+                    # the words are side by side in the solution
+                    word_lengths = [len(w) for w in next_candidate.split()]
+                    for length, pos in enumerate(word_lengths):
+                        if length > 8:
+                            if length == 11:
+                                if (
+                                    word_lengths[length - 1] == 8
+                                    or word_lengths[length + 1] == 8
+                                    or pos == len(word_lengths)
+                                ):
+                                    pass
+                                else:
+                                    constraint_violations += 1
+                            else:
+                                constraint_violations += 1
+
+                # initial oracle score
+                # oracles are expensive, don't bother if this candidate cannot win
+                if constraint_violations != 0:
+                    score = float("-inf")
+                else:
+                    score = self.oracle.score_candidate(next_candidate)
+
+                # finally, HeapQueue is a min-queue, so better candidates should have
+                # a smaller value.
+                score *= -1
+                g = Guess(next_candidate, remaining - Fragment(word).letters, score)
                 if len(candidates) >= max_candidates:
                     candidates.replace(g)
                 else:
                     candidates.push(g)
+
 
 @dataclass()
 class Guess:
