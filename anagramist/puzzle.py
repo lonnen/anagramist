@@ -1,9 +1,10 @@
 import logging
+import math
+import random
 from dataclasses import dataclass
 from typing import List, Self
 
 from .fragment import Fragment
-from .heapqueue import HeapQueue
 from .oracles import Oracle, UniversalOracle
 from .vocab import vocab
 
@@ -43,91 +44,25 @@ class Puzzle:
             self.oracle = oracle
         self.c1663 = c1663
 
-    @property
-    def validates(self) -> bool:
-        """Answers whether the candidate_sentence satisfies the constraints of the
-        Qwantzle puzzle. Not all constraints can be checked computationally, but the
-        following are checked:
-
-            * The candidate_sentence uses exactly all of the characters from the
-              letter_bank, not counting whitespace
-            * The characters are case-sensitive
-            * All the words are vocabulary.txt dictionary included in this library
-              (1-grams from qwantz comics up to c1663)
-
-        Additional constraints that are checked iff c1663:
-
-            * The solution starts with "I"
-            * The punctuation appears in the order :,!!
-            * The longest word is 11 characters long
-            * The second longest word is 8 characters, and occurs adjacent to the
-              longest word
-
-        Constraints that are not validated:
-
-            * The solution is a natural-sounding, reasonably-grammatical dialogue that
-              T-rex would say
-            * The solution does not refer to anagrams or puzzles or winning t-shirts
-            * The solution is directly related to the content of the comic 1663 "The
-              Qwantzle"
-            * The solution "would make a good epitaph"
-
-        Constraints collected from https://github.com/lonnen/cryptoanagram/blob/main/README.md.
-        There are multiple anagrams of c1663 that will pass this function, which
-        satisfy several of the "Constraints that are not validated", but which are not
-        the solution.
-
-        return (`bool`) - does the candidate sentence satisfy the constraints of the
-        Qwantzle puzzle
-        """
-        bank = Fragment(self.letter_bank.letters)
-
-        # first check - do they have the same numbers of specific letters?
-        if not self.candidate.letters == bank:
-            return False
-
-        # check that every word appears in the vocab list
-        for word in self.candidate.sentence:
-            if word == "":
-                continue
-            if word not in self.vocab:
-                return False
-
-        if not self.c1663:
-            return True
-
-        # From here out, only rules specific to comic 1663
-
-        if self.candidate.sentence[0] != "I":
-            return False
-
-        words_len = [len(w) for w in self.candidate.sentence]
-
-        longest, second_longest = sorted(words_len)[:2]
-        if longest != 11 or second_longest != 8:
-            return False
-
-        position_longest = words_len.index(11)
-        if words_len[position_longest - 1] != 8 or words_len[position_longest + 1] != 8:
-            return False
-
-        return True
-
     def search(self, sentence_start: str, max_candidates: int = 1000):
         remaining = self.letter_bank.letters.copy()
         remaining.subtract(Fragment(sentence_start).letters)
         self.max_candidates = max_candidates
-        candidates = HeapQueue(
-            [
-                Guess(
-                    sentence_start,
-                    remaining,
-                    self.oracle.score_candidate(sentence_start),
-                )
-            ]
-        )
+        candidates = [
+            Guess(
+                sentence_start,
+                remaining,
+                math.exp(self.oracle.score_candidate(sentence_start)),
+            )
+        ]
         while len(candidates) > 0:
-            c = candidates.pop()
+            # c = candidates.weighted_random_pop()
+            pos = random.choices(
+                [p for p in range(len(candidates))],
+                weights=[d.score for d in candidates],
+            )[0]
+            c = candidates.pop(pos)
+
             candidate = c.placed
             remaining = Fragment(c.remaining).letters
 
@@ -146,8 +81,8 @@ class Puzzle:
                 # additional letter placements
 
                 # the sentence uses only characters from the provided bank
-                if any([v < 0 for v in next_remaining.values]):
-                    continue # missing letters, abort word
+                if any([v < 0 for v in next_remaining.values()]):
+                    continue  # missing letters, abort word
 
                 # constraints that only apply to c1663
                 if self.c1663:
@@ -164,7 +99,7 @@ class Puzzle:
                             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
                         }:
                             if len(punctuation) == 0 or cha != punctuation.pop(0):
-                                constraint_violations += 1
+                                continue
                         pos += 1
 
                     # longest word is 11 characters long
@@ -181,35 +116,32 @@ class Puzzle:
                                 ):
                                     pass
                                 else:
-                                    constraint_violations += 1
+                                    continue
                             else:
-                                constraint_violations += 1
-                    
+                                continue
+
                     # the final letter is "w"
                     # so the final three characters must be "w!!"
                     if next_remaining.total() > 3:
                         if next_remaining["w"] == 0:
                             continue
-                    
+
                     if next_remaining.total() == 2:
                         if next_candidate[-1] != "w":
                             continue
                         else:
                             next_candidate += "!!"
                             next_remaining = next_remaining.subtract("!!")
-                        
 
                 # calculate a heuristic score
-                score = self.oracle.score_candidate(next_candidate)
+                score = math.exp(self.oracle.score_candidate(next_candidate))
 
-                # finally, HeapQueue is a min-queue, so better candidates should have
-                # a lower value. This is the opposite of oracle scoring, so flip it.
-                score *= -1
                 g = Guess(next_candidate, remaining - Fragment(word).letters, score)
+                # if we're too large, remove the poorest performer before adding another
                 if len(candidates) >= max_candidates:
-                    candidates.replace(g)
-                else:
-                    candidates.push(g)
+                    candidates.sort(key=lambda x: x.score)
+                    candidates.pop(0)
+                candidates.append(g)
 
 
 @dataclass()
