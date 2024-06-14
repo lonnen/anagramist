@@ -9,3 +9,5 @@ venv
 .DS_Store
 dist
 build
+.ruff_cache
+.tox
