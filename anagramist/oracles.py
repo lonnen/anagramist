@@ -119,7 +119,10 @@ class TransformerOracle(Oracle):
             """
 
     def score_candidates(self, candidates: List[str]) -> List[float]:
-        """Calculate the log scores of a given set of candidate sentences
+        """Calculate the log scores of a given set of candidate sentences. This is
+        theoretically more efficient than looping over single candidates, but too many
+        at once can cause issues. It is recommended that consumers experiment with their
+        hardware and chunk candidates into batches for improved efficiency.
 
         adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
         """
