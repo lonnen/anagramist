@@ -14,9 +14,10 @@ class Fragment:
     """
 
     def __init__(self, candidate_sentence: str):
-        self.sentence = parse_sentence(candidate_sentence)
+        self.sentence = candidate_sentence
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
+        self.words = parse_sentence(candidate_sentence)
 
 
 def parse_sentence(candidate_sentence: str) -> List[str]:
