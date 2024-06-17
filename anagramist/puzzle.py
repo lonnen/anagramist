@@ -1,8 +1,9 @@
 import logging
 import math
 import random
+from collections import UserList
 from dataclasses import dataclass
-from typing import List, Self
+from typing import Iterable, List, Self
 
 from .fragment import Fragment
 from .oracles import Oracle, UniversalOracle
@@ -48,19 +49,18 @@ class Puzzle:
         remaining = self.letter_bank.letters.copy()
         remaining.subtract(Fragment(sentence_start).letters)
         self.max_candidates = max_candidates
-        candidates = [
-            Guess(
-                sentence_start,
-                remaining,
-                math.exp(self.oracle.score_candidate(sentence_start)),
-            )
-        ]
+        candidates = SearchQueue(
+            [
+                Guess(
+                    sentence_start,
+                    remaining,
+                    math.exp(self.oracle.score_candidate(sentence_start)),
+                )
+            ],
+            max_size=max_candidates,
+        )
         while len(candidates) > 0:
-            pos = random.choices(
-                [p for p in range(len(candidates))],
-                weights=[d.score for d in candidates],
-            )[0]
-            c = candidates.pop(pos)
+            c = candidates.weighted_random_sample(key=lambda x: x.score)
 
             candidate = c.placed
             remaining = Fragment(c.remaining).letters
@@ -73,21 +73,21 @@ class Puzzle:
                 next_remaining = remaining.copy()
                 next_remaining.subtract(word)
 
-                # constraint violations indicate we should `continue` to throw out this
-                # candidate. A lot of constraints will be soft-violated while the
-                # solution is being assembled -- `continue` only when the candidate has
-                # crossed the point where it can no longer become a valid answer with
-                # additional letter placements
+                # A lot of constraints will be soft-violated while the solution is
+                # being assembled -- reject them only when the candidate has crossed
+                # the point where it could no longer become a valid answer with some
+                # hypothetical arragnement of remaining letters
 
+                violations = 0
                 # the sentence uses only characters from the provided bank
                 if any([v < 0 for v in next_remaining.values()]):
-                    continue  # missing letters, abort word
+                    violations += 1  # candidate uses letters not in the bank
 
                 # constraints that only apply to c1663
                 if self.c1663:
                     # the first word is "I"
                     if next_candidate[0] != "I":
-                        continue
+                        violations += 1
 
                     # punctuation is in the solution in the order :,!!
                     punctuation = [":", ",", "!", "!"]
@@ -98,7 +98,7 @@ class Puzzle:
                             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
                         }:
                             if len(punctuation) == 0 or cha != punctuation.pop(0):
-                                continue
+                                violations += 1
                         pos += 1
 
                     # longest word is 11 characters long
@@ -115,32 +115,32 @@ class Puzzle:
                                 ):
                                     pass
                                 else:
-                                    continue
+                                    violations += 1
                             else:
-                                continue
+                                violations += 1
 
                     # the final letter is "w"
                     # so the final three characters must be "w!!"
                     if next_remaining.total() > 3:
                         if next_remaining["w"] == 0:
-                            continue
+                            violations += 1
 
                     if next_remaining.total() == 2:
                         if next_candidate[-1] != "w":
-                            continue
+                            violations += 1
                         else:
                             next_candidate += "!!"
                             next_remaining = next_remaining.subtract("!!")
+                            print("winner: {}".format(next_candidate))
 
-                # calculate a heuristic score
-                score = math.exp(self.oracle.score_candidate(next_candidate))
+                if violations > 0:
+                    score = 0
+                else:
+                    # calculate a heuristic score
+                    score = math.exp(self.oracle.score_candidate(next_candidate))
 
                 g = Guess(next_candidate, remaining - Fragment(word).letters, score)
-                # if we're too large, remove the poorest performer before adding another
-                if len(candidates) >= max_candidates:
-                    candidates.sort(key=lambda x: x.score)
-                    candidates.pop(0)
-                candidates.append(g)
+                candidates.push(g)
 
 
 @dataclass()
@@ -180,3 +180,26 @@ class Guess:
 
     def __ge__(self, other: Self):
         return self.score >= other.score
+
+
+class SearchQueue(UserList):
+    def __init__(self, iterable: Iterable, max_size: int = None):
+        self.data = list(iterable)
+        self.max_size = max_size
+
+    def weighted_random_sample(self, key=lambda x: x):
+        pos = random.choices(
+            [p for p, _ in enumerate(self.data)],
+            weights=[key(d) for d in self.data],
+        )[0]
+        return self.data.pop(pos)
+
+    def push(self, element, key=lambda x: x):
+        if self.max_size is not None:
+            if len(self.data) >= self.max_size:
+                index, _ = min(
+                    enumerate([key(i) for i in self.data]),
+                    key=lambda e: e[1],
+                )
+                self.data.pop(index)
+        self.data.append(element)
