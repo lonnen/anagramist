@@ -20,8 +20,6 @@ class Puzzle:
         letter_bank: (`String`) - a string containing all the characters to be used in
             the solution. Spaces will be ignored. This may be a sentence, or a simple
             sequence of letters
-        candidate: (`String`) or (`Fragment`) - a possible, possibly partial, solution
-            to the puzzle
         vocabulary: (`List[String]`) - a list of words that may be used in valid answers
         oracle: (`Oracle`) - a heuristic strategy for evaluating candidates during
             search. If `None` the `UniversalOracle` will be used, which evaluates every
