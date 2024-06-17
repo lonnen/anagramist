@@ -56,7 +56,6 @@ class Puzzle:
             )
         ]
         while len(candidates) > 0:
-            # c = candidates.weighted_random_pop()
             pos = random.choices(
                 [p for p in range(len(candidates))],
                 weights=[d.score for d in candidates],
