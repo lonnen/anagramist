@@ -1,12 +1,11 @@
 import logging
 import math
-import random
-from collections import UserList
 from dataclasses import dataclass
-from typing import Iterable, List, Self, TypeVar
+from typing import List, Self
 
 from .fragment import Fragment
 from .oracles import Oracle, UniversalOracle
+from .searchqueue import SearchQueue
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
