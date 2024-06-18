@@ -79,6 +79,11 @@ class Puzzle:
         self.vocabulary = set(
             w for w in vocabulary if Fragment(w).letters <= self.letter_bank
         )
+        if c1663:
+            # longest word is 11 chars, second longest is 8 chars
+            self.vocabulary = set(
+                w for w in self.vocabulary if (len(w) == 11 or len(w) <= 8)
+            )
         if oracle is None:
             self.oracle = UniversalOracle()
         else:
@@ -126,6 +131,13 @@ class Puzzle:
         # restrict vocab to what can be spelled given the remaining letters
         # after removing letters used by the guess
         vocab = set(w for w in self.vocabulary if Fragment(w).letters <= remaining)
+
+        if self.c1663:
+            candidate_words = Fragment(candidate_guess.placed).words
+            if len(candidate_words[-1]) == 11 and len(candidate_words[-2]) != 8:
+                # len 11 and len 8 are adjacent
+                # if len 11 has appeared, and len 8 has not, it must be next
+                vocab = set(w for w in vocab if len(w) == 8)
 
         for word in vocab:
             # compute child candidate and remaining letters
