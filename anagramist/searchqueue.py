@@ -7,7 +7,6 @@ T = TypeVar("T")
 
 
 class SearchQueue(UserList):
-
     data: List[T] = []
 
     def __init__[T](self, iterable: Optional[Iterable[T]] = None, max_size: int = None):
