@@ -75,8 +75,9 @@ class Puzzle:
         c1663: bool = False,
     ) -> None:
         self.letter_bank = Fragment(letter_bank).letters
+        # first pass restriction of the vocabulary based on the initial letter_bank
         self.vocabulary = set(
-            w for w in vocabulary if Fragment(w).letters <= letter_bank
+            w for w in vocabulary if Fragment(w).letters <= self.letter_bank
         )
         if oracle is None:
             self.oracle = UniversalOracle()
