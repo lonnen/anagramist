@@ -3,7 +3,7 @@ import math
 import random
 from collections import UserList
 from dataclasses import dataclass
-from typing import Iterable, List, Self
+from typing import Iterable, List, Self, TypeVar
 
 from .fragment import Fragment
 from .oracles import Oracle, UniversalOracle
@@ -179,20 +179,21 @@ class Guess:
     def __ge__(self, other: Self):
         return self.score >= other.score
 
+T = TypeVar('T')
 
 class SearchQueue(UserList):
-    def __init__(self, iterable: Iterable, max_size: int = None):
-        self.data = list(iterable)
-        self.max_size = max_size
+    def __init__[T](self, iterable: Iterable[T], max_size: int = None):
+        self.data: List[T] = list(iterable)
+        self.max_size: int = max_size
 
-    def weighted_random_sample(self, key=lambda x: x):
+    def weighted_random_sample(self, key=lambda x: x) -> T:
         pos = random.choices(
             [p for p, _ in enumerate(self.data)],
             weights=[key(d) for d in self.data],
         )[0]
         return self.data.pop(pos)
 
-    def push(self, element, key=lambda x: x):
+    def push(self, element: T, key=lambda x: x):
         if self.max_size is not None:
             if len(self.data) >= self.max_size:
                 index, _ = min(
