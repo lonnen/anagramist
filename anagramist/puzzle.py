@@ -82,7 +82,7 @@ class Puzzle:
                     violations += 1  # candidate uses letters not in the bank
 
                 if any([w not in vocab for w in next_candidate.words]):
-                    violations += 1 # candidate uses words not in the bank
+                    violations += 1  # candidate uses words not in the bank
 
                 # constraints that only apply to c1663
                 if self.c1663:
@@ -96,8 +96,11 @@ class Puzzle:
                     while pos < len(next_candidate.words):
                         cha = next_candidate.words[pos]
                         if len(cha) == 1:
-                            if len(punctuation) < 1 or cha != punctuation.pop():
-                                violations += 1
+                            if cha not in set(
+                                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                            ):
+                                if len(punctuation) < 1 or cha != punctuation.pop():
+                                    violations += 1
                         pos += 1
 
                     # longest word is 11 characters long
@@ -113,7 +116,7 @@ class Puzzle:
                         if (
                             pos == len(word_lengths)
                             and word_lengths[length - 1] != 8
-                            and word_lengths[length + 1] != 8 
+                            and word_lengths[length + 1] != 8
                         ):
                             # either adjacent word must be len 8
                             # or the 11 letter word is the most recently placed
@@ -135,9 +138,13 @@ class Puzzle:
                     score = 0
                 else:
                     # calculate a heuristic score
-                    score = math.exp(self.oracle.score_candidate(next_candidate.sentence))
+                    score = math.exp(
+                        self.oracle.score_candidate(next_candidate.sentence)
+                    )
 
-                g = Guess(next_candidate.sentence, remaining - Fragment(word).letters, score)
+                g = Guess(
+                    next_candidate.sentence, remaining - Fragment(word).letters, score
+                )
                 candidates.push(g)
 
 
@@ -179,7 +186,9 @@ class Guess:
     def __ge__(self, other: Self):
         return self.score >= other.score
 
-T = TypeVar('T')
+
+T = TypeVar("T")
+
 
 class SearchQueue(UserList):
     def __init__[T](self, iterable: Iterable[T], max_size: int = None):
