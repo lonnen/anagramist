@@ -66,7 +66,7 @@ class Puzzle:
             # calculate valid next words
             for word in self.vocabulary:
                 # score valid next words
-                next_candidate = candidate + " " + word
+                next_candidate = Fragment(candidate + " " + word)
 
                 next_remaining = remaining.copy()
                 next_remaining.subtract(word)
@@ -81,41 +81,43 @@ class Puzzle:
                 if any([v < 0 for v in next_remaining.values()]):
                     violations += 1  # candidate uses letters not in the bank
 
+                if any([w not in vocab for w in next_candidate.words]):
+                    violations += 1 # candidate uses words not in the bank
+
                 # constraints that only apply to c1663
                 if self.c1663:
                     # the first word is "I"
-                    if next_candidate[0] != "I":
+                    if next_candidate.words[0] != "I":
                         violations += 1
 
                     # punctuation is in the solution in the order :,!!
                     punctuation = [":", ",", "!", "!"]
                     pos = 0
-                    while pos < len(next_candidate):
-                        cha = next_candidate[pos]
-                        if cha not in {
-                            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
-                        }:
-                            if len(punctuation) == 0 or cha != punctuation.pop(0):
+                    while pos < len(next_candidate.words):
+                        cha = next_candidate.words[pos]
+                        if len(cha) == 1:
+                            if len(punctuation) < 1 or cha != punctuation.pop():
                                 violations += 1
                         pos += 1
 
                     # longest word is 11 characters long
                     # second longest word is 8 characters long
                     # the words are side by side in the solution
-                    word_lengths = [len(w) for w in next_candidate.split()]
+                    word_lengths = [len(w) for w in next_candidate.words]
                     for length, pos in enumerate(word_lengths):
-                        if length > 8:
-                            if length == 11:
-                                if (
-                                    word_lengths[length - 1] == 8
-                                    or word_lengths[length + 1] == 8
-                                    or pos == len(word_lengths)
-                                ):
-                                    pass
-                                else:
-                                    violations += 1
-                            else:
-                                violations += 1
+                        if length <= 8:
+                            continue
+                        if length != 11:
+                            violations += 1
+                            continue
+                        if (
+                            pos == len(word_lengths)
+                            and word_lengths[length - 1] != 8
+                            and word_lengths[length + 1] != 8 
+                        ):
+                            # either adjacent word must be len 8
+                            # or the 11 letter word is the most recently placed
+                            violations += 1
 
                     # the final letter is "w"
                     # so the final three characters must be "w!!"
@@ -127,17 +129,15 @@ class Puzzle:
                         if next_candidate[-1] != "w":
                             violations += 1
                         else:
-                            next_candidate += "!!"
-                            next_remaining = next_remaining.subtract("!!")
-                            print("winner: {}".format(next_candidate))
+                            print("WINNER: {}!!".format(next_candidate))
 
                 if violations > 0:
                     score = 0
                 else:
                     # calculate a heuristic score
-                    score = math.exp(self.oracle.score_candidate(next_candidate))
+                    score = math.exp(self.oracle.score_candidate(next_candidate.sentence))
 
-                g = Guess(next_candidate, remaining - Fragment(word).letters, score)
+                g = Guess(next_candidate.sentence, remaining - Fragment(word).letters, score)
                 candidates.push(g)
 
 
