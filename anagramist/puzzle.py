@@ -121,32 +121,36 @@ class Puzzle:
             # the point where it could no longer become a valid answer with some
             # hypothetical arragnement of remaining letters
 
-            violations = 0
+            # however, candidates that cannot be the solution because of words already
+            # placed should be abandoned as quickly as we can detect them and unrecorded
+
             # the sentence uses only characters from the provided bank
             if any([v < 0 for v in next_remaining.values()]):
-                violations += 1  # candidate uses letters not in the bank
+                continue  # candidate uses letters not in the bank
 
             if any([w not in vocab for w in next_candidate.words]):
-                violations += 1  # candidate uses words not in the bank
+                continue  # candidate uses words not in the bank
 
             # constraints that only apply to c1663
             if self.c1663:
                 # the first word is "I"
                 if next_candidate.words[0] != "I":
-                    violations += 1
+                    continue
 
+                violations = 0
                 # punctuation is in the solution in the order :,!!
                 punctuation = [":", ",", "!", "!"]
                 pos = 0
                 while pos < len(next_candidate.words):
                     cha = next_candidate.words[pos]
-                    if len(cha) == 1:
-                        if cha not in set(
-                            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-                        ):
-                            if len(punctuation) < 1 or cha != punctuation.pop():
-                                violations += 1
+                    if len(cha) == 1 and cha not in set(
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                    ):
+                        if len(punctuation) < 1 or cha != punctuation.pop():
+                            violations += 1
                     pos += 1
+                if violations > 0:
+                    continue
 
                 # longest word is 11 characters long
                 # second longest word is 8 characters long
@@ -166,22 +170,22 @@ class Puzzle:
                         # either adjacent word must be len 8
                         # or the 11 letter word is the most recently placed
                         violations += 1
+                if violations > 0:
+                    continue
 
                 # the final letter is "w"
                 # so the final three characters must be "w!!"
                 if next_remaining.total() > 3:
                     if next_remaining["w"] == 0:
-                        violations += 1
+                        continue
 
                 if next_remaining.total() == 2:
                     if next_candidate[-1] != "w":
-                        violations += 1
-                    else:
-                        print("WINNER: {}!!".format(next_candidate))
-
-            if violations > 0:
-                score = 0
-            else:
+                        continue
+                    print("WINNER: {}!!".format(next_candidate))
+                    score = float("inf")
+            
+            if score != float("inf"):
                 # calculate a heuristic score
                 score = math.exp(self.oracle.score_candidate(next_candidate.sentence))
 
