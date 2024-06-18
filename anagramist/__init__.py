@@ -24,6 +24,6 @@ def search(
     puzzle = Puzzle(
         letters,
         oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
-        c1663=c1663
+        c1663=c1663,
     )
     return puzzle.search("I")
