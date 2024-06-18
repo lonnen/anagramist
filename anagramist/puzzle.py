@@ -113,11 +113,26 @@ class Puzzle:
         """
         candidates = []  # a place to store child-guesses calculations
 
-        for word in self.vocabulary:
-            # score valid next words
+        # calculate new letter pool
+        remaining = self.letter_bank.copy()
+        remaining.subtract(candidate_guess.placed)
+        del remaining[" "]
+
+        if any([v < 0 for v in remaining.values()]):
+            # the submitted guess uses letters not in the bank
+            # no placement of additional letters can save it
+            return []
+
+        # restrict vocab to what can be spelled given the remaining letters
+        # after removing letters used by the guess
+        vocab = set(w for w in self.vocabulary if Fragment(w).letters <= remaining)
+
+        for word in vocab:
+            # compute child candidate and remaining letters
             next_candidate = Fragment(candidate_guess.placed + " " + word)
             next_remaining = self.letter_bank.copy()
             next_remaining.subtract(next_candidate.sentence)
+            del next_remaining[" "]
 
             if not self.soft_validate(next_candidate, next_remaining):
                 # do not record candidates that cannot be winners because of
@@ -125,7 +140,7 @@ class Puzzle:
                 continue
 
             if (
-                next_candidate[-1] == "w"
+                next_candidate.sentence[-1] == "w"
                 and next_remaining.total() == 2
                 and next_remaining.get("!") == 2
             ):
@@ -175,7 +190,7 @@ class Puzzle:
         if remaining.total() > 0:
             for w in self.vocabulary:
                 if Fragment(w).letters <= remaining:
-                    # at least one valid word can be spelled with the remaining
+                    # at least one valid word can be spelled with the remaining letters
                     break
             else:
                 return False  # candidate can't make a valid word with remaining letters
@@ -186,7 +201,6 @@ class Puzzle:
             if placed.words[0] != "I":
                 return False
 
-            violations = 0
             # punctuation is in the solution in the order :,!!
             punctuation = [":", ",", "!", "!"]
             pos = 0
@@ -196,10 +210,8 @@ class Puzzle:
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
                 ):
                     if len(punctuation) < 1 or cha != punctuation.pop():
-                        violations += 1
+                        return False
                 pos += 1
-            if violations > 0:
-                return False
 
             # longest word is 11 characters long
             # second longest word is 8 characters long
@@ -209,18 +221,15 @@ class Puzzle:
                 if length <= 8:
                     continue
                 if length != 11:
-                    violations += 1
+                    # we have a word longer than 8 chars that is not 11 letters
+                    return False
+                # now we have our 11 letter word
+                # if it is the most recently placed, the next word could be length 8
+                if pos == len(word_lengths):
                     continue
-                if (
-                    pos == len(word_lengths)
-                    and word_lengths[length - 1] != 8
-                    and word_lengths[length + 1] != 8
-                ):
-                    # either adjacent word must be len 8
-                    # or the 11 letter word is the most recently placed
-                    violations += 1
-            if violations > 0:
-                return False
+                if word_lengths[length - 1] != 8 and word_lengths[length + 1] != 8:
+                    # either the word before or after must be 8
+                    return False
 
             # the final letter is "w"
             # so the final three characters must be "w!!"
