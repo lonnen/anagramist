@@ -1,14 +1,18 @@
 import random
 from collections import UserList
-from typing import Iterable, List, TypeVar
+from typing import Iterable, List, Optional, TypeVar
 
 
 T = TypeVar("T")
 
 
 class SearchQueue(UserList):
-    def __init__[T](self, iterable: Iterable[T], max_size: int = None):
-        self.data: List[T] = list(iterable)
+
+    data: List[T] = []
+
+    def __init__[T](self, iterable: Optional[Iterable[T]] = None, max_size: int = None):
+        if iterable is not None:
+            self.data: List[T] = list(iterable)
         self.max_size: int = max_size
 
     def weighted_random_sample(self, key=lambda x: x) -> T:
