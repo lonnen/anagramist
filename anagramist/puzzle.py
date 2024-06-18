@@ -71,6 +71,7 @@ class Puzzle:
         letter_bank: str,
         vocabulary: List[str] = vocab,
         oracle: Oracle = None,  # default: Universal
+        max_candidates: int = 1000,
         c1663: bool = False,
     ) -> None:
         self.letter_bank = Fragment(letter_bank)
@@ -79,124 +80,40 @@ class Puzzle:
             self.oracle = UniversalOracle()
         else:
             self.oracle = oracle
+        self.candidates = SearchQueue(max_size=max_candidates)
         self.c1663 = c1663
 
-    def search(self, sentence_start: str, max_candidates: int = 1000):
+    def search(self, sentence_start: str):
         remaining = self.letter_bank.letters.copy()
         remaining.subtract(Fragment(sentence_start).letters)
-        self.max_candidates = max_candidates
-        candidates = SearchQueue(
-            [
-                Guess(
-                    sentence_start,
-                    remaining,
-                    math.exp(self.oracle.score_candidate(sentence_start)),
-                )
-            ],
-            max_size=max_candidates,
+        self.candidates.push(
+            Guess(
+                sentence_start,
+                remaining,
+                math.exp(self.oracle.score_candidate(sentence_start)),
+            )
         )
-        while len(candidates) > 0:
-            c = candidates.weighted_random_sample(key=lambda x: x.score)
+        while len(self.candidates) > 0:
+            c = self.candidates.weighted_random_sample(key=lambda x: x.score)
+            for child in self.evaluate_one(c):
+                self.candidates.push(child)
 
-            candidate = c.placed
-            remaining = Fragment(c.remaining).letters
+    def evaluate_one(self, candidate_guess: Guess) -> List[Guess]:
+        """Starting from the provided Guess, iterate through the vocabulary to
+        produce all possible child guesses.
 
-            # calculate valid next words
-            for word in self.vocabulary:
-                # score valid next words
-                next_candidate = Fragment(candidate + " " + word)
+        Args:
+            candidate_guess(`Guess`) - a root Guess within the context of the Puzzle
 
-                next_remaining = remaining.copy()
-                next_remaining.subtract(word)
+        Returns:
+            A List of Guesses representing all possible children of the candidate_guess
+        """
+        candidates = []  # a place to store child-guess calculations
 
-                # A lot of constraints will be soft-violated while the solution is
-                # being assembled -- reject them only when the candidate has crossed
-                # the point where it could no longer become a valid answer with some
-                # hypothetical arragnement of remaining letters
-
-                violations = 0
-                # the sentence uses only characters from the provided bank
-                if any([v < 0 for v in next_remaining.values()]):
-                    violations += 1  # candidate uses letters not in the bank
-
-                if any([w not in vocab for w in next_candidate.words]):
-                    violations += 1  # candidate uses words not in the bank
-
-                # constraints that only apply to c1663
-                if self.c1663:
-                    # the first word is "I"
-                    if next_candidate.words[0] != "I":
-                        violations += 1
-
-                    # punctuation is in the solution in the order :,!!
-                    punctuation = [":", ",", "!", "!"]
-                    pos = 0
-                    while pos < len(next_candidate.words):
-                        cha = next_candidate.words[pos]
-                        if len(cha) == 1:
-                            if cha not in set(
-                                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-                            ):
-                                if len(punctuation) < 1 or cha != punctuation.pop():
-                                    violations += 1
-                        pos += 1
-
-                    # longest word is 11 characters long
-                    # second longest word is 8 characters long
-                    # the words are side by side in the solution
-                    word_lengths = [len(w) for w in next_candidate.words]
-                    for length, pos in enumerate(word_lengths):
-                        if length <= 8:
-                            continue
-                        if length != 11:
-                            violations += 1
-                            continue
-                        if (
-                            pos == len(word_lengths)
-                            and word_lengths[length - 1] != 8
-                            and word_lengths[length + 1] != 8
-                        ):
-                            # either adjacent word must be len 8
-                            # or the 11 letter word is the most recently placed
-                            violations += 1
-
-                    # the final letter is "w"
-                    # so the final three characters must be "w!!"
-                    if next_remaining.total() > 3:
-                        if next_remaining["w"] == 0:
-                            violations += 1
-
-                    if next_remaining.total() == 2:
-                        if next_candidate[-1] != "w":
-                            violations += 1
-                        else:
-                            print("WINNER: {}!!".format(next_candidate))
-
-                if violations > 0:
-                    score = 0
-                else:
-                    # calculate a heuristic score
-                    score = math.exp(
-                        self.oracle.score_candidate(next_candidate.sentence)
-                    )
-
-                g = Guess(
-                    next_candidate.sentence, remaining - Fragment(word).letters, score
-                )
-                candidates.push(g)
-
-    def evaluate_one(self, candidate: Guess):
-        c = self.candidates.weighted_random_sample(key=lambda x: x.score)
-
-        candidate = c.placed
-        remaining = Fragment(c.remaining).letters
-
-        # calculate valid next words
         for word in self.vocabulary:
             # score valid next words
-            next_candidate = Fragment(candidate + " " + word)
-
-            next_remaining = remaining.copy()
+            next_candidate = Fragment(candidate_guess.placed + " " + word)
+            next_remaining = Fragment(candidate_guess.remaining).letters
             next_remaining.subtract(word)
 
             # A lot of constraints will be soft-violated while the solution is
@@ -269,6 +186,7 @@ class Puzzle:
                 score = math.exp(self.oracle.score_candidate(next_candidate.sentence))
 
             g = Guess(
-                next_candidate.sentence, remaining - Fragment(word).letters, score
+                next_candidate.sentence, "".join(next_remaining.elements()), score
             )
-            candidates.push(g)
+            candidates.append(g)
+        return candidates
