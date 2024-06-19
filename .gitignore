@@ -11,3 +11,7 @@ dist
 build
 .ruff_cache
 .tox
+
+# sqlite
+anagramist.db
+test_anagramist.db
