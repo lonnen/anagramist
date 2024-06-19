@@ -81,7 +81,7 @@ class PersistentSearchQueue:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM frontier").fetchone()[0]
 
-    def weighted_random_sample(self, key=lambda x: x) -> T:
+    def weighted_random_sample(self,) -> T:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         sampled = cur.execute("""
@@ -95,7 +95,7 @@ class PersistentSearchQueue:
         cur.close()
         return sampled
 
-    def push(self, element: T, key=lambda x: x):
+    def push(self, element: T):
         if self.max_size is not None:
             if len(self) >= self.max_size:
                 con = sqlite3.connect(self.__db_name)
