@@ -45,12 +45,13 @@ class TestParseSentence:
 class TestFragment:
     def test_init(self):
         c = Fragment("a")
-        assert c.sentence == ["a"]
+        assert c.sentence == "a"
+        assert c.words == ["a"]
         assert c.letters == Counter("a")
 
     def test_sentence(self):
         c = Fragment("but they were also concerned about people")
-        assert c.sentence == [
+        assert c.words == [
             "but",
             "they",
             "were",
@@ -83,7 +84,7 @@ class TestFragment:
 
     def test_punctuation(self):
         c = Fragment("behold! a dragon")
-        assert c.sentence == [
+        assert c.words == [
             "behold",
             "!",
             "a",
@@ -108,7 +109,7 @@ class TestFragment:
 
     def test_capitalization(self):
         c = Fragment("CAPS MATTER")
-        assert c.sentence == [
+        assert c.words == [
             "CAPS",
             "MATTER",
         ]
