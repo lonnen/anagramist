@@ -35,7 +35,6 @@ def cli():
 def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
     search(
-        "This story gets better soon, I promise!",
         letters,
         model_name_or_path,
         seed,

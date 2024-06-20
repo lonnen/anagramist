@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def search(
-    candidate_sentence: str,
     letters: str,
     model_name_or_path: str | PathLike[str],
     seed: int,
@@ -21,9 +20,17 @@ def search(
     fp16: bool = False,
     c1663: bool = False,
 ):
-    puzzle = Puzzle(
-        letters,
-        oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
-        c1663=c1663,
-    )
-    return puzzle.search("I")
+    if c1663:
+        logger.log("c1663 is true - overriding provided letters")
+        puzzle = Puzzle(
+            "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
+            oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
+            c1663=c1663,
+        )
+    else:
+        puzzle = Puzzle(
+            letters,
+            oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
+            c1663=c1663,
+        )
+        return puzzle.search("")
