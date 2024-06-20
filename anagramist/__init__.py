@@ -21,7 +21,7 @@ def search(
     c1663: bool = False,
 ):
     if c1663:
-        logger.log("c1663 is true - overriding provided letters")
+        logger.debug("c1663 is true - overriding provided letters")
         puzzle = Puzzle(
             "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
             oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
