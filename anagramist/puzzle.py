@@ -5,7 +5,7 @@ from typing import Counter, List, Self
 
 from .fragment import Fragment
 from .oracles import Oracle, UniversalOracle
-from .searchqueue import SearchQueue
+from .searchqueue import PersistentSearchQueue
 from .vocab import vocab
 
 logger = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ class Puzzle:
             self.oracle = UniversalOracle()
         else:
             self.oracle = oracle
-        self.candidates = SearchQueue(max_size=max_candidates)
+        self.candidates = PersistentSearchQueue(max_size=max_candidates)
         self.c1663 = c1663
 
     def search(self, sentence_start: str):
@@ -102,7 +102,8 @@ class Puzzle:
             )
         )
         while len(self.candidates) > 0:
-            c = self.candidates.weighted_random_sample(key=lambda x: x.score)
+            g = self.candidates.weighted_random_sample()
+            c = Guess(g[0], g[1], g[2])
             for child in self.evaluate_one(c):
                 self.candidates.push(child)
 
