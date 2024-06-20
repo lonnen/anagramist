@@ -13,5 +13,5 @@ build
 .tox
 
 # sqlite
-anagramist.db
-test_anagramist.db
+*.db
+*.db-journal
