@@ -81,16 +81,15 @@ class PersistentSearchQueue:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM frontier").fetchone()[0]
 
-    def weighted_random_sample(self,) -> T:
+    def weighted_random_sample(
+        self,
+    ) -> T:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
-        sampled = cur.execute("""
-        SELECT id, -LOG(RAND()) / score AS priority
-        FROM frontier
-        ORDER BY priority
-        LIMIT 1
-        """).fetchone()
-        cur.execute("DELETE FROM frontier WHERE placed = '{}'".format(sampled[0]))
+        rows = cur.execute("""SELECT * FROM frontier""").fetchall()
+        sampled = random.choices(rows, weights=[d[2] for d in rows])[0]
+        sql = "DELETE FROM frontier WHERE placed = '{}'".format(sampled[0])
+        cur.execute(sql)
         con.commit()
         cur.close()
         return sampled
