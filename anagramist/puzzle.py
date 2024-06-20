@@ -1,7 +1,7 @@
 import logging
 import math
 from dataclasses import dataclass
-from typing import Counter, List, Self
+from typing import Counter, Iterator, List, Self
 
 from .fragment import Fragment
 from .oracles import Oracle, UniversalOracle
@@ -97,7 +97,7 @@ class Puzzle:
         self.candidates.push(
             Guess(
                 sentence_start,
-                remaining,
+                ''.join(remaining.elements()),
                 math.exp(self.oracle.score_candidate(sentence_start)),
             )
         )
@@ -107,7 +107,7 @@ class Puzzle:
             for child in self.evaluate_one(c):
                 self.candidates.push(child)
 
-    def evaluate_one(self, candidate_guess: Guess) -> List[Guess]:
+    def evaluate_one(self, candidate_guess: Guess) -> Iterator[Guess]:
         """Starting from the provided Guess, iterate through the vocabulary to
         produce all possible child guesses.
 
@@ -127,7 +127,7 @@ class Puzzle:
         if any([v < 0 for v in remaining.values()]):
             # the submitted guess uses letters not in the bank
             # no placement of additional letters can save it
-            return []
+            raise StopIteration
 
         # restrict vocab to what can be spelled given the remaining letters
         # after removing letters used by the guess
@@ -169,8 +169,7 @@ class Puzzle:
             g = Guess(
                 next_candidate.sentence, "".join(next_remaining.elements()), score
             )
-            candidates.append(g)
-        return candidates
+            yield g
 
     def soft_validate(self, placed: Fragment, remaining: Counter) -> bool:
         """Soft validation answers whether the candidate conforms to the problem
