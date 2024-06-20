@@ -109,7 +109,7 @@ class PersistentSearchQueue:
             ON CONFLICT(placed, remaining) 
             DO UPDATE SET score = excluded.score;
             """,
-            (element.placed, "".join(element.remaining.elements()), element.score),
+            (element.placed, element.remaining, element.score),
         )
         cur.execute(
             """INSERT INTO visited 
@@ -117,6 +117,6 @@ class PersistentSearchQueue:
             ON CONFLICT(placed, remaining) 
             DO UPDATE SET score = excluded.score
             """,
-            (element.placed, "".join(element.remaining.elements()), element.score),
+            (element.placed, element.remaining, element.score),
         )
         con.commit()
