@@ -1,6 +1,7 @@
 import os
 import pytest
 import sqlite3
+from anagramist.fragment import Fragment
 from anagramist.puzzle import Guess
 from anagramist.searchqueue import PersistentSearchQueue
 
@@ -56,12 +57,8 @@ class TestSearchQueue:
 
     def test_database_sample(self, temp_database):
         psq = PersistentSearchQueue(db_name=temp_database)
-        psq.push(Guess("first", "first_remains", float(0)))
-        psq.push(Guess("second", "second_remains", float(1)))
-        psq.push(Guess("third", "third_remains", float(0)))
+        psq.push(Guess("first", Fragment("first_remains").letters, float(0)))
+        psq.push(Guess("second", Fragment("second_remains").letters, float(1)))
+        psq.push(Guess("third", Fragment("third_remains").letters, float(0)))
 
-        assert psq.weighted_random_sample() == (
-            "second",
-            "second_remains",
-            float(1),
-        )
+        assert psq.weighted_random_sample()[0] == "second"

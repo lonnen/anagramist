@@ -104,13 +104,19 @@ class PersistentSearchQueue:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
-            """INSERT INTO frontier VALUES ('{}', '{}', '{}')""".format(
-                element.placed, element.remaining, element.score
-            )
+            """INSERT INTO frontier 
+                VALUES (?, ?, ?) 
+            ON CONFLICT(placed, remaining) 
+            DO UPDATE SET score = excluded.score;
+            """,
+            (element.placed, "".join(element.remaining.elements()), element.score),
         )
         cur.execute(
-            """INSERT INTO visited VALUES ('{}', '{}', '{}')""".format(
-                element.placed, element.remaining, element.score
-            )
+            """INSERT INTO visited 
+                VALUES (?, ?, ?) 
+            ON CONFLICT(placed, remaining) 
+            DO UPDATE SET score = excluded.score
+            """,
+            (element.placed, "".join(element.remaining.elements()), element.score),
         )
         con.commit()
