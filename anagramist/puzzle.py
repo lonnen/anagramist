@@ -97,7 +97,7 @@ class Puzzle:
         self.candidates.push(
             Guess(
                 sentence_start,
-                ''.join(remaining.elements()),
+                "".join(remaining.elements()),
                 math.exp(self.oracle.score_candidate(sentence_start)),
             )
         )
