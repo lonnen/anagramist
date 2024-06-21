@@ -24,14 +24,18 @@ def search(
         logger.debug("c1663 is true - overriding provided letters")
         puzzle = Puzzle(
             "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
-            oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
+            oracle=TransformerOracle(
+                model_name_or_path, seed, (not use_gpu), fp16, c1663
+            ),
             c1663=c1663,
         )
         return puzzle.search("I")
     else:
         puzzle = Puzzle(
             letters,
-            oracle=TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663),
+            oracle=TransformerOracle(
+                model_name_or_path, seed, (not use_gpu), fp16, c1663
+            ),
             c1663=c1663,
         )
         return puzzle.search("")
