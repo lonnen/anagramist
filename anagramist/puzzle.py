@@ -98,7 +98,11 @@ class Puzzle:
             Guess(
                 sentence_start,
                 "".join(remaining.elements()),
-                math.exp(self.oracle.score_candidate(sentence_start)),
+                self.oracle.score_candidate(sentence_start)
+                * math.log(
+                    Fragment(sentence_start).letters.total()
+                    / (Fragment(sentence_start).letters.total() + remaining.total())
+                ),
             )
         )
         while len(self.candidates) > 0:
@@ -117,8 +121,6 @@ class Puzzle:
         Returns:
             A List of Guesses representing all possible children of the candidate_guess
         """
-        candidates = []  # a place to store child-guesses calculations
-
         # calculate new letter pool
         remaining = self.letter_bank.copy()
         remaining.subtract(candidate_guess.placed)
@@ -164,7 +166,10 @@ class Puzzle:
                 score = float("inf")
             else:
                 # calculate a heuristic score
-                score = math.exp(self.oracle.score_candidate(next_candidate.sentence))
+                score = self.oracle.score_candidate(next_candidate.sentence) + math.log(
+                    next_candidate.letters.total()
+                    / (next_candidate.letters.total() + remaining.total())
+                )
 
             g = Guess(
                 next_candidate.sentence, "".join(next_remaining.elements()), score
