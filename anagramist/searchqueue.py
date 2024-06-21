@@ -99,7 +99,9 @@ class PersistentSearchQueue:
             if len(self) >= self.max_size:
                 con = sqlite3.connect(self.__db_name)
                 cur = con.cursor()
-                cur.execute("DELETE FROM frontier WHERE (placed, remaining) in (SELECT placed, remaining from frontier ORDER BY score ASC LIMIT 1)")
+                cur.execute(
+                    "DELETE FROM frontier WHERE (placed, remaining) in (SELECT placed, remaining from frontier ORDER BY score ASC LIMIT 1)"
+                )
                 con.commit()
                 cur.close()
         con = sqlite3.connect(self.__db_name)
