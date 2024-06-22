@@ -90,7 +90,9 @@ class PersistentSearchQueue:
         scores = [d[2] for d in rows]
         # scores cannot sum to a negative number, but are log derived and often negative
         # this applies an even boost to ensure they sum to at least 1
-        sampled = random.choices(rows, weights=[s + abs(min(scores)) + 1 for s in scores])[0]
+        sampled = random.choices(
+            rows, weights=[s + abs(min(scores)) + 1 for s in scores]
+        )[0]
         sql = "DELETE FROM frontier WHERE placed = '{}'".format(sampled[0])
         cur.execute(sql)
         con.commit()
