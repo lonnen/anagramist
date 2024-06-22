@@ -92,19 +92,16 @@ class Puzzle:
         self.c1663 = c1663
 
     def search(self, sentence_start: str):
-        remaining = self.letter_bank.copy()
-        remaining.subtract(Fragment(sentence_start).letters)
-        self.candidates.push(
-            Guess(
-                sentence_start,
-                "".join(remaining.elements()),
-                self.oracle.score_candidate(sentence_start)
-                * math.log(
-                    Fragment(sentence_start).letters.total()
-                    / (Fragment(sentence_start).letters.total() + remaining.total())
-                ),
+        if len(self.candidates) < 1:
+            remaining = self.letter_bank.copy()
+            remaining.subtract(Fragment(sentence_start).letters)
+            self.candidates.push(
+                Guess(
+                    sentence_start,
+                    "".join(remaining.elements()),
+                    self.score_candidate(sentence_start, remaining),
+                )
             )
-        )
         while len(self.candidates) > 0:
             g = self.candidates.weighted_random_sample()
             c = Guess(g[0], g[1], g[2])
@@ -166,15 +163,21 @@ class Puzzle:
                 score = float("inf")
             else:
                 # calculate a heuristic score
-                score = self.oracle.score_candidate(next_candidate.sentence) + math.log(
-                    next_candidate.letters.total()
-                    / (next_candidate.letters.total() + remaining.total())
-                )
+                score = self.score_candidate(next_candidate.sentence, next_remaining)
 
             g = Guess(
                 next_candidate.sentence, "".join(next_remaining.elements()), score
             )
             yield g
+
+    def score_candidate(self, candidate: str, remaining: Counter):
+        oracle = self.oracle.score_candidate(candidate)
+
+        used_letter_count = Fragment(candidate).letters.total()
+        letter_usage = math.log(
+            used_letter_count / (used_letter_count + remaining.total())
+        )
+        return math.fsum((oracle, letter_usage))
 
     def soft_validate(self, placed: Fragment, remaining: Counter) -> bool:
         """Soft validation answers whether the candidate conforms to the problem
