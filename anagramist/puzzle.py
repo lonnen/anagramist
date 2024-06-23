@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import Counter, Iterator, List
+from typing import Counter, Iterator, List, Set
 
 from .fragment import Fragment
 from .guess import Guess
@@ -94,7 +94,7 @@ class Puzzle:
                 next_remaining.subtract(next_candidate.sentence)
                 del next_remaining[" "]
 
-                if not self.soft_validate(next_candidate, next_remaining):
+                if not soft_validate(next_candidate, next_remaining, c1663=self.c1663):
                     # there is no hope for this candidate
                     # delete the word and retry until we're out of words
                     vocab = vocab - set(word)
@@ -193,7 +193,7 @@ class Puzzle:
             next_remaining.subtract(next_candidate.sentence)
             del next_remaining[" "]
 
-            if not self.soft_validate(next_candidate, next_remaining):
+            if not soft_validate(next_candidate, next_remaining, c1663=self.c1663):
                 # do not record candidates that cannot be winners because of
                 # words that have already been placed.
                 continue
@@ -227,97 +227,106 @@ class Puzzle:
         # return math.fsum((oracle, letter_usage))
         return oracle
 
-    def soft_validate(self, placed: Fragment, remaining: Counter) -> bool:
-        """Soft validation answers whether the candidate conforms to the problem
-        constraints given the placement of letters so far.
 
-        All incomplete solutions will violate at least some of the problem constraints
-        as the space is explored, by virtue of having some unplaced letters. Soft
-        validation will only fail if some placement of the current letters guarantees
-        that no possible placement of remaining letters could make the guess valid.
+def soft_validate(
+    placed: Fragment,
+    remaining: Counter,
+    vocabulary: Set[str] = vocab,
+    c1663: bool = False,
+) -> bool:
+    """Soft validation answers whether the candidate conforms to the problem
+    constraints given the placement of letters so far.
 
-        Critically passing soft validation does not necessarily guarantee there exists
-        a solution in an arrangement of remaining letters, only that the current
-        placement does not preclude one existing.
+    All incomplete solutions will violate at least some of the problem constraints
+    as the space is explored, by virtue of having some unplaced letters. Soft
+    validation will only fail if some placement of the current letters guarantees
+    that no possible placement of remaining letters could make the guess valid.
 
-        Examples of states that would return false include placements using words
-        outside of the vocab list, or characters outside of the letter bank. For c1663,
-        additional constraints are applied, collected from Ryan North's hints about that
-        specific puzzle. For example, the final letter of the puzzle is "w". This means
-        that if all the "w"s are used before the final word is placed, the guess fails
-        soft validation. It also means when there are no remaining values, the final
-        placed letter should be "w".
-        """
-        # the sentence uses only characters from the provided bank
-        if any([v < 0 for v in remaining.values()]):
-            return False  # candidate uses letters not in the bank
+    Critically passing soft validation does not necessarily guarantee there exists
+    a solution in an arrangement of remaining letters, only that the current
+    placement does not preclude one existing.
 
-        if any([w not in vocab for w in placed.words]):
-            return False  # candidate uses words not in the bank
+    Examples of states that would return false include placements using words
+    outside of the vocab list, or characters outside of the letter bank. For c1663,
+    additional constraints are applied, collected from Ryan North's hints about that
+    specific puzzle. For example, the final letter of the puzzle is "w". This means
+    that if all the "w"s are used before the final word is placed, the guess fails
+    soft validation. It also means when there are no remaining values, the final
+    placed letter should be "w".
+    """
+    # the sentence uses only characters from the provided bank
+    if any([v < 0 for v in remaining.values()]):
+        return False  # candidate uses letters not in the bank
 
-        if remaining.total() > 0:
-            for w in self.vocabulary:
-                if Fragment(w).letters <= remaining:
-                    # at least one valid word can be spelled with the remaining letters
-                    break
-            else:
-                return False  # candidate can't make a valid word with remaining letters
+    if any([w not in vocab for w in placed.words]):
+        return False  # candidate uses words not in the bank
 
-        # constraints that only apply to c1663
-        if self.c1663:
-            # the first word is "I"
-            if placed.words[0] != "I":
-                return False
+    if remaining.total() > 0:
+        for w in vocabulary:
+            if Fragment(w).letters <= remaining:
+                # at least one valid word can be spelled with the remaining letters
+                break
+        else:
+            return False  # candidate can't make a valid word with remaining letters
 
-            # punctuation is in the solution in the order :,!!
-            punctuation = [":", ",", "!", "!"]
-            pos = 0
-            while pos < len(placed.words):
-                cha = placed.words[pos]
-                if len(cha) == 1 and cha not in set(
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-                ):
-                    if len(punctuation) < 1 or cha != punctuation.pop():
-                        return False
-                pos += 1
+    if not c1663:
+        return True
 
-            # longest word is 11 characters long
-            # second longest word is 8 characters long
-            # the words are side by side in the solution
-            word_lengths = [len(w) for w in placed.words]
-            for length, pos in enumerate(word_lengths):
-                if length <= 8:
-                    continue
-                if length != 11:
-                    # we have a word longer than 8 chars that is not 11 letters
-                    return False
-                # now we have our 11 letter word
-                # if it is the most recently placed, the next word could be length 8
-                if pos == len(word_lengths):
-                    continue
-                if word_lengths[length - 1] != 8 and word_lengths[length + 1] != 8:
-                    # either the word before or after must be 8
-                    return False
+    # from here on out, the constraints are derived from hints about comic 1663
 
-            # the final letter is "w"
-            # so the final three characters must be "w!!"
-            if remaining.total() == 2:
-                if placed.sentence[-1] != "w" or remaining["!"] != 2:
-                    return False
+    # the first word is "I"
+    if placed.words[0] != "I":
+        return False
 
-            # so word bank must contain a "w!!" until the end
-            if remaining.total() > 3:
-                if remaining["w"] == 0 or remaining["!"] < 2:
-                    return False
+    # punctuation is in the solution in the order :,!!
+    expected_punctuation = [":", ",", "!", "!"]
+    actual_punctuation = [
+        w
+        for w in placed.words
+        if len(w) == 1
+        and w not in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+    ]
+    for e, a in zip(expected_punctuation, actual_punctuation, strict=False):
+        if e != a:
+            return False
 
-            # so there must be a word in the vocab ending in "w" until the last
-            if remaining.total() > 2:
-                for w in self.vocabulary:
-                    if Fragment(w).letters <= remaining and w[-1] == "w":
-                        # at least one valid word ending in "w" remains
-                        break
-                else:
-                    # remaining letters do not allow for a word ending in "w"
-                    return False
+    # longest word is 11 characters long
+    # second longest word is 8 characters long
+    # the words are side by side in the solution
+    word_lengths = [len(w) for w in placed.words]
+    for length, pos in enumerate(word_lengths):
+        if length <= 8:
+            continue
+        if length != 11:
+            # we have a word longer than 8 chars that is not 11 letters
+            return False
+        # now we have our 11 letter word
+        # if it is the most recently placed, the next word could be length 8
+        if pos == len(word_lengths):
+            continue
+        if word_lengths[length - 1] != 8 and word_lengths[length + 1] != 8:
+            # either the word before or after must be 8
+            return False
 
-            return True
+    # the final letter is "w"
+    # so the final three characters must be "w!!"
+    if remaining.total() == 2:
+        if placed.sentence[-1] != "w" or remaining["!"] != 2:
+            return False
+
+    # so word bank must contain a "w!!" until the end
+    if remaining.total() > 3:
+        if remaining["w"] == 0 or remaining["!"] < 2:
+            return False
+
+    # so there must be a word in the vocab ending in "w" until the last
+    if remaining.total() > 2:
+        for w in vocabulary:
+            if Fragment(w).letters <= remaining and w[-1] == "w":
+                # at least one valid word ending in "w" remains
+                break
+        else:
+            # remaining letters do not allow for a word ending in "w"
+            return False
+
+    return True
