@@ -135,8 +135,8 @@ class Puzzle:
 
                 if not self.soft_validate(next_candidate, next_remaining):
                     # there is no hope for this candidate
-                    # pop the word off and retry until we're out of words
-                    del vocab[word]
+                    # delete the word and retry until we're out of words
+                    vocab = vocab - set(word)
                     next_candidate = Fragment(' '.join(next_candidate.words[:-1]))
                     # reuse vocab, no need to recalc
                     continue
@@ -159,8 +159,11 @@ class Puzzle:
                     )
 
                 if score < self.MAGIC_SCORE_THRESHOLD:
-                    # quick! abandon this line
-                    vocab = set()
+                    # there is no hope for this candidate
+                    # delete the word and retry until we're out of words
+                    vocab = vocab - set(word)
+                    next_candidate = Fragment(' '.join(next_candidate.words[:-1]))
+                    # reuse vocab, no need to recalc
                     continue
 
                 self.candidates.push(
