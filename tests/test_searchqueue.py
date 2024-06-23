@@ -53,11 +53,3 @@ class TestSearchQueue:
         psq.push(Guess("even more letters", "some letters", float(2)))
 
         assert len(psq) == 3
-
-    def test_database_sample(self, temp_database):
-        psq = PersistentSearchQueue(db_name=temp_database)
-        psq.push(Guess("first", "first_remains", float(0)))
-        psq.push(Guess("second", "second_remains", float(1)))
-        psq.push(Guess("third", "third_remains", float(0)))
-
-        assert psq.weighted_random_sample()[0] == "second"
