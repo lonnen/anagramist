@@ -29,7 +29,7 @@ def search(
             ),
             c1663=c1663,
         )
-        return puzzle.search("I")
+        return puzzle.search("I", strategy="strat_random_dfs")
     else:
         puzzle = Puzzle(
             letters,
