@@ -1,5 +1,5 @@
 import logging
-import math
+import random
 from dataclasses import dataclass
 from typing import Counter, Iterator, List, Self
 
@@ -54,6 +54,10 @@ class Puzzle:
     """A cryptoanagram puzzle consisting of a bank of letters to be formed into a
     sentence.
 
+    Attributes:
+        magic_score_threshhold: (`float`) - ignore logprobs below this threshold as if
+        they didn't pass soft-validation
+
     Args:
         letter_bank: (`String`) - a string containing all the characters to be used in
             the solution. Spaces will be ignored. This may be a sentence, or a simple
@@ -66,12 +70,14 @@ class Puzzle:
             to comic 1663 "The Qwantzle"
     """
 
+    MAGIC_SCORE_THRESHOLD = float(-50)
+
     def __init__(
         self,
         letter_bank: str,
         vocabulary: List[str] = vocab,
         oracle: Oracle = None,  # default: Universal
-        max_candidates: int = 1000,
+        max_candidates: int = 10000,
         c1663: bool = False,
     ) -> None:
         self.letter_bank = Fragment(letter_bank).letters
@@ -91,7 +97,84 @@ class Puzzle:
         self.candidates = PersistentSearchQueue(max_size=max_candidates)
         self.c1663 = c1663
 
-    def search(self, sentence_start: str):
+    def search(self, sentence_start: str, strategy="strat_weighted_bfs"):
+        if strategy == "strat_weighted_bfs":
+            self.strat_weighted_bfs(sentence_start)
+        elif strategy == "strat_random_dfs":
+            self.strat_random_dfs(sentence_start)
+
+    def strat_random_dfs(self, sentence_start: str):
+        if len(self.candidates) < 1:
+            remaining = self.letter_bank.copy()
+            remaining.subtract(Fragment(sentence_start).letters)
+            self.candidates.push(
+                Guess(
+                    sentence_start,
+                    "".join(remaining.elements()),
+                    self.score_candidate(sentence_start, remaining),
+                )
+            )
+        while len(self.candidates) > 0:
+            g = self.candidates.weighted_random_sample()
+            next_candidate = Fragment(g[0])
+
+            vocab = set(
+                w
+                for w in self.vocabulary
+                if Fragment(g[0] + " " + w).letters <= self.letter_bank
+            )
+
+            while len(vocab) > 0:
+                word = random.choice(list(vocab))
+
+                # compute child candidate and remaining letters
+                next_candidate = Fragment(next_candidate.sentence + " " + word)
+                next_remaining = self.letter_bank.copy()
+                next_remaining.subtract(next_candidate.sentence)
+                del next_remaining[" "]
+
+                if not self.soft_validate(next_candidate, next_remaining):
+                    # there is no hope for this candidate
+                    # pop the word off and retry until we're out of words
+                    del vocab[word]
+                    next_candidate = Fragment(' '.join(next_candidate.words[:-1]))
+                    # reuse vocab, no need to recalc
+                    continue
+
+                # ok this isn't yet a loser, so let's check for a winner
+                if (
+                    next_candidate.sentence[-1] == "w"
+                    and next_remaining.total() == 2
+                    and next_remaining.get("!") == 2
+                ):
+                    # we have a winner
+                    next_candidate.sentence += "!!"
+                    del next_remaining["!"]
+                    print("WINNER: {}".format(next_candidate))
+                    score = float("inf")
+                else:
+                    # neither doomed nor annointed? Dunno. Feed it to some ML heuristic?
+                    score = self.score_candidate(
+                        next_candidate.sentence, next_remaining
+                    )
+
+                if score < self.MAGIC_SCORE_THRESHOLD:
+                    # quick! abandon this line
+                    vocab = set()
+                    continue
+
+                self.candidates.push(
+                    Guess(
+                        next_candidate.sentence,
+                        "".join(next_remaining.elements()),
+                        score,
+                    )
+                )
+                vocab = set(
+                    w for w in self.vocabulary if Fragment(w).letters <= next_remaining
+                )
+
+    def strat_weighted_bfs(self, sentence_start: str):
         if len(self.candidates) < 1:
             remaining = self.letter_bank.copy()
             remaining.subtract(Fragment(sentence_start).letters)
@@ -173,11 +256,12 @@ class Puzzle:
     def score_candidate(self, candidate: str, remaining: Counter):
         oracle = self.oracle.score_candidate(candidate)
 
-        used_letter_count = Fragment(candidate).letters.total()
-        letter_usage = math.log(
-            used_letter_count / (used_letter_count + remaining.total())
-        )
-        return math.fsum((oracle, letter_usage))
+        # used_letter_count = Fragment(candidate).letters.total()
+        # letter_usage = math.log(
+        #     used_letter_count / (used_letter_count + remaining.total())
+        # )
+        # return math.fsum((oracle, letter_usage))
+        return oracle
 
     def soft_validate(self, placed: Fragment, remaining: Counter) -> bool:
         """Soft validation answers whether the candidate conforms to the problem
