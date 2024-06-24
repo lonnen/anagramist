@@ -118,14 +118,7 @@ class TransformerOracle(Oracle):
             games anymore.
             """
 
-    def score_candidates(self, candidates: List[str]) -> List[float]:
-        """Calculate the log scores of a given set of candidate sentences. This is
-        theoretically more efficient than looping over single candidates, but too many
-        at once can cause issues. It is recommended that consumers experiment with their
-        hardware and chunk candidates into batches for improved efficiency.
-
-        adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
-        """
+    def calc_candidate_scores(self, candidates: List[str]) -> List[float]:
         self.tokenizer.pad_token = self.tokenizer.bos_token
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
@@ -151,12 +144,24 @@ class TransformerOracle(Oracle):
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
             batch.append(text_sequence)
 
+        return batch
+
+    def score_candidates(self, candidates: List[str]) -> List[float]:
+        """Calculate the log scores of a given set of candidate sentences. This is
+        theoretically more efficient than looping over single candidates, but too many
+        at once can cause issues. It is recommended that consumers experiment with their
+        hardware and chunk candidates into batches for improved efficiency.
+
+        adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
+        """
+        batch = self.calc_candidate_scores(candidates)
+
         batch_scores = []
         for sequence in batch:
             batch_scores.append(fsum([log_score for _, log_score in sequence]))
 
         return batch_scores
 
-    def score_candidate(self, candidate) -> float:
+    def score_candidate(self, candidate: List[str]) -> float:
         """Calculate the log scores of a single candidate sentence"""
         return self.score_candidates([candidate])[0]
