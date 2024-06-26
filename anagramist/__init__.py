@@ -4,7 +4,7 @@ from os import PathLike
 
 from .fragment import Fragment
 from .oracles import TransformerOracle
-from .puzzle import Puzzle
+from .puzzle import Puzzle, soft_validate
 from .searchqueue import PersistentSearchTree
 
 logging.basicConfig(
@@ -63,11 +63,12 @@ def faux_uct_search(
     root = "I" if c1663 else ""
 
     node = root
+    # selection
+    # take a random weighted walk across the known world to an unexpanded node
     while True:
-        # selection
-        p, r, score, parent = search_tree.get(node)
-        placed = Fragment(placed)
-        remaining = Fragment(remaining)
+        p, r, score, _ = search_tree.get(node)
+        placed = Fragment(p)
+        remaining = Fragment(r)
 
         if score is None:
             # we have found an unexpanded node
@@ -85,9 +86,12 @@ def faux_uct_search(
         node = choices([w[0] for w in words], weights=[w[1] for w in words])[0]
         # keep looping until we reach an unexpanded node (no score)
 
-    # expansion
-    node 
-
-    # simulation
+    # expansion & simulation
+    # take a deep, uniform, random walk until we fail soft validation
+    while soft_validate(node):
+        placed = Fragment(node)
+        remaining = puzzle.letter_bank.copy()
+        remaining.subtract(placed)
 
     # backpropogation
+    oracle.calc_candidate_scores(placed.sentence)
