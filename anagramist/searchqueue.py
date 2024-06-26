@@ -171,16 +171,26 @@ class PersistentSearchTree:
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
+                
+    def children_of(self, element: T):
+        with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
+            with conn:  # auto-commits
+                with closing(conn.cursor()) as cursor:  # auto-closes
+                    return cursor.execute("""
+                        SELECT *
+                        FROM visited
+                        WHERE parent = '?'
+                    """, element.placed).fetchall()
 
-    def push(self, element: T):
+    def push(self, placed: str, remaining: str, score: float | None, parent: str):
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
             """INSERT INTO visited 
-                VALUES (?, ?, ?) 
+                VALUES (?, ?, ?, ?) 
             ON CONFLICT (placed, remaining) 
             DO UPDATE SET score = excluded.score
             """,
-            (element.placed, element.remaining, element.score),
+            (placed, remaining, score, parent),
         )
         con.commit()
