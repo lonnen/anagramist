@@ -136,7 +136,7 @@ class PersistentSearchQueue:
 
 
 class PersistentSearchTree:
-    """A persistence structure for storing the tree-search-space in a SQL lite db. 
+    """A persistence structure for storing the tree-search-space in a SQL lite db.
     Absolutely not thread-safe, nor any other kind of safe. It will delete all your data
     and physically deform your storage devices. It is literally powered by injustice.
 
