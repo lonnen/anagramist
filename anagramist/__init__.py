@@ -84,14 +84,28 @@ def faux_uct_search(
             )
         # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
         node = choices([w[0] for w in words], weights=[w[1] for w in words])[0]
-        # keep looping until we reach an unexpanded node (no score)
+        # loop repeats, breaking when we reach an unexpanded node (no score)
 
     # expansion & simulation
-    # take a deep, uniform, random walk until we fail soft validation
+    # take a deep, uniform, random walk until soft validation fails
     while soft_validate(node):
         placed = Fragment(node)
         remaining = puzzle.letter_bank.copy()
         remaining.subtract(placed)
 
+        # recalculate all valid next words
+        # pick one by uniform random sample
+        next_words = (w for w in puzzle.vocabulary if Fragment(w).letters <= remaining)
+        node = choices(next_words)[0]
+
     # backpropogation
+    # add the new random walk information to the known table
     oracle.calc_candidate_scores(placed.sentence)
+    sentence = ""
+    remaining = puzzle.letter_bank.copy()
+    for w, score in oracle.calc_candidate_scores(placed.sentence):
+        parent = sentence
+        sentence = sentence + " " + w
+        remaining = puzzle.letter_bank.copy()
+        remaining.subtract(placed)
+        search_tree.push(sentence, remaining, score, parent)
