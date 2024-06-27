@@ -54,6 +54,7 @@ class TestSearchQueue:
 
         assert len(psq) == 3
 
+
 class TestPersistentSearchTree:
     def test_database_creation(self, temp_database):
         PersistentSearchTree(db_name=temp_database)
@@ -78,7 +79,12 @@ class TestPersistentSearchTree:
             SELECT *
             FROM visited;
         """)
-        assert cur.fetchone() == ("placed letters", "remaining letters", "0.0", "placed")
+        assert cur.fetchone() == (
+            "placed letters",
+            "remaining letters",
+            "0.0",
+            "placed",
+        )
         con.commit()
         cur.close()
 
