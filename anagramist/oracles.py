@@ -118,7 +118,7 @@ class TransformerOracle(Oracle):
             games anymore.
             """
 
-    def calc_candidate_scores(self, candidates: List[str]) -> List[float]:
+    def calc_candidate_scores(self, candidates: List[str]) -> List[(str, float)]:
         self.tokenizer.pad_token = self.tokenizer.bos_token
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
