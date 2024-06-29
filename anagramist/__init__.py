@@ -23,25 +23,26 @@ def search(
     fp16: bool = False,
     c1663: bool = False,
 ):
-    if c1663:
-        logger.debug("c1663 is true - overriding provided letters")
-        puzzle = Puzzle(
-            "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
-            oracle=TransformerOracle(
-                model_name_or_path, seed, (not use_gpu), fp16, c1663
-            ),
-            c1663=c1663,
-        )
-        return puzzle.search("I", strategy="strat_random_dfs")
-    else:
-        puzzle = Puzzle(
-            letters,
-            oracle=TransformerOracle(
-                model_name_or_path, seed, (not use_gpu), fp16, c1663
-            ),
-            c1663=c1663,
-        )
-        return puzzle.search("")
+    faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663)
+    # if c1663:
+    #     logger.debug("c1663 is true - overriding provided letters")
+    #     puzzle = Puzzle(
+    #         "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
+    #         oracle=TransformerOracle(
+    #             model_name_or_path, seed, (not use_gpu), fp16, c1663
+    #         ),
+    #         c1663=c1663,
+    #     )
+    #     return puzzle.search("I", strategy="strat_random_dfs")
+    # else:
+    #     puzzle = Puzzle(
+    #         letters,
+    #         oracle=TransformerOracle(
+    #             model_name_or_path, seed, (not use_gpu), fp16, c1663
+    #         ),
+    #         c1663=c1663,
+    #     )
+    #     return puzzle.search("")
 
 
 # the exploration constant is the stand in score for unscored candidates
