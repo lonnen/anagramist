@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from math import fsum
 from os import PathLike
-from typing import List
+from typing import List, Tuple
 
 from accelerate import PartialState
 from accelerate.utils import set_seed
@@ -118,7 +118,7 @@ class TransformerOracle(Oracle):
             games anymore.
             """
 
-    def calc_candidate_scores(self, candidates: List[str]) -> List[(str, float)]:
+    def calc_candidate_scores(self, candidates: List[str]) -> List[Tuple[str, float]]:
         self.tokenizer.pad_token = self.tokenizer.bos_token
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
