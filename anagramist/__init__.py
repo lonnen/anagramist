@@ -67,13 +67,15 @@ def faux_uct_search(
     # selection
     # take a random weighted walk across the known world to an unexpanded node
     while True:
-        p, r, score, _ = search_tree.get(node)
-        placed = Fragment(p)
-        remaining = Fragment(r)
-
-        if score is None:
+        cached = search_tree.get(node)
+        if cached is None:
             # we have found an unexpanded node
             break
+
+        p, r, score, _ = cached
+
+        placed = Fragment(p)
+        remaining = Fragment(r)
 
         words = []
         for word in puzzle.vocabulary:
@@ -89,22 +91,25 @@ def faux_uct_search(
 
     # expansion & simulation
     # take a deep, uniform, random walk until soft validation fails
-    while soft_validate(node):
+    while True:
         placed = Fragment(node)
         remaining = puzzle.letter_bank.copy()
-        remaining.subtract(placed)
+        remaining.subtract(placed.letters)
+
+        if not soft_validate(placed, remaining, puzzle.vocabulary, c1663):
+            break
 
         # recalculate all valid next words
         # pick one by uniform random sample
-        next_words = (w for w in puzzle.vocabulary if Fragment(w).letters <= remaining)
-        node = choices(next_words)[0]
+        next_words = [w for w in puzzle.vocabulary if Fragment(w).letters <= remaining]
+        next = choices(next_words)[0]
+        node = node + " " + next
 
     # backpropogation
     # add the new random walk information to the known table
-    oracle.calc_candidate_scores(placed.sentence)
     sentence = ""
     remaining = puzzle.letter_bank.copy()
-    for w, score in oracle.calc_candidate_scores(placed.sentence):
+    for w, score in oracle.calc_candidate_scores(placed.words):
         parent = sentence
         sentence = sentence + " " + w
         remaining = puzzle.letter_bank.copy()
