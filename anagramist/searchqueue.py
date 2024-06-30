@@ -186,7 +186,7 @@ class PersistentSearchTree:
                         (placed,),
                     ).fetchone()
 
-    def push(self, placed: str, remaining: str, score: float | None, parent: str):
+    def push(self, placed: str, remaining: str, parent: str,  score: float | None):
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
@@ -195,6 +195,6 @@ class PersistentSearchTree:
             ON CONFLICT (placed, remaining) 
             DO UPDATE SET score = excluded.score
             """,
-            (placed, remaining, score, parent),
+            (placed, remaining, parent, score),
         )
         con.commit()

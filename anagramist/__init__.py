@@ -157,7 +157,7 @@ def faux_uct_search(
                 del remaining["!"]
                 print("WINNER: {}".format(sentence))
                 score = float("inf")
-            search_tree.push(sentence, "".join(remaining.elements()), score, parent)
+            search_tree.push(sentence, "".join(remaining.elements()), parent, score)
 
 
 def compute_valid_vocab(vocab: List[str], remaining: Counter, c116: bool):
