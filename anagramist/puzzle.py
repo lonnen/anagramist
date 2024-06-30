@@ -294,7 +294,7 @@ def soft_validate(
     # second longest word is 8 characters long
     # the words are side by side in the solution
     word_lengths = [len(w) for w in placed.words]
-    for length, pos in enumerate(word_lengths):
+    for pos, length in enumerate(word_lengths):
         if length <= 8:
             continue
         if length != 11:
