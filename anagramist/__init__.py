@@ -233,15 +233,12 @@ def soft_validate(
 
     # punctuation is in the solution in the order :,!!
     expected_punctuation = [":", ",", "!", "!"]
-    actual_punctuation = [
-        w
-        for w in placed.words
-        if len(w) == 1
-        and w not in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
-    ]
-    for e, a in zip(expected_punctuation, actual_punctuation, strict=False):
-        if e != a:
-            return False
+    punctuation_position = 0
+    for w in placed.words:
+        if len(w) == 1 and w not in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"):
+            if expected_punctuation[punctuation_position] != w:
+                return False
+            punctuation_position += 1
 
     # longest word is 11 characters long
     # second longest word is 8 characters long
