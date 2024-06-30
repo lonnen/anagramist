@@ -141,17 +141,18 @@ def faux_uct_search(
                 sentence = sentence + " " + w
             remaining = puzzle.letter_bank.copy()
             remaining.subtract(sentence)
+
             # check for a winner
-            if (
-                sentence[-1] == "w"
-                and remaining.total() == 2
-                and remaining.get("!") == 2
-            ):
+            if hard_validate(sentence, remaining, letters, c1663=c1663):
                 # we have a winner
                 sentence += "!!"
                 del remaining["!"]
                 print("WINNER: {}".format(sentence))
                 score = float("inf")
+            elif w == scored_words[-1][0]:
+                # the final word failed soft validation, and by definition cannot win
+                score = float("-inf")
+
             search_tree.push(sentence, "".join(remaining.elements()), parent, score)
 
 
