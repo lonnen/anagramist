@@ -40,7 +40,7 @@ def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
         seed,
         use_gpu,
         fp16,
-        c1663,
+        c1663=c1663,
     )
 
 

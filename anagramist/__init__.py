@@ -25,7 +25,7 @@ def search(
     fp16: bool = False,
     c1663: bool = False,
 ):
-    faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663)
+    faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663)
 
 
 # the exploration constant is the stand in score for unscored candidates
@@ -33,7 +33,7 @@ EXPLORATION_SCORE = float(-40)
 
 
 def faux_uct_search(
-    letter_bank: str,
+    letters: str,
     model_name_or_path: str | PathLike[str],
     seed: int,
     use_gpu: bool = False,
@@ -42,6 +42,7 @@ def faux_uct_search(
     c1663: bool = False,
 ):
     # setup
+    letter_bank = Fragment(letters).letters
     oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     search_tree = PersistentSearchTree()
     root = "I" if c1663 else ""
@@ -62,9 +63,7 @@ def faux_uct_search(
             remaining = Fragment(r)
 
             words = []
-            for word in compute_valid_vocab(
-                vocabulary, letter_bank, c1663
-            ):
+            for word in compute_valid_vocab(vocabulary, letter_bank, c1663):
                 words.append(
                     search_tree.get(placed.sentence + " " + word, EXPLORATION_SCORE)
                 )
@@ -84,9 +83,7 @@ def faux_uct_search(
 
             # recalculate all valid next words
             # pick one by uniform random sample
-            next_words = [
-                w for w in compute_valid_vocab(vocabulary, remaining, c1663)
-            ]
+            next_words = [w for w in compute_valid_vocab(vocabulary, remaining, c1663)]
 
             next = choices(next_words)[0]
             node = node + " " + next
@@ -122,7 +119,7 @@ def faux_uct_search(
             remaining.subtract(sentence)
 
             # check for a winner
-            if hard_validate(sentence, remaining, letter_bank, c1663=c1663):
+            if hard_validate(Fragment(sentence), remaining, letter_bank, c1663=c1663):
                 # we have a winner
                 sentence += "!!"
                 del remaining["!"]
