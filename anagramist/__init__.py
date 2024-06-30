@@ -2,6 +2,7 @@ import logging
 from math import fsum
 from random import choices
 from os import PathLike
+from typing import Counter, List
 
 from .fragment import Fragment
 from .oracles import TransformerOracle
@@ -28,7 +29,8 @@ def search(
     # if c1663:
     #     logger.debug("c1663 is true - overriding provided letters")
     #     puzzle = Puzzle(
-    #         "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
+    #         """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssss
+    #            dddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""",
     #         oracle=TransformerOracle(
     #             model_name_or_path, seed, (not use_gpu), fp16, c1663
     #         ),
@@ -64,9 +66,8 @@ def faux_uct_search(
     puzzle = Puzzle(letters, c1663=c1663)
     root = "I" if c1663 else ""
 
-    node = root
-
     while True:
+        node = root
         # selection
         # take a random weighted walk across the known world to an unexpanded node
         while True:
@@ -104,20 +105,34 @@ def faux_uct_search(
 
             # recalculate all valid next words
             # pick one by uniform random sample
-            next_words = [w for w in puzzle.vocabulary if Fragment(w).letters <= remaining]
+            next_words = [
+                w
+                for w in puzzle.vocabulary
+                if Fragment(w).letters <= remaining
+                and (
+                    Fragment(w).letters.get("w", 0) < 1
+                    or (remaining.get("w", 0) == 1 and w[-1] == "w")
+                )
+            ]
             next = choices(next_words)[0]
             node = node + " " + next
 
         # preprocessing to get to word-level scores
-        scored_tokens = oracle.calc_candidate_scores([placed.sentence,])[0]
+        scored_tokens = oracle.calc_candidate_scores(
+            [
+                placed.sentence,
+            ]
+        )[0]
         scored_words = []
         for w in placed.words:
             accumulated_tokens = []
             while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
                 accumulated_tokens.append(scored_tokens.pop(0))
-            scored_words.append([
-                "".join([token.strip() for token, _ in accumulated_tokens]),
-                fsum([score for _, score in accumulated_tokens])]
+            scored_words.append(
+                [
+                    "".join([token.strip() for token, _ in accumulated_tokens]),
+                    fsum([score for _, score in accumulated_tokens]),
+                ]
             )
 
         # backpropogation
@@ -143,3 +158,21 @@ def faux_uct_search(
                 print("WINNER: {}".format(sentence))
                 score = float("inf")
             search_tree.push(sentence, "".join(remaining.elements()), score, parent)
+
+
+def compute_valid_vocab(vocab: List[str], remaining: Counter, c116: bool):
+    for word in vocab:
+        next_word = Fragment(word)
+        if not next_word.letters <= remaining:
+            continue
+        if not c116:
+            yield next_word.sentence
+        else:
+            if remaining.get("w", 0) == next_word.letters.get("w", 0):
+                if next_word.sentence[-1] != "w":
+                    # last word must end in "w"
+                    continue
+                if remaining != next_word.letters ++ Counter("!!"):
+                    # the last w must be used in the final word
+                    continue
+            yield next_word.sentence
