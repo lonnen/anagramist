@@ -1,9 +1,10 @@
 from collections import Counter
 from random import shuffle
 
+from anagramist import compute_valid_vocab
 from anagramist.fragment import Fragment, parse_sentence
 from anagramist.puzzle import Guess
-
+from anagramist.vocab import vocab
 
 class TestParseSentence:
     def test_parse_sentence(self):
@@ -125,3 +126,48 @@ class TestGuess:
         shuffle(guesses)
         assert [g.score for g in guesses] != [g.score for g in sorted(guesses)]
         assert [g.score for g in sorted(guesses)] == expected
+
+class TestVocabFilter:
+    def test_basic_filter(self):
+        remaining = Counter("knows!!")
+        expected = [
+            "!",
+            "k",
+            "know",
+            "knows",
+            "n",
+            "no",
+            "now",
+            "o",
+            "ok",
+            "on",
+            "ow",
+            "own",
+            "owns",
+            "s",
+            "snow",
+            "so",
+            "son",
+            "w",
+            "won",
+        ]
+        filtered = [w for w in compute_valid_vocab(vocab, remaining, False)]
+        assert expected == sorted(filtered)
+    
+    def test_c1663_filter(self):
+        remaining = Counter("know!!")
+        expected = [
+            "!",
+            "k",
+            "know",
+            "n",
+            "no",
+            "o",
+            "ok",
+            "on",
+        ]
+        filtered = [w for w in compute_valid_vocab(vocab, remaining, True)]
+        assert expected == sorted(filtered)
+        
+
+        compute_valid_vocab(vocab, remaining, True)
