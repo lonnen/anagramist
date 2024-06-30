@@ -6,6 +6,7 @@ from anagramist.fragment import Fragment, parse_sentence
 from anagramist.puzzle import Guess
 from anagramist.vocab import vocab
 
+
 class TestParseSentence:
     def test_parse_sentence(self):
         assert parse_sentence("I") == ["I"]
@@ -127,6 +128,7 @@ class TestGuess:
         assert [g.score for g in guesses] != [g.score for g in sorted(guesses)]
         assert [g.score for g in sorted(guesses)] == expected
 
+
 class TestVocabFilter:
     def test_basic_filter(self):
         remaining = Counter("knows!!")
@@ -153,7 +155,7 @@ class TestVocabFilter:
         ]
         filtered = [w for w in compute_valid_vocab(vocab, remaining, False)]
         assert expected == sorted(filtered)
-    
+
     def test_c1663_filter(self):
         remaining = Counter("know!!")
         expected = [
@@ -168,6 +170,5 @@ class TestVocabFilter:
         ]
         filtered = [w for w in compute_valid_vocab(vocab, remaining, True)]
         assert expected == sorted(filtered)
-        
 
         compute_valid_vocab(vocab, remaining, True)

@@ -186,7 +186,7 @@ class PersistentSearchTree:
                         (placed,),
                     ).fetchone()
 
-    def push(self, placed: str, remaining: str, parent: str,  score: float | None):
+    def push(self, placed: str, remaining: str, parent: str, score: float | None):
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
