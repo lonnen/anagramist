@@ -1,4 +1,5 @@
 import logging
+from math import fsum
 from random import choices
 from os import PathLike
 
@@ -105,13 +106,27 @@ def faux_uct_search(
         next = choices(next_words)[0]
         node = node + " " + next
 
+    # preprocessing to get to word-level scores
+    scored_tokens = oracle.calc_candidate_scores([placed.sentence,])[0]
+    scored_words = []
+    for w in placed.words:
+        accumulated_tokens = []
+        while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
+            accumulated_tokens.append(scored_tokens.pop(0))
+        scored_words.append([
+            "".join([token.strip() for token, _ in accumulated_tokens]),
+            fsum([score for _, score in accumulated_tokens])]
+        )
+
     # backpropogation
     # add the new random walk information to the known table
     sentence = ""
-    remaining = puzzle.letter_bank.copy()
-    for w, score in oracle.calc_candidate_scores(placed.words):
+    for w, score in scored_words:
         parent = sentence
-        sentence = sentence + " " + w
+        if sentence == "":
+            sentence = sentence + w
+        else:
+            sentence = sentence + " " + w
         remaining = puzzle.letter_bank.copy()
-        remaining.subtract(placed)
-        search_tree.push(sentence, remaining, score, parent)
+        remaining.subtract(sentence)
+        search_tree.push(sentence, "".join(remaining.elements()), score, parent)
