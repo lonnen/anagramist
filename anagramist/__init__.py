@@ -82,10 +82,9 @@ def faux_uct_search(
             remaining = Fragment(r)
 
             words = []
-            for word in puzzle.vocabulary:
-                if not Fragment(word).letters <= remaining:
-                    # word cannot be spelled with remaining characters
-                    continue
+            for word in compute_valid_vocab(
+                puzzle.vocabulary, puzzle.letter_bank, c1663
+            ):
                 words.append(
                     search_tree.get(placed.sentence + " " + word, EXPLORATION_SCORE)
                 )
@@ -106,14 +105,9 @@ def faux_uct_search(
             # recalculate all valid next words
             # pick one by uniform random sample
             next_words = [
-                w
-                for w in puzzle.vocabulary
-                if Fragment(w).letters <= remaining
-                and (
-                    Fragment(w).letters.get("w", 0) < 1
-                    or (remaining.get("w", 0) == 1 and w[-1] == "w")
-                )
+                w for w in compute_valid_vocab(puzzle.vocabulary, remaining, c1663)
             ]
+
             next = choices(next_words)[0]
             node = node + " " + next
 
@@ -160,19 +154,27 @@ def faux_uct_search(
             search_tree.push(sentence, "".join(remaining.elements()), parent, score)
 
 
-def compute_valid_vocab(vocab: List[str], remaining: Counter, c116: bool):
+def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):
+    """Filters the vocab list to return only know-valid words that can be placed next.
+
+    Args:
+        vocab (`List[str]`) - the list containing the words that are legal to use in
+            this puzzle
+        remaining (`Counter`) - the letters remaining to be placed
+        c1163 (`bool`) - whether or not to leverage comic 1663 specific hints
+    """
     for word in vocab:
         next_word = Fragment(word)
         if not next_word.letters <= remaining:
             continue
-        if not c116:
+        if not c1163:
             yield next_word.sentence
         else:
             if remaining.get("w", 0) == next_word.letters.get("w", 0):
                 if next_word.sentence[-1] != "w":
                     # last word must end in "w"
                     continue
-                if remaining != next_word.letters ++ Counter("!!"):
+                if remaining != next_word.letters + +Counter("!!"):
                     # the last w must be used in the final word
                     continue
             yield next_word.sentence
