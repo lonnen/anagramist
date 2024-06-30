@@ -6,7 +6,6 @@ from typing import Counter, List, Set
 
 from .fragment import Fragment
 from .oracles import TransformerOracle
-from .puzzle import Puzzle
 from .searchqueue import PersistentSearchTree
 from .vocab import vocab
 
@@ -34,17 +33,17 @@ EXPLORATION_SCORE = float(-40)
 
 
 def faux_uct_search(
-    letters: str,
+    letter_bank: str,
     model_name_or_path: str | PathLike[str],
     seed: int,
     use_gpu: bool = False,
     fp16: bool = False,
+    vocabulary: Set[str] = vocab,
     c1663: bool = False,
 ):
     # setup
     oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     search_tree = PersistentSearchTree()
-    puzzle = Puzzle(letters, c1663=c1663)
     root = "I" if c1663 else ""
 
     while True:
@@ -64,7 +63,7 @@ def faux_uct_search(
 
             words = []
             for word in compute_valid_vocab(
-                puzzle.vocabulary, puzzle.letter_bank, c1663
+                vocabulary, letter_bank, c1663
             ):
                 words.append(
                     search_tree.get(placed.sentence + " " + word, EXPLORATION_SCORE)
@@ -77,16 +76,16 @@ def faux_uct_search(
         # take a deep, uniform, random walk until soft validation fails
         while True:
             placed = Fragment(node)
-            remaining = puzzle.letter_bank.copy()
+            remaining = letter_bank.copy()
             remaining.subtract(placed.letters)
 
-            if not soft_validate(placed, remaining, puzzle.vocabulary, c1663):
+            if not soft_validate(placed, remaining, vocabulary, c1663):
                 break
 
             # recalculate all valid next words
             # pick one by uniform random sample
             next_words = [
-                w for w in compute_valid_vocab(puzzle.vocabulary, remaining, c1663)
+                w for w in compute_valid_vocab(vocabulary, remaining, c1663)
             ]
 
             next = choices(next_words)[0]
@@ -119,11 +118,11 @@ def faux_uct_search(
                 sentence = sentence + w
             else:
                 sentence = sentence + " " + w
-            remaining = puzzle.letter_bank.copy()
+            remaining = letter_bank.copy()
             remaining.subtract(sentence)
 
             # check for a winner
-            if hard_validate(sentence, remaining, letters, c1663=c1663):
+            if hard_validate(sentence, remaining, letter_bank, c1663=c1663):
                 # we have a winner
                 sentence += "!!"
                 del remaining["!"]
@@ -216,7 +215,9 @@ def soft_validate(
     expected_punctuation = [":", ",", "!", "!"]
     punctuation_position = 0
     for w in placed.words:
-        if len(w) == 1 and w not in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"):
+        if len(w) == 1 and w not in set(
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        ):
             if expected_punctuation[punctuation_position] != w:
                 return False
             punctuation_position += 1
@@ -262,6 +263,7 @@ def soft_validate(
 
     return True
 
+
 def hard_validate(
     placed: Fragment,
     remaining: Counter,
@@ -270,11 +272,11 @@ def hard_validate(
     c1663: bool = False,
 ) -> bool:
     """Hard validation andswers whether this passes all the constraints that can be
-    verified computationally. 
+    verified computationally.
     """
 
     if placed.letters != original_letter_bank:
-        return False # placed must use exactly all the letters of the bank 
+        return False  # placed must use exactly all the letters of the bank
 
     if any([w not in vocab for w in placed.words]):
         return False  # candidate uses words not in the bank
@@ -287,7 +289,7 @@ def hard_validate(
     # the first word is "I"
     if placed.words[0] != "I":
         return False
-    
+
     # the final three characters are "w!!"
     if placed.sentence[-3:] != "w!!":
         return False
@@ -296,7 +298,9 @@ def hard_validate(
     expected_punctuation = [":", ",", "!", "!"]
     punctuation_position = 0
     for w in placed.words:
-        if len(w) == 1 and w not in set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"):
+        if len(w) == 1 and w not in set(
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        ):
             if expected_punctuation[punctuation_position] != w:
                 return False
             punctuation_position += 1
