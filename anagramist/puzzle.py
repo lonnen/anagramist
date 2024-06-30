@@ -304,7 +304,7 @@ def soft_validate(
         # if it is the most recently placed, the next word could be length 8
         if pos == len(word_lengths):
             continue
-        if word_lengths[length - 1] != 8 and word_lengths[length + 1] != 8:
+        if word_lengths[pos - 1] != 8 and word_lengths[pos + 1] != 8:
             # either the word before or after must be 8
             return False
 
