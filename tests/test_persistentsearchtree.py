@@ -12,6 +12,7 @@ def temp_database():
     yield db_name
     os.remove(db_name)
 
+
 class TestPersistentSearchTree:
     def test_database_creation(self, temp_database):
         PersistentSearchTree(db_name=temp_database)
