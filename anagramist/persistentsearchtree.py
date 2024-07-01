@@ -40,11 +40,11 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
-    def get(self, placed: str):
+    def get(self, placed: str, default=None):
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
-                    cursor.execute(
+                    fetch = cursor.execute(
                         """
                         SELECT *
                         FROM visited
@@ -53,6 +53,10 @@ class PersistentSearchTree:
                     """,
                         (placed,),
                     ).fetchone()
+                    if fetch is None:
+                        if default is not None:
+                            return default
+                    return fetch
 
     def push(
         self,
