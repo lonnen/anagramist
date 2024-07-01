@@ -117,29 +117,20 @@ class TestFragment:
         ]
         assert not c.sentence == ["caps", "matter"]
 
-    def test_punctuation(self):
+    def test_merged_punctuation(self):
         c = Fragment(
-            "I rem erk cells inhibit bye noises await holla authors loved needs laan hah toot du tony ,"
+            """I rem needs laan hah toot du tony ,"""
         )
         assert c.words == [
-                "I",
-                "rem",
-                "erk",
-                "cells",
-                "inhibit",
-                "bye",
-                "noises",
-                "await",
-                "holla",
-                "authors",
-                "loved",
-                "needs",
-                "laan",
-                "hah",
-                "toot",
-                "du",
-                "tony",
-                ",",
+            "I",
+            "rem",
+            "needs",
+            "laan",
+            "hah",
+            "toot",
+            "du",
+            "tony",
+            ",",
         ]
 
 
