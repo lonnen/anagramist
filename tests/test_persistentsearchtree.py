@@ -49,7 +49,9 @@ class TestPersistentSearchTree:
     def test_database_len(self, temp_database):
         psq = PersistentSearchTree(db_name=temp_database)
         psq.push("placed letters", "remaining letters", "placed", float(0), float(0))
-        psq.push("other letters", "other remaining letters", "other", float(1), float(1))
+        psq.push(
+            "other letters", "other remaining letters", "other", float(1), float(1)
+        )
         psq.push("even more letters", "some letters", "even more", float(2), float(2))
 
         assert len(psq) == 3
