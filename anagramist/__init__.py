@@ -85,6 +85,9 @@ def faux_uct_search(
             # pick one by uniform random sample
             next_words = [w for w in compute_valid_vocab(vocabulary, remaining, c1663)]
 
+            if len(next_words) == 0:
+                break
+
             next = choices(next_words)[0]
             node = node + " " + next
 
