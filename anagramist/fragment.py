@@ -42,7 +42,11 @@ def parse_sentence(candidate_sentence: str) -> List[str]:
                 words.append("")
         else:
             # anything else is a word unto itself
-            words.append(char)
+            if words[-1] != "":
+                # move to a new word as in the case of comma without preceeding space
+                # but check first so sequential punctuation don't leave empty words
+                words.append("")
+            words[-1] += char
             words.append("")
     if words[-1] != "":
         return words

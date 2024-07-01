@@ -3,7 +3,7 @@ from random import shuffle
 
 from anagramist import compute_valid_vocab
 from anagramist.fragment import Fragment, parse_sentence
-from anagramist import Guess
+from anagramist.guess import Guess
 from anagramist.vocab import vocab
 
 
@@ -116,6 +116,31 @@ class TestFragment:
             "MATTER",
         ]
         assert not c.sentence == ["caps", "matter"]
+
+    def test_punctuation(self):
+        c = Fragment(
+            "I rem erk cells inhibit bye noises await holla authors loved needs laan hah toot du tony ,"
+        )
+        assert c.words == [
+                "I",
+                "rem",
+                "erk",
+                "cells",
+                "inhibit",
+                "bye",
+                "noises",
+                "await",
+                "holla",
+                "authors",
+                "loved",
+                "needs",
+                "laan",
+                "hah",
+                "toot",
+                "du",
+                "tony",
+                ",",
+        ]
 
 
 class TestGuess:
