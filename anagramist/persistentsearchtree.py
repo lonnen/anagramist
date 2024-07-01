@@ -20,6 +20,7 @@ class PersistentSearchTree:
         remaining TEXT NOT NULL,
         parent TEXT NOT NULL,
         score REAL,
+        cumulative_score REAL,
 
         PRIMARY KEY(placed, remaining)
     );
@@ -53,15 +54,24 @@ class PersistentSearchTree:
                         (placed,),
                     ).fetchone()
 
-    def push(self, placed: str, remaining: str, parent: str, score: float | None):
+    def push(
+        self,
+        placed: str,
+        remaining: str,
+        parent: str,
+        score: float | None,
+        cumulative_score: float | None,
+    ):
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
             """INSERT INTO visited 
-                VALUES (?, ?, ?, ?) 
+                VALUES (?, ?, ?, ?, ?) 
             ON CONFLICT (placed, remaining) 
-            DO UPDATE SET score = excluded.score
+            DO UPDATE SET 
+                score = excluded.score, 
+                cumulative_score = excluded.cumulative_score
             """,
-            (placed, remaining, parent, score),
+            (placed, remaining, parent, score, cumulative_score),
         )
         con.commit()

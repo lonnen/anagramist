@@ -102,9 +102,13 @@ def faux_uct_search(
             accumulated_tokens = []
             while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
                 accumulated_tokens.append(scored_tokens.pop(0))
+            accumulated_word = "".join(
+                [token.strip() for token, _ in accumulated_tokens]
+            )
+            assert accumulated_word in vocab
             scored_words.append(
                 [
-                    "".join([token.strip() for token, _ in accumulated_tokens]),
+                    accumulated_word,
                     fsum([score for _, score in accumulated_tokens]),
                 ]
             )
@@ -112,6 +116,7 @@ def faux_uct_search(
         # backpropogation
         # add the new random walk information to the known table
         sentence = ""
+        cumulative_score = 0
         for w, score in scored_words:
             parent = sentence
             if sentence == "":
@@ -130,9 +135,12 @@ def faux_uct_search(
                 score = float("inf")
             elif w == scored_words[-1][0]:
                 # the final word failed soft validation, and by definition cannot win
-                score = float("-inf")
+                continue
 
-            search_tree.push(sentence, "".join(remaining.elements()), parent, score)
+            cumulative_score = fsum([cumulative_score, score])
+            search_tree.push(
+                sentence, "".join(remaining.elements()), parent, score, cumulative_score
+            )
 
 
 def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):
