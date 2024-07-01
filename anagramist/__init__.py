@@ -6,7 +6,7 @@ from typing import Counter, List, Set
 
 from .fragment import Fragment
 from .oracles import TransformerOracle
-from .searchqueue import PersistentSearchTree
+from .persistentsearchtree import PersistentSearchTree
 from .vocab import vocab
 
 logging.basicConfig(

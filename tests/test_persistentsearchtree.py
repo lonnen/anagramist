@@ -1,8 +1,7 @@
 import os
 import pytest
 import sqlite3
-from anagramist.puzzle import Guess
-from anagramist.searchqueue import PersistentSearchQueue, PersistentSearchTree
+from anagramist import Guess, PersistentSearchTree
 
 
 @pytest.fixture
@@ -15,7 +14,7 @@ def temp_database():
 
 class TestSearchQueue:
     def test_database_creation(self, temp_database):
-        PersistentSearchQueue(db_name=temp_database)
+        PersistentSearchTree(db_name=temp_database)
         con = sqlite3.connect(temp_database)
         cur = con.cursor()
         cur.execute("""
@@ -28,7 +27,7 @@ class TestSearchQueue:
         cur.close()
 
     def test_database_push(self, temp_database):
-        psq = PersistentSearchQueue(db_name=temp_database)
+        psq = PersistentSearchTree(db_name=temp_database)
         psq.push(Guess("placed letters", "remaining letters", float(0)))
 
         con = sqlite3.connect(temp_database)
@@ -47,7 +46,7 @@ class TestSearchQueue:
         cur.close()
 
     def test_database_len(self, temp_database):
-        psq = PersistentSearchQueue(db_name=temp_database)
+        psq = PersistentSearchTree(db_name=temp_database)
         psq.push(Guess("placed letters", "remaining letters", float(0)))
         psq.push(Guess("other letters", "other remaining letters", float(1)))
         psq.push(Guess("even more letters", "some letters", float(2)))

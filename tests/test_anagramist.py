@@ -3,7 +3,7 @@ from random import shuffle
 
 from anagramist import compute_valid_vocab
 from anagramist.fragment import Fragment, parse_sentence
-from anagramist.puzzle import Guess
+from anagramist import Guess
 from anagramist.vocab import vocab
 
 
