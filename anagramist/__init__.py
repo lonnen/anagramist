@@ -57,17 +57,15 @@ def faux_uct_search(
                 # we have found an unexpanded node
                 break
 
-            p, r, score, _, _ = cached
-
-            placed = Fragment(p)
-            remaining = Fragment(r)
+            placed_letters, _, score, _, _ = cached
 
             words = []
-            for word in compute_valid_vocab(vocabulary, letter_bank, c1663):
+            valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank, c1663)]
+            for word in valid_vocab:
                 words.append(
                     search_tree.get(
-                        placed.sentence + " " + word,
-                        (placed.sentence + " " + word, '', '', EXPLORATION_SCORE, 0),
+                        placed_letters + " " + word,
+                        (placed_letters + " " + word, '', '', EXPLORATION_SCORE, 0),
                     )
                 )
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
