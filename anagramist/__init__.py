@@ -155,7 +155,7 @@ def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):
         c1163 (`bool`) - whether or not to leverage comic 1663 specific hints
     """
     for word in vocab:
-        next_word = Fragment(word)
+        next_word = Fragment(word, word=True)
         if not next_word.letters <= remaining:
             continue
         if not c1163:
@@ -206,7 +206,7 @@ def soft_validate(
 
     if remaining.total() > 0:
         for w in vocabulary:
-            if Fragment(w).letters <= remaining:
+            if Fragment(w, word=True).letters <= remaining:
                 # at least one valid word can be spelled with the remaining letters
                 break
         else:
@@ -264,7 +264,7 @@ def soft_validate(
     # so there must be a word in the vocab ending in "w" until the last
     if remaining.total() > 2:
         for w in vocabulary:
-            if Fragment(w).letters <= remaining and w[-1] == "w":
+            if Fragment(w, word=True).letters <= remaining and w[-1] == "w":
                 # at least one valid word ending in "w" remains
                 break
         else:
