@@ -18,9 +18,10 @@ class Fragment:
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
         if word:
-            self.words = parse_sentence(candidate_sentence)
-        else:
             self.words = [candidate_sentence]
+        else:
+            self.words = parse_sentence(candidate_sentence)
+            
 
 
 def parse_sentence(candidate_sentence: str) -> List[str]:
