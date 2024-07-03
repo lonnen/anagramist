@@ -20,6 +20,10 @@ class Fragment:
     
     @property
     def words(self) -> List[str]:
+        """This defers computing the property `words` until it is accessed for the 
+        first time. Computing `words` is relatively expensive and the majority of
+        Fragment instances never access it.
+        """
         return parse_sentence(self.sentence)
 
 
