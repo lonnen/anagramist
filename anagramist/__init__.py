@@ -77,76 +77,88 @@ def faux_uct_search(
             )[0]
             # loop repeats, breaking when we reach an unexpanded node (no score)
 
-        # expansion & simulation
-        # take a deep, uniform, random walk until soft validation fails
-        while True:
-            placed = Fragment(node)
-            remaining = letter_bank.copy()
-            remaining.subtract(placed.letters)
+        MAX_NUM_OF_SIMULATIONS = 100
+        simulation_id = 0
+        while simulation_id < MAX_NUM_OF_SIMULATIONS:
+            # expansion & simulation
+            # take a deep, uniform, random walk until soft validation fails
+            while True:
+                placed = Fragment(node)
+                remaining = letter_bank.copy()
+                remaining.subtract(placed.letters)
 
-            if not soft_validate(placed, remaining, vocabulary, c1663):
-                break
+                if not soft_validate(placed, remaining, vocabulary, c1663):
+                    break
 
-            # recalculate all valid next words
-            # pick one by uniform random sample
-            next_words = [w for w in compute_valid_vocab(vocabulary, remaining, c1663)]
-
-            if len(next_words) == 0:
-                break
-
-            next = choices(next_words)[0]
-            node = node + " " + next
-
-        # preprocessing to get to word-level scores
-        scored_tokens = oracle.calc_candidate_scores(
-            [
-                placed.sentence,
-            ]
-        )[0]
-        scored_words = []
-        for w in placed.words:
-            accumulated_tokens = []
-            while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
-                accumulated_tokens.append(scored_tokens.pop(0))
-            accumulated_word = "".join(
-                [token.strip() for token, _ in accumulated_tokens]
-            )
-            assert accumulated_word in vocab
-            scored_words.append(
-                [
-                    accumulated_word,
-                    fsum([score for _, score in accumulated_tokens]),
+                # recalculate all valid next words
+                # pick one by uniform random sample
+                next_words = [
+                    w for w in compute_valid_vocab(vocabulary, remaining, c1663)
                 ]
-            )
 
-        # backpropogation
-        # add the new random walk information to the known table
-        sentence = ""
-        cumulative_score = 0
-        for w, score in scored_words:
-            parent = sentence
-            if sentence == "":
-                sentence = sentence + w
-            else:
-                sentence = sentence + " " + w
-            remaining = letter_bank.copy()
-            remaining.subtract(sentence)
+                if len(next_words) == 0:
+                    break
 
-            # check for a winner
-            if hard_validate(Fragment(sentence), remaining, letter_bank, c1663=c1663):
-                # we have a winner
-                sentence += "!!"
-                del remaining["!"]
-                print("WINNER: {}".format(sentence))
-                score = float("inf")
-            elif w == scored_words[-1][0]:
-                # the final word failed soft validation, and by definition cannot win
-                continue
+                next = choices(next_words)[0]
+                node = node + " " + next
 
-            cumulative_score = fsum([cumulative_score, score])
-            search_tree.push(
-                sentence, "".join(remaining.elements()), parent, score, cumulative_score
-            )
+            # preprocessing to get to word-level scores
+            scored_tokens = oracle.calc_candidate_scores(
+                [
+                    placed.sentence,
+                ]
+            )[0]
+            scored_words = []
+            for w in placed.words:
+                accumulated_tokens = []
+                while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
+                    accumulated_tokens.append(scored_tokens.pop(0))
+                accumulated_word = "".join(
+                    [token.strip() for token, _ in accumulated_tokens]
+                )
+                assert accumulated_word in vocab
+                scored_words.append(
+                    [
+                        accumulated_word,
+                        fsum([score for _, score in accumulated_tokens]),
+                    ]
+                )
+
+            # backpropogation
+            # add the new random walk information to the known table
+            sentence = ""
+            cumulative_score = 0
+            for w, score in scored_words:
+                parent = sentence
+                if sentence == "":
+                    sentence = sentence + w
+                else:
+                    sentence = sentence + " " + w
+                remaining = letter_bank.copy()
+                remaining.subtract(sentence)
+
+                # check for a winner
+                if hard_validate(
+                    Fragment(sentence), remaining, letter_bank, c1663=c1663
+                ):
+                    # we have a winner
+                    sentence += "!!"
+                    del remaining["!"]
+                    print("WINNER: {}".format(sentence))
+                    score = float("inf")
+                elif w == scored_words[-1][0]:
+                    # the final word failed soft validation and by definition cannot win
+                    continue
+
+                cumulative_score = fsum([cumulative_score, score])
+                search_tree.push(
+                    sentence,
+                    "".join(remaining.elements()),
+                    parent,
+                    score,
+                    cumulative_score,
+                )
+        simulation_id += 1
 
 
 def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):
