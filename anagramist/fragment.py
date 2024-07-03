@@ -20,7 +20,7 @@ class Fragment:
     
     @property
     def words(self) -> List[str]:
-        self.words = parse_sentence(self.sentence)
+        return parse_sentence(self.sentence)
 
 
 def parse_sentence(candidate_sentence: str) -> List[str]:
