@@ -57,7 +57,7 @@ def faux_uct_search(
                 # we have found an unexpanded node
                 break
 
-            placed_letters, _, score, _, _ = cached
+            placed_letters, _, _, _, _ = cached
 
             words = []
             valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank, c1663)]
