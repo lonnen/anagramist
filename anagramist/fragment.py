@@ -13,15 +13,14 @@ class Fragment:
             that could have come from Dinosaur Comics
     """
 
-    def __init__(self, candidate_sentence: str, word: bool = False):
+    def __init__(self, candidate_sentence: str):
         self.sentence = candidate_sentence
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
-        if word:
-            self.words = [candidate_sentence]
-        else:
-            self.words = parse_sentence(candidate_sentence)
-            
+    
+    @property
+    def words(self) -> List[str]:
+        self.words = parse_sentence(self.sentence)
 
 
 def parse_sentence(candidate_sentence: str) -> List[str]:
