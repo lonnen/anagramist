@@ -69,8 +69,12 @@ def faux_uct_search(
                     )
                 )
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
-            weight_offset = abs(min([w[3] for w in words])) + 1 # weights must sum positive, but all scores are negative
-            node = choices([w[0] for w in words], weights=[w[3] + weight_offset for w in words])[0]
+            weight_offset = (
+                abs(min([w[3] for w in words])) + 1
+            )  # weights must sum positive, but all scores are negative
+            node = choices(
+                [w[0] for w in words], weights=[w[3] + weight_offset for w in words]
+            )[0]
             # loop repeats, breaking when we reach an unexpanded node (no score)
 
         # expansion & simulation
