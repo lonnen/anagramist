@@ -60,12 +60,17 @@ def faux_uct_search(
             placed_letters, _, _, _, _ = cached
 
             words = []
-            valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank, c1663)]
+            valid_vocab = [
+                w for w in compute_valid_vocab(vocabulary, letter_bank, c1663)
+            ]
+            explored_vocab = {
+                entry[0]: entry for entry in search_tree.get_children(placed_letters)
+            }
             for word in valid_vocab:
+                new_sentence = placed_letters + " " + word
                 words.append(
-                    search_tree.get(
-                        placed_letters + " " + word,
-                        (placed_letters + " " + word, '', '', EXPLORATION_SCORE, 0),
+                    explored_vocab.get(
+                        new_sentence, (new_sentence, "", "", EXPLORATION_SCORE, 0)
                     )
                 )
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
@@ -77,9 +82,10 @@ def faux_uct_search(
             )[0]
             # loop repeats, breaking when we reach an unexpanded node (no score)
 
-        MAX_NUM_OF_SIMULATIONS = 100
+        MAX_NUM_OF_SIMULATIONS = 1
         simulation_id = 0
         while simulation_id < MAX_NUM_OF_SIMULATIONS:
+            simulation_id += 1
             # expansion & simulation
             # take a deep, uniform, random walk until soft validation fails
             while True:
@@ -158,7 +164,6 @@ def faux_uct_search(
                     score,
                     cumulative_score,
                 )
-        simulation_id += 1
 
 
 def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):

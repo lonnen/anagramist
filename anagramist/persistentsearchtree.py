@@ -1,5 +1,6 @@
 import sqlite3
 from contextlib import closing
+from typing import Tuple
 
 
 class PersistentSearchTree:
@@ -40,7 +41,7 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
-    def get(self, placed: str, default=None):
+    def get(self, placed: str, default=None) -> Tuple[str, str, str, float, float]:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
@@ -56,6 +57,20 @@ class PersistentSearchTree:
                     if fetch is None:
                         if default is not None:
                             return default
+                    return fetch
+
+    def get_children(self, parent: str):
+        with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
+            with conn:  # auto-commits
+                with closing(conn.cursor()) as cursor:  # auto-closes
+                    fetch = cursor.execute(
+                        """
+                        SELECT *
+                        FROM visited
+                        WHERE parent = ?
+                    """,
+                        (parent,),
+                    ).fetchall()
                     return fetch
 
     def push(
