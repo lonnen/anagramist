@@ -1,6 +1,6 @@
 import sqlite3
 from contextlib import closing
-from typing import Tuple
+from typing import List, Tuple
 
 
 class PersistentSearchTree:
@@ -22,6 +22,7 @@ class PersistentSearchTree:
         parent TEXT NOT NULL,
         score REAL,
         cumulative_score REAL,
+        mean_score, REAL
 
         PRIMARY KEY(placed, remaining)
     );
@@ -41,7 +42,9 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
-    def get(self, placed: str, default=None) -> Tuple[str, str, str, float, float]:
+    def get(
+        self, placed: str, default=None
+    ) -> Tuple[str, str, str, float, float, float]:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
@@ -59,11 +62,13 @@ class PersistentSearchTree:
                             return default
                     return fetch
 
-    def get_children(self, parent: str):
+    def get_children(
+        self, parent: str
+    ) -> List[Tuple[str, str, str, float, float, float]]:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
-                    fetch = cursor.execute(
+                    return cursor.execute(
                         """
                         SELECT *
                         FROM visited
@@ -71,7 +76,6 @@ class PersistentSearchTree:
                     """,
                         (parent,),
                     ).fetchall()
-                    return fetch
 
     def push(
         self,
@@ -80,17 +84,18 @@ class PersistentSearchTree:
         parent: str,
         score: float | None,
         cumulative_score: float | None,
-    ):
+        mean_score: float | None,
+    ) -> None:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
             """INSERT INTO visited 
-                VALUES (?, ?, ?, ?, ?) 
+                VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT (placed, remaining) 
             DO UPDATE SET 
                 score = excluded.score, 
                 cumulative_score = excluded.cumulative_score
             """,
-            (placed, remaining, parent, score, cumulative_score),
+            (placed, remaining, parent, score, cumulative_score, mean_score),
         )
         con.commit()
