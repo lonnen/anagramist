@@ -17,10 +17,10 @@ class Fragment:
         self.sentence = candidate_sentence
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
-    
+
     @property
     def words(self) -> List[str]:
-        """This defers computing the property `words` until it is accessed for the 
+        """This defers computing the property `words` until it is accessed for the
         first time. Computing `words` is relatively expensive and the majority of
         Fragment instances never access it.
         """
