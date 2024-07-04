@@ -83,7 +83,7 @@ def faux_uct_search(
             )[0]
             # loop repeats, breaking when we reach an unexpanded node (no score)
 
-        MAX_NUM_OF_SIMULATIONS = 1
+        MAX_NUM_OF_SIMULATIONS = 10
         simulation_id = 0
         while simulation_id < MAX_NUM_OF_SIMULATIONS:
             simulation_id += 1
