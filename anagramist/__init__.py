@@ -2,6 +2,7 @@ import logging
 from math import fsum
 from random import choices
 from os import PathLike
+from statistics import geometric_mean
 from typing import Counter, List, Set
 
 from .fragment import Fragment
@@ -57,7 +58,7 @@ def faux_uct_search(
                 # we have found an unexpanded node
                 break
 
-            placed_letters, _, _, _, _ = cached
+            placed_letters, _, _, _, _, _ = cached
 
             words = []
             valid_vocab = [
@@ -70,7 +71,7 @@ def faux_uct_search(
                 new_sentence = placed_letters + " " + word
                 words.append(
                     explored_vocab.get(
-                        new_sentence, (new_sentence, "", "", EXPLORATION_SCORE, 0)
+                        new_sentence, (new_sentence, "", "", EXPLORATION_SCORE, None, None)
                     )
                 )
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
@@ -134,6 +135,7 @@ def faux_uct_search(
             # add the new random walk information to the known table
             sentence = ""
             cumulative_score = 0
+            scores = []
             for w, score in scored_words:
                 parent = sentence
                 if sentence == "":
@@ -156,13 +158,17 @@ def faux_uct_search(
                     # the final word failed soft validation and by definition cannot win
                     continue
 
-                cumulative_score = fsum([cumulative_score, score])
+                scores.append(score)
+                cumulative_score = fsum(scores)
+                offset = abs(min(scores)) + 1
+                mean_score = geometric_mean([s + offset for s in scores]) - offset
                 search_tree.push(
                     sentence,
                     "".join(remaining.elements()),
                     parent,
                     score,
                     cumulative_score,
+                    mean_score
                 )
 
 
