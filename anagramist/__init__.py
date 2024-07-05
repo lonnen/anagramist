@@ -5,6 +5,9 @@ from os import PathLike
 from statistics import geometric_mean
 from typing import Counter, List, Set
 
+import cProfile
+from pstats import Stats, SortKey
+
 from .fragment import Fragment
 from .oracles import TransformerOracle
 from .persistentsearchtree import PersistentSearchTree
@@ -26,6 +29,16 @@ def search(
     fp16: bool = False,
     c1663: bool = False,
 ):
+    do_profiling = False
+    if do_profiling:
+        with cProfile.Profile() as pr:
+            faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663, max_iterations = 100)
+        with open("profiling_stats.txt", "w") as stream:
+            stats = Stats(pr, stream=stream)
+            stats.strip_dirs()
+            stats.sort_stats("time")
+            stats.dump_stats(".prof_stats")
+            stats.print_stats()
     faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663)
 
 
@@ -41,6 +54,7 @@ def faux_uct_search(
     fp16: bool = False,
     vocabulary: Set[str] = vocab,
     c1663: bool = False,
+    max_iterations: int = None
 ):
     # setup
     letter_bank = Fragment(letters).letters
@@ -49,7 +63,12 @@ def faux_uct_search(
     root = "I" if c1663 else ""
     # vocabulary = vocab_c1663 if c1663 else vocab
 
+    loop_count = 0
     while True:
+        if max_iterations != None:
+            if loop_count == max_iterations:
+                break
+            loop_count += 1
         node = root
         # selection
         # take a random weighted walk across the known world to an unexpanded node
