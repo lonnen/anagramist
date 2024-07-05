@@ -158,7 +158,9 @@ def faux_uct_search(
                     score = float("inf")
                 elif w == scored_words[-1][0]:
                     # the final word failed soft validation and by definition cannot win
-                    continue
+                    # but we must keep track of it or it could keep getting randomly 
+                    # selected
+                    score = float("-inf")
 
                 scores.append(score)
                 cumulative_score = fsum(scores)
