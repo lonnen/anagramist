@@ -22,7 +22,7 @@ class PersistentSearchTree:
         parent TEXT NOT NULL,
         score REAL,
         cumulative_score REAL,
-        mean_score, REAL
+        mean_score REAL,
 
         PRIMARY KEY(placed, remaining)
     );
