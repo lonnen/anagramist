@@ -47,6 +47,7 @@ def faux_uct_search(
     oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     search_tree = PersistentSearchTree()
     root = "I" if c1663 else ""
+    # vocabulary = vocab_c1663 if c1663 else vocab
 
     while True:
         node = root
@@ -62,7 +63,7 @@ def faux_uct_search(
 
             words = []
             valid_vocab = [
-                w for w in compute_valid_vocab(vocabulary, letter_bank, c1663)
+                w for w in compute_valid_vocab(vocabulary, letter_bank)
             ]
             explored_vocab = {
                 entry[0]: entry for entry in search_tree.get_children(placed_letters)
@@ -71,7 +72,8 @@ def faux_uct_search(
                 new_sentence = placed_letters + " " + word
                 words.append(
                     explored_vocab.get(
-                        new_sentence, (new_sentence, "", "", EXPLORATION_SCORE, None, None)
+                        new_sentence,
+                        (new_sentence, "", "", EXPLORATION_SCORE, None, None),
                     )
                 )
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
@@ -168,7 +170,7 @@ def faux_uct_search(
                     parent,
                     score,
                     cumulative_score,
-                    mean_score
+                    mean_score,
                 )
 
 
