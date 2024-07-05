@@ -100,7 +100,7 @@ def faux_uct_search(
                 # recalculate all valid next words
                 # pick one by uniform random sample
                 next_words = [
-                    w for w in compute_valid_vocab(vocabulary, remaining, c1663)
+                    w for w in compute_valid_vocab(vocabulary, remaining)
                 ]
 
                 if len(next_words) == 0:
@@ -172,7 +172,7 @@ def faux_uct_search(
                 )
 
 
-def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):
+def compute_valid_vocab(vocabulary: List[str], remaining: Counter):
     """Filters the vocab list to return only know-valid words that can be placed next.
 
     Args:
@@ -181,21 +181,11 @@ def compute_valid_vocab(vocab: List[str], remaining: Counter, c1163: bool):
         remaining (`Counter`) - the letters remaining to be placed
         c1163 (`bool`) - whether or not to leverage comic 1663 specific hints
     """
-    for word in vocab:
+    for word in vocabulary:
         next_word = Fragment(word)
         if not next_word.letters <= remaining:
             continue
-        if not c1163:
-            yield next_word.sentence
-        else:
-            if remaining.get("w", 0) == next_word.letters.get("w", 0):
-                if next_word.sentence[-1] != "w":
-                    # last word must end in "w"
-                    continue
-                if remaining != next_word.letters + +Counter("!!"):
-                    # the last w must be used in the final word
-                    continue
-            yield next_word.sentence
+        yield next_word.sentence
 
 
 def soft_validate(
