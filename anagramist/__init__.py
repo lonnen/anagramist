@@ -20,7 +20,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 def search(
     letters: str,
     model_name_or_path: str | PathLike[str],
@@ -61,7 +60,6 @@ def faux_uct_search(
     oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     search_tree = PersistentSearchTree()
     root = "I" if c1663 else ""
-    # vocabulary = vocab_c1663 if c1663 else vocab
 
     loop_count = 0
     while True:
