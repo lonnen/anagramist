@@ -79,20 +79,18 @@ def faux_uct_search(
             placed_letters, _, _, _, _, _ = cached
 
             words = []
-            valid_vocab = [
-                w for w in compute_valid_vocab(vocabulary, letter_bank)
-            ]
+            valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
             explored_vocab = {
                 entry[0]: entry for entry in search_tree.get_children(placed_letters)
             }
             for word in valid_vocab:
                 new_sentence = placed_letters + " " + word
-                words.append(
-                    explored_vocab.get(
+                w = explored_vocab.get(
                         new_sentence,
                         (new_sentence, "", "", EXPLORATION_SCORE, None, None),
                     )
-                )
+                if w[3] != float("-inf"):
+                    words.append(w)
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
             weight_offset = (
                 abs(min([w[3] for w in words])) + 1
@@ -118,9 +116,7 @@ def faux_uct_search(
 
                 # recalculate all valid next words
                 # pick one by uniform random sample
-                next_words = [
-                    w for w in compute_valid_vocab(vocabulary, remaining)
-                ]
+                next_words = [w for w in compute_valid_vocab(vocabulary, remaining)]
 
                 if len(next_words) == 0:
                     break
