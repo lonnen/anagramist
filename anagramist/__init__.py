@@ -85,7 +85,7 @@ def faux_uct_search(
                 # we have found an unexpanded node
                 break
 
-            placed_letters, _, _, _, _, _ = cached
+            placed_letters, _, _, _, _, _, _ = cached
 
             words = []
             valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
@@ -96,9 +96,9 @@ def faux_uct_search(
                 new_sentence = placed_letters + " " + word
                 w = explored_vocab.get(
                     new_sentence,
-                    (new_sentence, "", "", EXPLORATION_SCORE, None, None),
+                    (new_sentence, "", "", EXPLORATION_SCORE, None, None, 0),
                 )
-                if w[3] != float("-inf"):
+                if w[6] > 0: # see CANDIDATE_STATUS_CODES for details
                     words.append(w)
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
             weight_offset = (
@@ -184,6 +184,8 @@ def faux_uct_search(
                     # selected
                     score = float("-inf")
 
+                status = 1 if score == float("-inf") else 0
+
                 scores.append(score)
                 cumulative_score = fsum(scores)
                 offset = abs(min(scores)) + 1
@@ -195,6 +197,7 @@ def faux_uct_search(
                     score,
                     cumulative_score,
                     mean_score,
+                    status
                 )
 
 
@@ -377,3 +380,9 @@ def hard_validate(
             return False
 
     return True
+
+CANDIDATE_STATUS_CODES = {
+    0: "OK", # or None
+    1: "Fails Validation",
+    7: "Manual Intervention",
+}

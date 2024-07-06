@@ -23,6 +23,7 @@ class PersistentSearchTree:
         score REAL,
         cumulative_score REAL,
         mean_score REAL,
+        status INTEGER,
 
         PRIMARY KEY(placed, remaining)
     );
@@ -36,7 +37,7 @@ class PersistentSearchTree:
             cursor.execute(self.__TABLE_SCHEMA_VISITED)
         con.close()
 
-    def __len__(self):
+    def __len__(self) -> int:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
@@ -44,7 +45,7 @@ class PersistentSearchTree:
 
     def get(
         self, placed: str, default=None
-    ) -> Tuple[str, str, str, float, float, float]:
+    ) -> Tuple[str, str, str, float, float, float, int]:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
@@ -64,7 +65,7 @@ class PersistentSearchTree:
 
     def get_children(
         self, parent: str
-    ) -> List[Tuple[str, str, str, float, float, float]]:
+    ) -> List[Tuple[str, str, str, float, float, float, int]]:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
@@ -85,17 +86,20 @@ class PersistentSearchTree:
         score: float | None,
         cumulative_score: float | None,
         mean_score: float | None,
+        status: int | None
     ) -> None:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
             """INSERT INTO visited 
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (placed, remaining) 
             DO UPDATE SET 
                 score = excluded.score, 
-                cumulative_score = excluded.cumulative_score
+                cumulative_score = excluded.cumulative_score,
+                mean_score = excluded.mean_score,
+                status = excluded.status
             """,
-            (placed, remaining, parent, score, cumulative_score, mean_score),
+            (placed, remaining, parent, score, cumulative_score, mean_score, status),
         )
         con.commit()
