@@ -179,7 +179,7 @@ def faux_uct_search(
                     print("WINNER: {}".format(sentence))
                     score = float("inf")
                 elif w == scored_words[-1][0]:
-                    # the final word failed soft validation and by definition cannot win
+                    # the final word failed validation and by definition cannot win
                     # but we must keep track of it or it could keep getting randomly
                     # selected
                     score = float("-inf")
