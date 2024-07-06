@@ -6,7 +6,7 @@ from statistics import geometric_mean
 from typing import Counter, List, Set
 
 import cProfile
-from pstats import Stats, SortKey
+from pstats import Stats
 
 from .fragment import Fragment
 from .oracles import TransformerOracle
@@ -20,6 +20,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 def search(
     letters: str,
     model_name_or_path: str | PathLike[str],
@@ -31,7 +32,15 @@ def search(
     do_profiling = False
     if do_profiling:
         with cProfile.Profile() as pr:
-            faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663, max_iterations = 100)
+            faux_uct_search(
+                letters,
+                model_name_or_path,
+                seed,
+                use_gpu,
+                fp16,
+                c1663=c1663,
+                max_iterations=100,
+            )
         with open("profiling_stats.txt", "w") as stream:
             stats = Stats(pr, stream=stream)
             stats.strip_dirs()
@@ -53,7 +62,7 @@ def faux_uct_search(
     fp16: bool = False,
     vocabulary: Set[str] = vocab,
     c1663: bool = False,
-    max_iterations: int = None
+    max_iterations: int = None,
 ):
     # setup
     letter_bank = Fragment(letters).letters
@@ -63,7 +72,7 @@ def faux_uct_search(
 
     loop_count = 0
     while True:
-        if max_iterations != None:
+        if max_iterations is not None:
             if loop_count == max_iterations:
                 break
             loop_count += 1
@@ -86,9 +95,9 @@ def faux_uct_search(
             for word in valid_vocab:
                 new_sentence = placed_letters + " " + word
                 w = explored_vocab.get(
-                        new_sentence,
-                        (new_sentence, "", "", EXPLORATION_SCORE, None, None),
-                    )
+                    new_sentence,
+                    (new_sentence, "", "", EXPLORATION_SCORE, None, None),
+                )
                 if w[3] != float("-inf"):
                     words.append(w)
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
@@ -171,7 +180,7 @@ def faux_uct_search(
                     score = float("inf")
                 elif w == scored_words[-1][0]:
                     # the final word failed soft validation and by definition cannot win
-                    # but we must keep track of it or it could keep getting randomly 
+                    # but we must keep track of it or it could keep getting randomly
                     # selected
                     score = float("-inf")
 
