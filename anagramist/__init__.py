@@ -209,8 +209,8 @@ def preprocess_word_scores(
             accept the `str` sentence and return token-level scores for each token given
             the previously examined tokens
 
-    returns (`List[Tuple[str, float]]`) A list of 2-item lists containing the accumulated
-        words and their combined score
+    returns (`List[Tuple[str, float]]`) A list of 2-item tuples containing the
+        accumulated words and their combined score
     """
     scored_tokens = oracle.calc_candidate_scores(
         [
