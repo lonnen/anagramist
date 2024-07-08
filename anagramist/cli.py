@@ -1,5 +1,7 @@
 import click
 
+from anagramist.persistentsearchtree import PersistentSearchTree
+
 from . import search
 
 
@@ -44,4 +46,19 @@ def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     )
 
 
+@click.command()
+@click.argument("root")
+def trim(root: str):
+    click.echo(f"Trimming descendents of: '{root}'")
+    pst = PersistentSearchTree()
+    modified, deleted = pst.trim(root)
+    if modified == 0 and deleted == 0:
+        click.echo(f"Root '{root}' not found in tree.")
+    if modified == -1 and deleted == 0:
+        click.echo(f"Root '{root}' found but already trimmed")
+    else:
+        click.echo(f"Modified {modified} rows. Deleted {deleted} rows.")
+
+
 cli.add_command(solve)
+cli.add_command(trim)

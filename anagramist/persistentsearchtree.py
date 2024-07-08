@@ -103,3 +103,57 @@ class PersistentSearchTree:
             (placed, remaining, parent, score, cumulative_score, mean_score, status),
         )
         con.commit()
+
+    def trim(self, placed: str, status: int = 7) -> Tuple[int, int]:
+        con = sqlite3.connect(self.__db_name)
+        cur = con.cursor()
+        rows = cur.execute(
+            """ 
+            WITH RECURSIVE descends_from(x) AS (
+                VALUES(?)
+                UNION
+                SELECT placed FROM visited, descends_from
+                WHERE visited.parent=descends_from.x
+            )
+            SELECT * FROM visited WHERE visited.placed IN descends_from
+            """,
+            (placed,),
+        ).fetchall()
+        con.commit()
+
+        if len(rows) == 0:
+            return (0, 0)
+
+        if len(rows) == 1 and rows[0][-1] == status:
+            return (-1, 0)
+
+        if status in [row[0] for row in rows]:  # status set but has descendents to trim
+            pass
+
+        modified = 0
+        # mark the root as trimmed
+        cur = con.cursor()
+        cur.execute(
+            """
+            UPDATE visited
+            SET status = ?
+            WHERE placed = ? AND remaining = ?
+            """,
+            [(status, chld[0], chld[1]) for chld in rows if chld[0] == placed][0],
+        )
+        modified = cur.rowcount
+        con.commit()
+
+        # discard the rest
+        children = [(chld[0], chld[1]) for chld in rows if chld[0] != placed]
+        cur = con.cursor()
+        rows = cur.executemany(
+            """
+            DELETE FROM visited
+            WHERE placed = ? AND remaining = ?
+            """,
+            children,
+        )
+        deleted = cur.rowcount
+        con.commit()
+        return (modified, deleted)
