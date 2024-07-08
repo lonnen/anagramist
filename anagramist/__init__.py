@@ -91,6 +91,8 @@ def faux_uct_search(
             explored_vocab = {
                 entry[0]: entry for entry in search_tree.get_children(placed_letters)
             }
+
+            words = []
             for word in valid_vocab:
                 new_sentence = placed_letters + " " + word
                 w = explored_vocab.get(
