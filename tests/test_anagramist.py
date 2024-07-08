@@ -1,9 +1,6 @@
 from collections import Counter
-from random import shuffle
 
-from anagramist import compute_valid_vocab
 from anagramist.fragment import Fragment, parse_sentence
-from anagramist.vocab import vocab
 
 
 class TestParseSentence:
