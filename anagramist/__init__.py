@@ -237,7 +237,7 @@ def preprocess_word_scores(
     args:
         placed: (`Fragment`) - A fragment containing the `str` sentence and `List[str]`
             of words parsed out of that sentence for alignment
-        oracle: (`Transformer Oracle`) - A wrapper around a transformer model that will
+        oracle: (`TransformerOracle`) - A wrapper around a transformer model that will
             accept the `str` sentence and return token-level scores for each token given
             the previously examined tokens
 
