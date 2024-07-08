@@ -145,8 +145,8 @@ class PersistentSearchTree:
             return (-1, -1)
 
         modified = 0
-        if status in [row[0] for row in rows]:
-            # status is set correctly but there are rows to trim
+        if rows[0][-1] == status:
+            # status is set correctly at root but there are rows to trim
             modified = -1
         else:
             # mark the root
