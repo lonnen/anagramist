@@ -86,7 +86,7 @@ class PersistentSearchTree:
         score: float | None,
         cumulative_score: float | None,
         mean_score: float | None,
-        status: int | None
+        status: int | None,
     ) -> None:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
