@@ -3,7 +3,7 @@ from math import fsum
 from random import choices
 from os import PathLike
 from statistics import geometric_mean
-from typing import Counter, List, Set, Tuple
+from typing import Counter, Generator, List, Set, Tuple
 
 import cProfile
 from pstats import Stats
@@ -267,7 +267,7 @@ def preprocess_word_scores(
     return scored_words
 
 
-def compute_valid_vocab(vocabulary: List[str], remaining: Counter) -> str:
+def compute_valid_vocab(vocabulary: List[str], remaining: Counter) -> Generator[str]:
     """Filters the vocab list to return only know-valid words that can be placed next.
 
     Args:
