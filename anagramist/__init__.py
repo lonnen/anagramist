@@ -3,7 +3,7 @@ from math import fsum
 from random import choices
 from os import PathLike
 from statistics import geometric_mean
-from typing import Counter, List, Set
+from typing import Counter, List, Set, Tuple
 
 import cProfile
 from pstats import Stats
@@ -116,45 +116,10 @@ def faux_uct_search(
             simulation_id += 1
             # expansion & simulation
             # take a deep, uniform, random walk until soft validation fails
-            while True:
-                placed = Fragment(node)
-                remaining = letter_bank.copy()
-                remaining.subtract(placed.letters)
-
-                if not soft_validate(placed, remaining, vocabulary, c1663):
-                    break
-
-                # recalculate all valid next words
-                # pick one by uniform random sample
-                next_words = [w for w in compute_valid_vocab(vocabulary, remaining)]
-
-                if len(next_words) == 0:
-                    break
-
-                next = choices(next_words)[0]
-                node = node + " " + next
+            placed = simulation(node, letter_bank, vocabulary, c1663)
 
             # preprocessing to get to word-level scores
-            scored_tokens = oracle.calc_candidate_scores(
-                [
-                    placed.sentence,
-                ]
-            )[0]
-            scored_words = []
-            for w in placed.words:
-                accumulated_tokens = []
-                while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
-                    accumulated_tokens.append(scored_tokens.pop(0))
-                accumulated_word = "".join(
-                    [token.strip() for token, _ in accumulated_tokens]
-                )
-                assert accumulated_word in vocab
-                scored_words.append(
-                    [
-                        accumulated_word,
-                        fsum([score for _, score in accumulated_tokens]),
-                    ]
-                )
+            scored_words = preprocess_word_scores(placed, oracle)
 
             # backpropogation
             # add the new random walk information to the known table
@@ -203,6 +168,64 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
+
+
+def simulation(
+    node: str, letter_bank: Counter, vocabulary: Set[str], c1663: bool = False
+):
+    # expansion & simulation
+    # take a deep, uniform, random walk until soft validation fails
+    while True:
+        placed = Fragment(node)
+        remaining = letter_bank.copy()
+        remaining.subtract(placed.letters)
+
+        if not soft_validate(placed, remaining, vocabulary, c1663):
+            break
+
+        # recalculate all valid next words
+        # pick one by uniform random sample
+        next_words = [w for w in compute_valid_vocab(vocabulary, remaining)]
+
+        if len(next_words) == 0:
+            break
+
+        next = choices(next_words)[0]
+        node = node + " " + next
+    return placed
+
+
+def preprocess_word_scores(
+    placed: Fragment, oracle: TransformerOracle
+) -> List[Tuple[str, float]]:
+    """Passes a sentence to the provided oracle for scoring, and then post-processes
+    the resulting value to combine token-level log-scores from the oracle into a list of
+    aligned word-level log-scores
+
+    args:
+        placed: (`Fragment`) - A fragment containing the `str` sentence and `List[str]`
+            of words parsed out of that sentence for alignment
+        oracle: (`Transformer Oracle`) - A wrapper around a transformer model that will
+            accept the `str` sentence and return token-level scores for each token given
+            the previously examined tokens
+
+    returns (`List[Tuple[str, float]]`) A list of 2-item lists containing the accumulated
+        words and their combined score
+    """
+    scored_tokens = oracle.calc_candidate_scores(
+        [
+            placed.sentence,
+        ]
+    )[0]
+    scored_words = []
+    for w in placed.words:
+        accumulated_tokens = []
+        while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
+            accumulated_tokens.append(scored_tokens.pop(0))
+        accumulated_word = "".join([token.strip() for token, _ in accumulated_tokens])
+        accumulated_score = fsum([score for _, score in accumulated_tokens])
+        scored_words.append((accumulated_word, accumulated_score))
+    return scored_words
 
 
 def compute_valid_vocab(vocabulary: List[str], remaining: Counter):
