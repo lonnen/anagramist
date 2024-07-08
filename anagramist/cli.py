@@ -61,6 +61,7 @@ def trim(root: str):
     if modified == -1 and deleted >= 0:
         click.echo(f"Root '{root}' already has correct status. Deleted {deleted} rows.")
         click.exit(1)
+    click.echo(f"{modified} rows modified. {deleted} rows deleted.")
 
 
 cli.add_command(solve)
