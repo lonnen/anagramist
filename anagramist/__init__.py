@@ -21,6 +21,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+CANDIDATE_STATUS_CODES = {
+    0: "OK",  # or None
+    1: "Fails Validation",
+    7: "Manual Intervention",
+}
+
+
 def search(
     letters: str,
     model_name_or_path: str | PathLike[str],
@@ -439,10 +446,3 @@ def hard_validate(
             return False
 
     return True
-
-
-CANDIDATE_STATUS_CODES = {
-    0: "OK",  # or None
-    1: "Fails Validation",
-    7: "Manual Intervention",
-}
