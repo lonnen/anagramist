@@ -78,37 +78,7 @@ def faux_uct_search(
             loop_count += 1
         node = root
         # selection
-        # take a random weighted walk across the known world to an unexpanded node
-        while True:
-            cached = search_tree.get(node)
-            if cached is None:
-                # we have found an unexpanded node
-                break
-
-            placed_letters, _, _, _, _, _, _ = cached
-
-            valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
-            explored_vocab = {
-                entry[0]: entry for entry in search_tree.get_children(placed_letters)
-            }
-
-            words = []
-            for word in valid_vocab:
-                new_sentence = placed_letters + " " + word
-                w = explored_vocab.get(
-                    new_sentence,
-                    (new_sentence, "", "", EXPLORATION_SCORE, None, None, 0),
-                )
-                if w[6] == 0:  # see CANDIDATE_STATUS_CODES for details
-                    words.append(w)
-            # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
-            weight_offset = (
-                abs(min([w[3] for w in words])) + 1
-            )  # weights must sum positive, but all scores are negative
-            node = choices(
-                [w[0] for w in words], weights=[w[3] + weight_offset for w in words]
-            )[0]
-            # loop repeats, breaking when we reach an unexpanded node (no score)
+        node = selection(node, letter_bank, search_tree, vocabulary)
 
         MAX_NUM_OF_SIMULATIONS = 10
         simulation_id = 0
@@ -168,6 +138,68 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
+
+
+def selection(
+    root: str,
+    letter_bank: Counter,
+    search_tree: PersistentSearchTree,
+    vocabulary: Set[str],
+) -> str:
+    """Take a random walk across a given `PersistentSearchTree` starting from a given
+    root node. Each step of the walk is determined by a weighted random choice from the
+    set of valid next steps, using Oracle scores as weights, a default score for
+    unexplored nodes, and ignoring nodes already marked as known losers.
+
+    This method is guaranteed to return an unexplored node
+
+    args:
+        root (`str`) - A sentence fragment corresponding to the placed letters of a
+            puzzle candidate. This is the first half of a position in the search_tree.
+        letter_bank (`Counter`) - The total characters to be placed. This is the
+            second half of a position in the search tree.
+        search_tree (`PersistentSearchTree`) - A tree containing all explored fragments
+            of the puzzle.
+        vocabulary (`Set[str]`) - The set known to contain at least all the words that
+            appear in the solution.
+
+    returns (`str`) - A string containing an unexplored node chosen by the random walk
+    """
+    while True:
+        node = root
+        # selection
+        # take a random weighted walk across the known world to an unexpanded node
+        while True:
+            cached = search_tree.get(node)
+            if cached is None:
+                # we have found an unexpanded node
+                break
+
+            placed_letters, _, _, _, _, _, _ = cached
+
+            valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
+            explored_vocab = {
+                entry[0]: entry for entry in search_tree.get_children(placed_letters)
+            }
+
+            words = []
+            for word in valid_vocab:
+                new_sentence = placed_letters + " " + word
+                w = explored_vocab.get(
+                    new_sentence,
+                    (new_sentence, "", "", EXPLORATION_SCORE, None, None, 0),
+                )
+                if w[6] == 0:  # see CANDIDATE_STATUS_CODES for details
+                    words.append(w)
+            # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
+            weight_offset = (
+                abs(min([w[3] for w in words])) + 1
+            )  # weights must sum positive, but all scores are negative
+            node = choices(
+                [w[0] for w in words], weights=[w[3] + weight_offset for w in words]
+            )[0]
+            # loop repeats, breaking when we reach an unexpanded node (no score)
+    return node
 
 
 def simulation(
