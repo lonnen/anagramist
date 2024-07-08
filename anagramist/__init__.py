@@ -172,7 +172,7 @@ def faux_uct_search(
 
 def simulation(
     node: str, letter_bank: Counter, vocabulary: Set[str], c1663: bool = False
-):
+) -> Fragment:
     # expansion & simulation
     # take a deep, uniform, random walk until soft validation fails
     while True:
@@ -228,7 +228,7 @@ def preprocess_word_scores(
     return scored_words
 
 
-def compute_valid_vocab(vocabulary: List[str], remaining: Counter):
+def compute_valid_vocab(vocabulary: List[str], remaining: Counter) -> str:
     """Filters the vocab list to return only know-valid words that can be placed next.
 
     Args:
