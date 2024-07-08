@@ -98,7 +98,7 @@ def faux_uct_search(
                     new_sentence,
                     (new_sentence, "", "", EXPLORATION_SCORE, None, None, 0),
                 )
-                if w[6] > 0: # see CANDIDATE_STATUS_CODES for details
+                if w[6] > 0:  # see CANDIDATE_STATUS_CODES for details
                     words.append(w)
             # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
             weight_offset = (
@@ -384,8 +384,9 @@ def hard_validate(
 
     return True
 
+
 CANDIDATE_STATUS_CODES = {
-    0: "OK", # or None
+    0: "OK",  # or None
     1: "Fails Validation",
     7: "Manual Intervention",
 }
