@@ -87,7 +87,6 @@ def faux_uct_search(
 
             placed_letters, _, _, _, _, _, _ = cached
 
-            words = []
             valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
             explored_vocab = {
                 entry[0]: entry for entry in search_tree.get_children(placed_letters)
