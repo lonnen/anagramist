@@ -267,7 +267,9 @@ def preprocess_word_scores(
     return scored_words
 
 
-def compute_valid_vocab(vocabulary: List[str], remaining: Counter) -> Generator[str]:
+def compute_valid_vocab(
+    vocabulary: List[str], remaining: Counter
+) -> Generator[str, None, None]:
     """Filters the vocab list to return only know-valid words that can be placed next.
 
     Args:
