@@ -54,10 +54,13 @@ def trim(root: str):
     modified, deleted = pst.trim(root)
     if modified == 0 and deleted == 0:
         click.echo(f"Root '{root}' not found in tree.")
-    if modified == -1 and deleted == 0:
-        click.echo(f"Root '{root}' found but already trimmed")
-    else:
-        click.echo(f"Modified {modified} rows. Deleted {deleted} rows.")
+        click.exit(1)
+    if modified == -1 and deleted == -1:
+        click.echo(f"Root '{root}' found but already trimmed. No changes made.")
+        click.exit(1)
+    if modified == -1 and deleted >= 0:
+        click.echo(f"Root '{root}' already has correct status. Deleted {deleted} rows.")
+        click.exit(1)
 
 
 cli.add_command(solve)
