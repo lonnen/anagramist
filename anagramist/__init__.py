@@ -189,7 +189,10 @@ def faux_uct_search(
                 scores.append(score)
                 cumulative_score = fsum(scores)
                 offset = abs(min(scores)) + 1
-                mean_score = geometric_mean([s + offset for s in scores]) - offset
+                if score == float("-inf"):
+                    mean_score = float("-inf")
+                else:
+                    mean_score = geometric_mean([s + offset for s in scores]) - offset                
                 search_tree.push(
                     sentence,
                     "".join(remaining.elements()),
