@@ -15,3 +15,8 @@ build
 # sqlite
 *.db
 *.db-journal
+
+# general utility
+*-backup
+.prof*
+profiling_stats*
