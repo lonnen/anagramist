@@ -11,7 +11,7 @@ from pstats import Stats
 from .fragment import Fragment
 from .oracles import TransformerOracle
 from .persistentsearchtree import PersistentSearchTree
-from .vocab import vocab
+from .vocab import vocab, vocab_c1663
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -75,7 +75,11 @@ def faux_uct_search(
     letter_bank = Fragment(letters).letters
     oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     search_tree = PersistentSearchTree()
-    root = "I" if c1663 else ""
+    root = ""
+
+    if c1663:
+        vocabulary = vocab_c1663
+        root = "I"
 
     loop_count = 0
     while True:
