@@ -8118,8 +8118,8 @@ vocab = {
     "zeus",
     "zip",
     "zoos",
-    "zulu", 
-    "'acceptible'", # 1-grams
+    "zulu",
+    "'acceptible'",  # 1-grams
     "'all",
     "'amoung'",
     "'balanced",
@@ -14968,8 +14968,7 @@ c1663_disallow = {
     "cooties",
     "cotard",
     "couldnt",
-    "cuntburglar"
-    "cyoas",
+    "cuntburglar" "cyoas",
     "daaaaamn",
     "daaaang",
     "dacryorrhea",
@@ -15008,6 +15007,7 @@ c1663_disallow = {
     "holmes",
     "homicide",
     "hovertrains",
+    "humus",
     "i",
     "indian",
     "iskasht",
@@ -15037,7 +15037,6 @@ c1663_disallow = {
     "oktoberfest",
     "ove",
     "raaaad",
-    "radiodurans",
     "radiodurans",
     "retroconned",
     "rhowbhoatte",
