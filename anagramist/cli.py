@@ -48,10 +48,17 @@ def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
 
 @click.command()
 @click.argument("root")
-def trim(root: str):
+@click.option(
+    "-s",
+    "--status",
+    type=int,
+    default=7,
+    help="Status code for the root node. Non-zero will prevent further searching."
+)
+def trim(root: str, status):
     click.echo(f"Trimming descendents of: '{root}'")
     pst = PersistentSearchTree()
-    modified, deleted = pst.trim(root)
+    modified, deleted = pst.trim(root, status=status)
     if modified == 0 and deleted == 0:
         click.echo(f"Root '{root}' not found in tree.")
         click.Context.exit(1)
