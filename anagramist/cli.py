@@ -53,7 +53,7 @@ def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     "--status",
     type=int,
     default=7,
-    help="Status code for the root node. Non-zero will prevent further searching."
+    help="Status code for the root node. Non-zero will prevent further searching.",
 )
 def trim(root: str, status):
     click.echo(f"Trimming descendents of: '{root}'")
