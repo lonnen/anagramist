@@ -176,40 +176,39 @@ def selection(
 
     returns (`str`) - A string containing an unexplored node chosen by the random walk
     """
+    node = root
+    # selection
+    # take a random weighted walk across the known world to an unexpanded node
     while True:
-        node = root
-        # selection
-        # take a random weighted walk across the known world to an unexpanded node
-        while True:
-            cached = search_tree.get(node)
-            if cached is None:
-                # we have found an unexpanded node
-                break
+        cached = search_tree.get(node)
+        if cached is None:
+            # we have found an unexpanded node
+            break
 
-            placed_letters, _, _, _, _, _, _ = cached
+        placed_letters, _, _, _, _, _, _ = cached
 
-            valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
-            explored_vocab = {
-                entry[0]: entry for entry in search_tree.get_children(placed_letters)
-            }
+        valid_vocab = [w for w in compute_valid_vocab(vocabulary, letter_bank)]
+        explored_vocab = {
+            entry[0]: entry for entry in search_tree.get_children(placed_letters)
+        }
 
-            words = []
-            for word in valid_vocab:
-                new_sentence = placed_letters + " " + word
-                w = explored_vocab.get(
-                    new_sentence,
-                    (new_sentence, "", "", EXPLORATION_SCORE, None, None, 0),
-                )
-                if w[6] == 0:  # see CANDIDATE_STATUS_CODES for details
-                    words.append(w)
-            # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
-            weight_offset = (
-                abs(min([w[3] for w in words])) + 1
-            )  # weights must sum positive, but all scores are negative
-            node = choices(
-                [w[0] for w in words], weights=[w[3] + weight_offset for w in words]
-            )[0]
-            # loop repeats, breaking when we reach an unexpanded node (no score)
+        words = []
+        for word in valid_vocab:
+            new_sentence = placed_letters + " " + word
+            w = explored_vocab.get(
+                new_sentence,
+                (new_sentence, "", "", EXPLORATION_SCORE, None, None, 0),
+            )
+            if w[6] == 0:  # see CANDIDATE_STATUS_CODES for details
+                words.append(w)
+        # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
+        weight_offset = (
+            abs(min([w[3] for w in words])) + 1
+        )  # weights must sum positive, but all scores are negative
+        node = choices(
+            [w[0] for w in words], weights=[w[3] + weight_offset for w in words]
+        )[0]
+        # loop repeats, breaking when we reach an unexpanded node (no score)
     return node
 
 
