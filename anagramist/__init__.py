@@ -90,6 +90,7 @@ def faux_uct_search(
         node = root
         # selection
         node = selection(node, letter_bank, search_tree, vocabulary)
+        logger.info(f"Selected '{node}'.")
 
         MAX_NUM_OF_SIMULATIONS = 10
         simulation_id = 0
@@ -149,6 +150,7 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
+            logger.info(f"Recorded simulation '{sentence}'.")
 
 
 def selection(
