@@ -129,7 +129,7 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
     click.echo("--------------------")
     for entry in sorted(children, key=lambda x: x[5], reverse=True)[:candidates]:
         score = float(entry[5])
-        click.echo(f"{score:.2f} - {entry[0]}")
+        click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
 
