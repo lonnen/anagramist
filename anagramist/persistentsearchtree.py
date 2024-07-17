@@ -187,7 +187,7 @@ class PersistentSearchTree:
                             FROM visited
                             WHERE placed LIKE ?
                         """,
-                            ("%"+placed+"%",),
+                            ("%" + placed + "%",),
                         ).fetchall()
                         return fetch
                     else:
@@ -198,6 +198,6 @@ class PersistentSearchTree:
                             WHERE placed LIKE ?
                             LIMIT ?
                         """,
-                            ("%"+placed+"%", int(limit)),
+                            ("%" + placed + "%", int(limit)),
                         ).fetchall()
                         return fetch
