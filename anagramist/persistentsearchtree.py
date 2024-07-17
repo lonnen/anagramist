@@ -175,3 +175,29 @@ class PersistentSearchTree:
         deleted = cur.rowcount
         con.commit()
         return (modified, deleted)
+
+    def contains(self, placed: str, limit: None):
+        with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
+            with conn:  # auto-commits
+                with closing(conn.cursor()) as cursor:  # auto-closes
+                    if limit is None:
+                        fetch = cursor.execute(
+                            """
+                            SELECT *
+                            FROM visited
+                            WHERE placed LIKE ?
+                        """,
+                            ("%"+placed+"%",),
+                        ).fetchall()
+                        return fetch
+                    else:
+                        fetch = cursor.execute(
+                            """
+                            SELECT *
+                            FROM visited
+                            WHERE placed LIKE ?
+                            LIMIT ?
+                        """,
+                            ("%"+placed+"%", int(limit)),
+                        ).fetchall()
+                        return fetch
