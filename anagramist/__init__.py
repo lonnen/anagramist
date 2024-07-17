@@ -453,3 +453,54 @@ def hard_validate(
             return False
 
     return True
+
+
+def show_candidate(
+    root: str, limit: int = 5, vocabulary: Set[str] = vocab, c1663: bool = True
+):
+    if c1663:
+        vocabulary = vocab_c1663
+
+    pst = PersistentSearchTree()
+    cached = pst.get(root)
+    if cached is None:
+        return {}, {}
+    _, remaining, _, _, _, _, _ = cached
+    children = pst.get_children(root)
+
+    if c1663:
+        vocabulary = vocab_c1663
+    valid_vocab = [w for w in compute_valid_vocab(vocabulary, Counter(remaining))]
+    explored_vocab = {entry[0]: entry for entry in children}
+
+    status_codes = {0: 0, 7: 0}
+    children = []
+    for word in valid_vocab:
+        new_sentence = root + " " + word
+        w = explored_vocab.get(
+            new_sentence,
+            (new_sentence, "", "", None, None, None, "Unexplored"),
+        )
+        sc = w[6]
+        if status_codes.get(sc) is None:
+            status_codes[sc] = 0
+        status_codes[sc] += 1
+        if sc == 0:  # see CANDIDATE_STATUS_CODES for details
+            children.append(w)
+    total = float(sum(status_codes.values()))
+
+    stats = {}
+    for sc, v in sorted(status_codes.items(), key=lambda x: str(x)):
+        s = str(sc)[0]
+        percentage = float(v) / total
+        stats[str(s)] = {"status_code": s, "count": v, "percentage": percentage}
+
+    top_children = {}
+    for entry in sorted(
+        children,
+        key=lambda x: x[5] if x[5] is not None else EXPLORATION_SCORE,
+        reverse=True,
+    )[:limit]:
+        top_children[entry[0]] = entry
+
+    return stats, top_children
