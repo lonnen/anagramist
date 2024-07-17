@@ -4,7 +4,13 @@ from collections import Counter
 from typing import Set
 
 from anagramist.persistentsearchtree import PersistentSearchTree
-from anagramist import search, compute_valid_vocab, vocab, vocab_c1663, EXPLORATION_SCORE
+from anagramist import (
+    search,
+    compute_valid_vocab,
+    vocab,
+    vocab_c1663,
+    EXPLORATION_SCORE,
+)
 
 
 @click.group()
@@ -127,7 +133,11 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
 
     click.echo("Top next candidates:")
     click.echo("--------------------")
-    for entry in sorted(children, key=lambda x: x[5] if x[5] is not None else EXPLORATION_SCORE, reverse=True)[:candidates]:
+    for entry in sorted(
+        children,
+        key=lambda x: x[5] if x[5] is not None else EXPLORATION_SCORE,
+        reverse=True,
+    )[:candidates]:
         score = float(entry[5])
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
