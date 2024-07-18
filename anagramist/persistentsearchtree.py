@@ -186,18 +186,19 @@ class PersistentSearchTree:
                             SELECT *
                             FROM visited
                             WHERE placed LIKE ?
+                            OR placed LIKE ?
                         """,
-                            ("%" + placed + "%",),
+                            ("% " + placed + " %", "% " + placed),
                         ).fetchall()
-                        return fetch
                     else:
                         fetch = cursor.execute(
                             """
                             SELECT *
                             FROM visited
                             WHERE placed LIKE ?
+                            OR placed LIKE ?
                             LIMIT ?
                         """,
-                            ("%" + placed + "%", int(limit)),
+                            ("% " + placed + " %", "% " + placed, int(limit)),
                         ).fetchall()
-                        return fetch
+                    return fetch
