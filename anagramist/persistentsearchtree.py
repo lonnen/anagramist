@@ -43,7 +43,7 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
-    def contains(self, placed: str, limit: None):
+    def contains(self, word: str, limit: None):
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
@@ -55,7 +55,7 @@ class PersistentSearchTree:
                             WHERE placed LIKE ?
                             OR placed LIKE ?
                         """,
-                            ("% " + placed + " %", "% " + placed),
+                            ("% " + word + " %", "% " + word),
                         ).fetchall()
                     else:
                         fetch = cursor.execute(
@@ -66,7 +66,7 @@ class PersistentSearchTree:
                             OR placed LIKE ?
                             LIMIT ?
                         """,
-                            ("% " + placed + " %", "% " + placed, int(limit)),
+                            ("% " + word + " %", "% " + word, int(limit)),
                         ).fetchall()
                     return fetch
 
