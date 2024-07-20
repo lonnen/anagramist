@@ -43,6 +43,33 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
+    def contains(self, placed: str, limit: None):
+        with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
+            with conn:  # auto-commits
+                with closing(conn.cursor()) as cursor:  # auto-closes
+                    if limit is None:
+                        fetch = cursor.execute(
+                            """
+                            SELECT *
+                            FROM visited
+                            WHERE placed LIKE ?
+                            OR placed LIKE ?
+                        """,
+                            ("% " + placed + " %", "% " + placed),
+                        ).fetchall()
+                    else:
+                        fetch = cursor.execute(
+                            """
+                            SELECT *
+                            FROM visited
+                            WHERE placed LIKE ?
+                            OR placed LIKE ?
+                            LIMIT ?
+                        """,
+                            ("% " + placed + " %", "% " + placed, int(limit)),
+                        ).fetchall()
+                    return fetch
+
     def get(
         self, placed: str, default=None
     ) -> Tuple[str, str, str, float, float, float, int]:
@@ -175,30 +202,3 @@ class PersistentSearchTree:
         deleted = cur.rowcount
         con.commit()
         return (modified, deleted)
-
-    def contains(self, placed: str, limit: None):
-        with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
-            with conn:  # auto-commits
-                with closing(conn.cursor()) as cursor:  # auto-closes
-                    if limit is None:
-                        fetch = cursor.execute(
-                            """
-                            SELECT *
-                            FROM visited
-                            WHERE placed LIKE ?
-                            OR placed LIKE ?
-                        """,
-                            ("% " + placed + " %", "% " + placed),
-                        ).fetchall()
-                    else:
-                        fetch = cursor.execute(
-                            """
-                            SELECT *
-                            FROM visited
-                            WHERE placed LIKE ?
-                            OR placed LIKE ?
-                            LIMIT ?
-                        """,
-                            ("% " + placed + " %", "% " + placed, int(limit)),
-                        ).fetchall()
-                    return fetch
