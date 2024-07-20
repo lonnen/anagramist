@@ -54,6 +54,7 @@ class PersistentSearchTree:
                             FROM visited
                             WHERE placed LIKE ?
                             OR placed LIKE ?
+                            ORDER BY placed
                         """,
                             ("% " + word + " %", "% " + word),
                         ).fetchall()
@@ -65,6 +66,7 @@ class PersistentSearchTree:
                             WHERE placed LIKE ?
                             OR placed LIKE ?
                             LIMIT ?
+                            ORDER BY placed
                         """,
                             ("% " + word + " %", "% " + word, int(limit)),
                         ).fetchall()
