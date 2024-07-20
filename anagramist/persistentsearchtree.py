@@ -141,8 +141,8 @@ class PersistentSearchTree:
             status (`int`) - The status code to use per CANDIDATE_STATUS_CODES
 
         Returns:
-            Tuple[int, int] - two integers indicating how many records were deletect
-                and modified, respectively. If (0, 0) is returnd the root was not found.
+            Tuple[int, int] - two integers indicating how many records were deleted and
+                modified, respectively. If (0, 0) is returned the root was not found.
                 If negative numbers are returned, it indicates that no modifications
                 were necessary. Repeated issuing of a command should indicate (-1, -1).
                 If the root's status was somehow modified to match the status already,
