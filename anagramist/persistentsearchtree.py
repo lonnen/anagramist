@@ -1,6 +1,8 @@
 import sqlite3
 from contextlib import closing
-from typing import List, Tuple
+from typing import List, Optional, Tuple
+
+from .fragment import Fragment
 
 
 class PersistentSearchTree:
@@ -43,32 +45,38 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     return cursor.execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
-    def contains(self, word: str, limit: None):
+    def contains(
+        self, word: str, limit: Optional[int] = None, status: Optional[int] = None
+    ):
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
             with conn:  # auto-commits
                 with closing(conn.cursor()) as cursor:  # auto-closes
+                    if status is None:
+                        status = "*"
                     if limit is None:
                         fetch = cursor.execute(
                             """
                             SELECT *
                             FROM visited
-                            WHERE placed LIKE ?
-                            OR placed LIKE ?
+                            WHERE 
+                                status = ?
+                            AND (placed LIKE ? OR placed LIKE ?)
                             ORDER BY placed
                         """,
-                            ("% " + word + " %", "% " + word),
+                            (status, "% " + word + " %", "% " + word),
                         ).fetchall()
                     else:
                         fetch = cursor.execute(
                             """
                             SELECT *
                             FROM visited
-                            WHERE placed LIKE ?
-                            OR placed LIKE ?
-                            LIMIT ?
+                            WHERE 
+                                 status = ?
+                            AND (placed LIKE ? OR placed LIKE ?)
                             ORDER BY placed
+                            LIMIT ?
                         """,
-                            ("% " + word + " %", "% " + word, int(limit)),
+                            (status, "% " + word + " %", "% " + word, int(limit)),
                         ).fetchall()
                     return fetch
 
