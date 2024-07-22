@@ -64,12 +64,12 @@ def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     the root string.""",
 )
 def trim(root: str, status, containing: bool):
-    click.echo(f"Trimming descendents of: '{root}'")
     pst = PersistentSearchTree()
-
     if containing:
+        click.echo(f"Trimming all branches containing: '{root}'")
         modified, deleted = pst.trim_containing(root, status=status)
     else:
+        click.echo(f"Trimming descendents of: '{root}'")
         modified, deleted = pst.trim(root, status=status)
     if modified == 0 and deleted == 0:
         click.echo(f"Root '{root}' not found in tree.")
