@@ -53,32 +53,30 @@ class PersistentSearchTree:
                 with closing(conn.cursor()) as cursor:  # auto-closes
                     if status is None:
                         status = "*"
+                    fetch = cursor.execute(
+                        """
+                        SELECT *
+                        FROM visited
+                        WHERE 
+                            status = ?
+                        AND (placed LIKE ? OR placed LIKE ?)
+                        ORDER BY placed
+                    """,
+                        (status, "% " + word + " %", "% " + word),
+                    ).fetchall()
+                    # SQLite is case insensitive, so double filter for case issues
+                    rows = []
+                    for row in fetch:
+                        placed = row[0]
+                        if word in placed:
+                            rows.append(row)
+                        else:
+                            pass
+                    # because of post-fetch filtering we cannot apply the limit until
+                    # after
                     if limit is None:
-                        fetch = cursor.execute(
-                            """
-                            SELECT *
-                            FROM visited
-                            WHERE 
-                                status = ?
-                            AND (placed LIKE ? OR placed LIKE ?)
-                            ORDER BY placed
-                        """,
-                            (status, "% " + word + " %", "% " + word),
-                        ).fetchall()
-                    else:
-                        fetch = cursor.execute(
-                            """
-                            SELECT *
-                            FROM visited
-                            WHERE 
-                                 status = ?
-                            AND (placed LIKE ? OR placed LIKE ?)
-                            ORDER BY placed
-                            LIMIT ?
-                        """,
-                            (status, "% " + word + " %", "% " + word, int(limit)),
-                        ).fetchall()
-                    return fetch
+                        limit = len(rows)
+                    return fetch[:limit]
 
     def get(
         self, placed: str, default=None
