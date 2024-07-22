@@ -3,7 +3,7 @@ from math import fsum
 from random import choices
 from os import PathLike
 from statistics import geometric_mean
-from typing import Counter, Generator, List, Set, Tuple
+from typing import Counter, Generator, List, Optional, Set, Tuple
 
 import cProfile
 from pstats import Stats
@@ -69,7 +69,7 @@ def faux_uct_search(
     fp16: bool = False,
     vocabulary: Set[str] = vocab,
     c1663: bool = False,
-    max_iterations: int = None,
+    max_iterations: Optional[int] = None,
 ):
     # setup
     letter_bank = Fragment(letters).letters
