@@ -127,6 +127,7 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+
 @click.command()
 def prune():
     click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
@@ -140,6 +141,7 @@ def prune():
         total_deleted += d
     click.echo(f"Fin. {total_modified} rows modified. {total_deleted} rows deleted.")
     click.echo("")
+
 
 cli.add_command(solve)
 cli.add_command(trim)
