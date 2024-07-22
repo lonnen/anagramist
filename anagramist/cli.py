@@ -2,8 +2,9 @@ import click
 
 from typing import Set
 
-from anagramist.persistentsearchtree import PersistentSearchTree
 from anagramist import search, vocab, show_candidate
+from anagramist.persistentsearchtree import PersistentSearchTree
+from anagramist.vocab import c1663_disallow
 
 
 @click.group()
@@ -126,7 +127,18 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+@click.command()
+def prune():
+    click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
+    total_modified, total_deleted = 0, 0
+    for word in c1663_disallow:
+        m, d = trim(word, status=7, containing=True)
+        total_modified += m
+        total_deleted += d
+    click.echo(f"{total_modified} rows modified. {total_deleted} rows deleted.")
+    click.echo("")
 
 cli.add_command(solve)
 cli.add_command(trim)
 cli.add_command(show)
+cli.add_command(prune)
