@@ -212,3 +212,16 @@ class PersistentSearchTree:
         deleted = cur.rowcount
         con.commit()
         return (modified, deleted)
+
+    def trim_containing(self, word: str, status: int = 7) -> int:
+        total_modified, total_deleted = 0, 0
+        while True:
+            rows = self.contains(word, limit=1, status=0)
+            entry = rows[0][0] if len(rows) > 0 else None
+            if entry is None:
+                return total_modified, total_deleted
+            frag = Fragment(entry).words
+            truncated = frag[: frag.index(word) + 1]
+            modified, deleted = self.trim(" ".join(truncated), status)
+            total_modified += max(modified, 0)
+            total_deleted += max(deleted, 0)
