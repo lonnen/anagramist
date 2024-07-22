@@ -3,11 +3,7 @@ import click
 from typing import Set
 
 from anagramist.persistentsearchtree import PersistentSearchTree
-from anagramist import (
-    search,
-    vocab,
-    show_candidate
-)
+from anagramist import search, vocab, show_candidate
 
 
 @click.group()
@@ -60,10 +56,21 @@ def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
     default=7,
     help="Status code for the root node. Non-zero will prevent further searching.",
 )
-def trim(root: str, status):
+@click.option(
+    "-c",
+    "--containing",
+    is_flag=True,
+    help="""Trim all explored nodes containing the 'root' string at each occurance of
+    the root string.""",
+)
+def trim(root: str, status, containing: bool):
     click.echo(f"Trimming descendents of: '{root}'")
     pst = PersistentSearchTree()
-    modified, deleted = pst.trim(root, status=status)
+
+    if containing:
+        modified, deleted = pst.trim_containing(root, status=status)
+    else:
+        modified, deleted = pst.trim(root, status=status)
     if modified == 0 and deleted == 0:
         click.echo(f"Root '{root}' not found in tree.")
         click.Context.exit(1)
@@ -94,21 +101,21 @@ def trim(root: str, status):
 )
 def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True):
     click.echo(f"Showing: '{root}'")
-    
+
     stats, top_children = show_candidate(
         root,
         limit=candidates,
         c1663=c1663,
     )
 
-    total = float(sum([x['count'] for x in stats.values()]))
+    total = float(sum([x["count"] for x in stats.values()]))
 
     click.echo(f"Child node demographics ({total:4}) children:")
     click.echo("-----------------------")
     for sc, v in sorted(stats.items(), key=lambda x: str(x[0])):
-        status = str(sc)[0],
-        count = v['count']
-        percentage = float(v['percentage'])
+        status = (str(sc)[0],)
+        count = v["count"]
+        percentage = float(v["percentage"])
         click.echo(f"{status}: {count:4} ({percentage:.2f}%)")
     click.echo("")
 
