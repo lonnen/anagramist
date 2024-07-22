@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from math import fsum
 from os import PathLike
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from accelerate import PartialState
 from accelerate.utils import set_seed
@@ -80,7 +80,7 @@ class TransformerOracle(Oracle):
     def __init__(
         self,
         model_name_or_path: str | PathLike[str],
-        seed: int = None,
+        seed: Optional[int] = None,
         use_cpu: bool = True,
         fp16: bool = False,
         c1663: bool = False,
