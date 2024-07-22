@@ -131,11 +131,14 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
 def prune():
     click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
     total_modified, total_deleted = 0, 0
+    pst = PersistentSearchTree()
     for word in c1663_disallow:
-        m, d = trim(word, status=7, containing=True)
+        click.echo(f"Trimming all branches containing: '{word}'")
+        m, d = pst.trim_containing(word, status=7)
+        click.echo(f"{m} rows modified. {d} rows deleted.")
         total_modified += m
         total_deleted += d
-    click.echo(f"{total_modified} rows modified. {total_deleted} rows deleted.")
+    click.echo(f"Fin. {total_modified} rows modified. {total_deleted} rows deleted.")
     click.echo("")
 
 cli.add_command(solve)
