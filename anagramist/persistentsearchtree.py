@@ -161,23 +161,22 @@ class PersistentSearchTree:
             """
             SELECT *
             FROM visited
-            WHERE placed LIKE ?
+            WHERE
+                placed LIKE ? OR placed = ?
             ORDER BY placed
             """,
-            (placed + " %",),
+            (placed + " %", placed),
         ).fetchall()
         con.commit()
 
         modified = 0
         deleted = 0
 
-        if len(rows) == 0:
+        if len(rows) < 1:
             # nothing found
             return modified, deleted
 
         if rows[0][0] == placed:
-            root = rows[0]
-            rows = rows[1:]
             if rows[0][-1] == status:
                 # root found but status is already set correctly
                 modified = -1
@@ -188,14 +187,13 @@ class PersistentSearchTree:
                     """
                     UPDATE visited
                     SET status = ?
-                    WHERE placed = ? AND remaining = ?
+                    WHERE placed = ?
                     """,
-                    [(status, chld[0], chld[1]) for chld in rows if chld[0] == placed][
-                        0
-                    ],
+                    (status, placed),
                 )
                 modified = cur.rowcount
                 con.commit()
+            rows = rows[1:]
 
         if len(rows) == 0:
             return (modified, deleted)
