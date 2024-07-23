@@ -197,6 +197,9 @@ class PersistentSearchTree:
                 modified = cur.rowcount
                 con.commit()
 
+        if len(rows) == 0:
+            return (modified, deleted)
+
         # discard the rest
         cur = con.cursor()
         rows = cur.executemany(
