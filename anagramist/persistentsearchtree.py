@@ -204,7 +204,7 @@ class PersistentSearchTree:
             DELETE FROM visited
             WHERE placed = ? AND remaining = ?
             """,
-            rows,
+            [(r[0], r[1]) for r in rows],
         )
         deleted = cur.rowcount
         con.commit()
