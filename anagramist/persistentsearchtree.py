@@ -68,7 +68,7 @@ class PersistentSearchTree:
                     rows = []
                     for row in fetch:
                         placed = row[0]
-                        if word in placed:
+                        if f' {word} ' in placed or placed.endswith(f' word'):
                             rows.append(row)
                         else:
                             pass
@@ -76,7 +76,7 @@ class PersistentSearchTree:
                     # after
                     if limit is None:
                         limit = len(rows)
-                    return fetch[:limit]
+                    return rows[:limit]
 
     def get(
         self, placed: str, default=None
