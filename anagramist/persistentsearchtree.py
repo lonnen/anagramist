@@ -158,54 +158,53 @@ class PersistentSearchTree:
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         rows = cur.execute(
-            """ 
-            WITH RECURSIVE descends_from(x) AS (
-                VALUES(?)
-                UNION
-                SELECT placed FROM visited, descends_from
-                WHERE visited.parent=descends_from.x
-            )
-            SELECT * FROM visited WHERE visited.placed IN descends_from
+            """
+            SELECT *
+            FROM visited
+            WHERE placed LIKE ?
+            ORDER BY placed
             """,
-            (placed,),
+            (placed + " %",),
         ).fetchall()
         con.commit()
 
-        if len(rows) == 0:
-            # root not found
-            return (0, 0)
-
-        if len(rows) == 1 and rows[0][-1] == status:
-            # no modifications are necessary, operations skipped
-            return (-1, -1)
-
         modified = 0
-        if rows[0][-1] == status:
-            # status is set correctly at root but there are rows to trim
-            modified = -1
-        else:
-            # mark the root
-            cur = con.cursor()
-            cur.execute(
-                """
-                UPDATE visited
-                SET status = ?
-                WHERE placed = ? AND remaining = ?
-                """,
-                [(status, chld[0], chld[1]) for chld in rows if chld[0] == placed][0],
-            )
-            modified = cur.rowcount
-            con.commit()
+        deleted = 0
+
+        if len(rows) == 0:
+            # nothing found
+            return modified, deleted
+
+        if rows[0][0] == placed:
+            root = rows[0]
+            rows = rows[1:]
+            if rows[0][-1] == status:
+                # root found but status is already set correctly
+                modified = -1
+            else:
+                # mark the root with the appropriate status
+                cur = con.cursor()
+                cur.execute(
+                    """
+                    UPDATE visited
+                    SET status = ?
+                    WHERE placed = ? AND remaining = ?
+                    """,
+                    [(status, chld[0], chld[1]) for chld in rows if chld[0] == placed][
+                        0
+                    ],
+                )
+                modified = cur.rowcount
+                con.commit()
 
         # discard the rest
-        children = [(chld[0], chld[1]) for chld in rows if chld[0] != placed]
         cur = con.cursor()
         rows = cur.executemany(
             """
             DELETE FROM visited
             WHERE placed = ? AND remaining = ?
             """,
-            children,
+            rows,
         )
         deleted = cur.rowcount
         con.commit()
