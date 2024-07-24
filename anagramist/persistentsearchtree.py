@@ -68,7 +68,7 @@ class PersistentSearchTree:
                     rows = []
                     for row in fetch:
                         placed = row[0]
-                        if f' {word} ' in placed or placed.endswith(f' {word}'):
+                        if f" {word} " in placed or placed.endswith(f" {word}"):
                             rows.append(row)
                         else:
                             pass
