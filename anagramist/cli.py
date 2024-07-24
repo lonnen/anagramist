@@ -134,12 +134,22 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+
 @click.command()
-def prune():
+@click.argument(
+    "words",
+    help="""Variadic arg. Space separated list of words to prune. Use * to prune the
+    c1663_disallow list. Pruning entails trimming every occurance of the word at the
+    occurance of the word""",
+)
+def prune(words: str):
+    to_prune = words.split()
+    if words == "*":
+        to_prune = sorted(c1663_disallow)
     click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
     total_modified, total_deleted = 0, 0
     pst = PersistentSearchTree()
-    for word in sorted(c1663_disallow):
+    for word in to_prune:
         click.echo(f"Trimming all branches containing: '{word}'")
         m, d = pst.trim_containing(word, status=7)
         click.echo(f"{m} rows modified. {d} rows deleted.")
