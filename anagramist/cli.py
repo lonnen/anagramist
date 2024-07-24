@@ -136,13 +136,15 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
 
 
 @click.command()
-@click.argument(
-    "words",
-    help="""Variadic arg. Space separated list of words to prune. Use * to prune the
-    c1663_disallow list. Pruning entails trimming every occurance of the word at the
-    occurance of the word""",
-)
+@click.argument("words")
 def prune(words: str):
+    """Prune the tree by trimming every occurance of a word or set of words at the
+    occurance of each word
+
+    Args:
+        Words - variadic. Either '*' for the c1663_disallow list or a space-separated
+        list of words to be pruned.
+    """
     to_prune = words.split()
     if words == "*":
         to_prune = sorted(c1663_disallow)
