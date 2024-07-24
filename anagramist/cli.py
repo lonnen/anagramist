@@ -103,7 +103,7 @@ def trim(root: str, status, containing: bool):
 def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True):
     click.echo(f"Showing: '{root}'")
 
-    stats, top_children = show_candidate(
+    stats, top_children, top_descendents = show_candidate(
         root,
         limit=candidates,
         c1663=c1663,
@@ -127,6 +127,12 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+    click.echo("Top descendents: (mean score)")
+    click.echo("---------------")
+    for entry in top_descendents.values():
+        score = float(entry[5])
+        click.echo(f"{score:.2f}: {entry[0]}")
+    click.echo("")
 
 @click.command()
 def prune():

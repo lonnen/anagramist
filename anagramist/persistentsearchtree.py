@@ -113,6 +113,21 @@ class PersistentSearchTree:
                         (parent,),
                     ).fetchall()
 
+    def get_descendents(
+        self, parent: str
+    ) -> List[Tuple[str, str, str, float, float, float, int]]:
+        with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
+            with conn:  # auto-commits
+                with closing(conn.cursor()) as cursor:  # auto-closes
+                    return cursor.execute(
+                        """
+                        SELECT *
+                        FROM visited
+                        WHERE placed LIKE ?
+                    """,
+                        (parent + " %",),
+                    ).fetchall()
+
     def push(
         self,
         placed: str,

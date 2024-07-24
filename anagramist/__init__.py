@@ -503,4 +503,13 @@ def show_candidate(
     )[:limit]:
         top_children[entry[0]] = entry
 
-    return stats, top_children
+    descendents = pst.get_descendents(root)
+    top_descendents = {}
+    for entry in sorted(
+        descendents,
+        key=lambda x: x[5] if x[5] is not None else EXPLORATION_SCORE,
+        reverse=True,
+    )[:limit]:
+        top_descendents[entry[0]] = entry
+
+    return stats, top_children, top_descendents
