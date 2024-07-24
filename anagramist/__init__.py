@@ -137,7 +137,7 @@ def faux_uct_search(
                 scores.append(score)
                 cumulative_score = fsum(scores)
                 offset = abs(min(scores)) + 1
-                if score == float("-inf"):
+                if score == float("-inf") or cumulative_score == float("-inf"):
                     mean_score = float("-inf")
                 else:
                     mean_score = geometric_mean([s + offset for s in scores]) - offset
