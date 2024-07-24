@@ -68,7 +68,7 @@ class PersistentSearchTree:
                     rows = []
                     for row in fetch:
                         placed = row[0]
-                        if f' {word} ' in placed or placed.endswith(f' word'):
+                        if f' {word} ' in placed or placed.endswith(f' {word}'):
                             rows.append(row)
                         else:
                             pass
@@ -213,6 +213,8 @@ class PersistentSearchTree:
 
     def trim_containing(self, word: str, status: int = 7) -> int:
         total_modified, total_deleted = 0, 0
+        if word == "dinokind":
+            pass
         while True:
             rows = self.contains(word, limit=1, status=0)
             entry = rows[0][0] if len(rows) > 0 else None
