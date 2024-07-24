@@ -15060,6 +15060,7 @@ c1663_disallow = {
     "booberry",
     "boobs",
     "boogied",
+    "booty",
     "booooooo",
     "boooring",
     "bort",
@@ -15682,8 +15683,7 @@ c1663_disallow = {
     "suicidal",
     "suis",
     "suitcase",
-    "suitte"
-    "surfing",
+    "suitte" "surfing",
     "surved",
     "survelliance",
     "sutible",
