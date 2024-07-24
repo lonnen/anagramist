@@ -133,7 +133,7 @@ def prune():
     click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
     total_modified, total_deleted = 0, 0
     pst = PersistentSearchTree()
-    for word in c1663_disallow:
+    for word in sorted(c1663_disallow):
         click.echo(f"Trimming all branches containing: '{word}'")
         m, d = pst.trim_containing(word, status=7)
         click.echo(f"{m} rows modified. {d} rows deleted.")
