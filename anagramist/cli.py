@@ -111,7 +111,7 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
 
     total = float(sum([x["count"] for x in stats.values()]))
 
-    click.echo(f"Child node demographics ({total:4}) children:")
+    click.echo(f"Child node demographics: ({total:4} children)")
     click.echo("-----------------------")
     for sc, v in sorted(stats.items(), key=lambda x: str(x[0])):
         status = (str(sc)[0],)
