@@ -15827,6 +15827,7 @@ c1663_disallow = {
     "whatisherdeal",
     "wheelies",
     "wheirwolf",
+    "whedon",
     "whenevs",
     "whereever",
     "whhhoooooooo",
