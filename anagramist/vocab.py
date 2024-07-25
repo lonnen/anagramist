@@ -15101,6 +15101,7 @@ c1663_disallow = {
     "chistmas",
     "chloomydia",
     "cho",
+    "cholera",
     "chowders",
     "chris",
     "chubbs",
@@ -15188,6 +15189,7 @@ c1663_disallow = {
     "dogasaurus",
     "don",
     "dont",
+    "drat",
     "drats",
     "drawls",
     "dromi",
@@ -15199,6 +15201,7 @@ c1663_disallow = {
     "dundee",
     "dunn",
     "dunoo",
+    "duracell",
     "durian",
     "duster",
     "e",
@@ -15321,6 +15324,7 @@ c1663_disallow = {
     "gumballs",
     "gurb",
     "hahaha",
+    "hahahah",
     "haiku",
     "hakeem",
     "hamlet",
@@ -15409,6 +15413,7 @@ c1663_disallow = {
     "laforge",
     "lah",
     "laird",
+    "las",
     "latinate",
     "laura",
     "le",
@@ -15460,6 +15465,7 @@ c1663_disallow = {
     "martinies",
     "martinis",
     "marty",
+    "maslow",
     "masala",
     "masse",
     "matey",
@@ -15476,6 +15482,7 @@ c1663_disallow = {
     "midas",
     "miletus",
     "milton",
+    "mistrial",
     "mnd",
     "mohawks",
     "moi",
@@ -15566,6 +15573,7 @@ c1663_disallow = {
     "rambley",
     "ranch",
     "rargh",
+    "regale",
     "rd",
     "rds",
     "re",
@@ -15709,6 +15717,7 @@ c1663_disallow = {
     "telefrancais",
     "teri",
     "tes",
+    "tesla",
     "th",
     "theodore",
     "thermos",
@@ -15876,7 +15885,7 @@ c1663_disallow = {
 
 vocab_c1663 = vocab - c1663_disallow
 
-# c1663 prefiltered vocab list
+# c1663 prefiltered vocab list by 
 # {
 #     ",",
 #     ":",
