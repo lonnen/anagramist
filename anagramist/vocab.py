@@ -15204,6 +15204,7 @@ c1663_disallow = {
     "duracell",
     "durian",
     "duster",
+    "dwarfism",
     "e",
     "earler",
     "eastend",
