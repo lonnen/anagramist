@@ -15630,6 +15630,7 @@ c1663_disallow = {
     "scat",
     "scrooge",
     "secretely",
+    "seeya",
     "seriouslyyouguys",
     "sh",
     "shaakaahaarini",
