@@ -116,8 +116,8 @@ def show(root: str, candidates, vocabulary: Set[str] = vocab, c1663: bool = True
     for sc, v in sorted(stats.items(), key=lambda x: str(x[0])):
         status = (str(sc)[0],)
         count = v["count"]
-        percentage = float(v["percentage"])
-        click.echo(f"{status}: {count:4} ({percentage:.2f}%)")
+        percentage = float(v["percentage"]) * 100
+        click.echo(f"{status}: {count:4} ({percentage:.1f}%)")
     click.echo("")
 
     click.echo("Top next candidates:")
