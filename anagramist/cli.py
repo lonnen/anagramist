@@ -147,8 +147,8 @@ def prune(words: str):
     """
     to_prune = words.split()
     if words == "*":
+        click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
         to_prune = sorted(c1663_disallow)
-    click.echo(f"pruning the c1663 dissalow list: {len(c1663_disallow)} entries")
     total_modified, total_deleted = 0, 0
     pst = PersistentSearchTree()
     for word in to_prune:
