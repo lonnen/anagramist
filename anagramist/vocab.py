@@ -16143,7 +16143,7 @@ c1663_disallow = {
 
 vocab_c1663 = vocab - c1663_disallow
 
-# c1663 prefiltered vocab list by 
+# c1663 prefiltered vocab list by
 # {
 #     ",",
 #     ":",
