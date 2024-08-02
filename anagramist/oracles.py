@@ -117,6 +117,9 @@ class TransformerOracle(Oracle):
             totally boring, as nobody is encoding fundamental discoveries into word 
             games anymore.
             """
+        self.puzzle_context_token_count = self.tokenizer(
+            [self.puzzle_context], padding=False, return_tensors="pt"
+        ).input_ids.shape[1]
 
     def calc_candidate_scores(
         self, candidates: List[str]
@@ -125,7 +128,7 @@ class TransformerOracle(Oracle):
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            [self.tokenizer.bos_token + c for c in candidates],
+            [self.tokenizer.bos_token + self.puzzle_context + c for c in candidates],
             padding=True,
             return_tensors="pt",
         ).input_ids
@@ -144,6 +147,10 @@ class TransformerOracle(Oracle):
             for token, p in zip(input_sentence, input_probs, strict=True):
                 if token not in self.tokenizer.all_special_ids:
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
+            if self.c1663:
+                text_sequence = text_sequence[
+                    self.puzzle_context_token_count :
+                ]  # trim off the puzzle_context
             batch.append(text_sequence)
 
         return batch
