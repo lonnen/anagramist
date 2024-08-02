@@ -84,6 +84,7 @@ class TransformerOracle(Oracle):
         use_cpu: bool = True,
         fp16: bool = False,
         c1663: bool = False,
+        puzzle_context: str = "",
     ) -> None:
         # Transformers Model Initialization
         self.distributed_state = PartialState(cpu=use_cpu)
@@ -111,7 +112,7 @@ class TransformerOracle(Oracle):
         self.c1663 = c1663
 
         # Puzzle Specific Initialization
-        self.puzzle_context = ""
+        self.puzzle_context = puzzle_context
         if c1663:
             self.puzzle_context = """In comparison, being an anagramist today is 
             totally boring, as nobody is encoding fundamental discoveries into word 
