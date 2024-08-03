@@ -15946,6 +15946,7 @@ c1663_disallow = {
     "thinanu",
     "thine",
     "thor",
+    "thos",
     "thou",
     "thoughlessness",
     "throg",
