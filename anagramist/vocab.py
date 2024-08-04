@@ -15383,6 +15383,7 @@ c1663_disallow = {
     "f",
     "facebook",
     "faersome",
+    "fag",
     "fakie",
     "falsetto",
     "fartnoise",
