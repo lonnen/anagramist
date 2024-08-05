@@ -150,7 +150,7 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
-            logger.info(f"Recorded simulation '{sentence}'.")
+                logger.info(f"Recorded simulation '{sentence}'.")
 
 
 def selection(
