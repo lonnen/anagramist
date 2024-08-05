@@ -114,6 +114,9 @@ def faux_uct_search(
                     sentence = sentence + w
                 else:
                     sentence = sentence + " " + w
+                if node.startswith(sentence):
+                    # avoid re-writing the tree up to the selected node
+                    continue
                 remaining = letter_bank.copy()
                 remaining.subtract(sentence)
 
