@@ -40,8 +40,8 @@ def search(
     use_gpu: bool = False,
     fp16: bool = False,
     c1663: bool = False,
+    do_profiling: bool = False
 ):
-    do_profiling = False
     if do_profiling:
         with cProfile.Profile() as pr:
             faux_uct_search(
