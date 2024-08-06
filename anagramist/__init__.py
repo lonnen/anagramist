@@ -27,6 +27,11 @@ CANDIDATE_STATUS_CODES = {
     7: "Manual Intervention",
 }
 
+PROFILING_ITERATIONS = 10
+'''how many iterations of search to do while profiling'''
+
+MAX_NUM_OF_SIMULATIONS = 100
+'''maximum number of simulations for each selection'''
 
 def search(
     letters: str,
@@ -46,7 +51,7 @@ def search(
                 use_gpu,
                 fp16,
                 c1663=c1663,
-                max_iterations=10,
+                max_iterations=PROFILING_ITERATIONS,
             )
         with open("profiling_stats.txt", "w") as stream:
             stats = Stats(pr, stream=stream)
@@ -92,7 +97,6 @@ def faux_uct_search(
         node = selection(node, letter_bank, search_tree, vocabulary)
         logger.info(f"Selected '{node}'.")
 
-        MAX_NUM_OF_SIMULATIONS = 10
         simulation_id = 0
         while simulation_id < MAX_NUM_OF_SIMULATIONS:
             simulation_id += 1
