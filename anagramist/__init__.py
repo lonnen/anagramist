@@ -59,6 +59,7 @@ def search(
             stats.sort_stats("time")
             stats.dump_stats(".prof_stats")
             stats.print_stats()
+        return
     faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663)
 
 
