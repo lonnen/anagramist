@@ -46,7 +46,7 @@ def search(
                 use_gpu,
                 fp16,
                 c1663=c1663,
-                max_iterations=100,
+                max_iterations=10,
             )
         with open("profiling_stats.txt", "w") as stream:
             stats = Stats(pr, stream=stream)
