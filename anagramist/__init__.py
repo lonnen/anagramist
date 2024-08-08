@@ -28,10 +28,11 @@ CANDIDATE_STATUS_CODES = {
 }
 
 PROFILING_ITERATIONS = 10
-'''how many iterations of search to do while profiling'''
+"""how many iterations of search to do while profiling"""
 
 MAX_NUM_OF_SIMULATIONS = 100
-'''maximum number of simulations for each selection'''
+"""maximum number of simulations for each selection"""
+
 
 def search(
     letters: str,
@@ -40,7 +41,7 @@ def search(
     use_gpu: bool = False,
     fp16: bool = False,
     c1663: bool = False,
-    do_profiling: bool = False
+    do_profiling: bool = False,
 ):
     if do_profiling:
         with cProfile.Profile() as pr:
