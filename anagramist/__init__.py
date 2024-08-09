@@ -226,6 +226,15 @@ def selection(
 def simulation(
     node: str, letter_bank: Counter, vocabulary: Set[str], c1663: bool = False
 ) -> Fragment:
+    """Simulates a deep, uniform, random walk down the branch until soft validation 
+    fails and no possible arrangement of additional letters could result in a winning
+    answer. 
+    
+    Critically, this leaf node could itself be a winner, because placing any
+    additional letters to the winner will never result in a winning answer.
+
+    returns (`str`) - the leaf node discovered at the end of the random walk
+    """
     # expansion & simulation
     # take a deep, uniform, random walk until soft validation fails
     while True:
@@ -291,6 +300,9 @@ def compute_valid_vocab(
             this puzzle
         remaining (`Counter`) - the letters remaining to be placed
         c1163 (`bool`) - whether or not to leverage comic 1663 specific hints
+    
+    returns (`generator[str, None, None]`) - a generator that yields vocabular words
+        that can be spelled with the remaining letters
     """
     for word in vocabulary:
         next_word = Fragment(word)
@@ -313,7 +325,7 @@ def soft_validate(
     validation will only fail if some placement of the current letters guarantees
     that no possible placement of remaining letters could make the guess valid.
 
-    Critically passing soft validation does not necessarily guarantee there exists
+    Critically, passing soft validation does not necessarily guarantee there exists
     a solution in an arrangement of remaining letters, only that the current
     placement does not preclude one existing.
 
@@ -324,6 +336,9 @@ def soft_validate(
     that if all the "w"s are used before the final word is placed, the guess fails
     soft validation. It also means when there are no remaining values, the final
     placed letter should be "w".
+
+    returns (`bool`) - indicating if the provided fragment `placed` conforms to the 
+        problem constraits given the letters placed so far
     """
     # the sentence uses only characters from the provided bank
     if any([v < 0 for v in remaining.values()]):
@@ -410,7 +425,11 @@ def hard_validate(
     c1663: bool = False,
 ) -> bool:
     """Hard validation andswers whether this passes all the constraints that can be
-    verified computationally.
+    verified computationally. In an effort to return quickly it starts with the broadest
+    and easiest to check constraints, saving expensive ones for later in the check.
+
+    returns (`bool`) - whether the provided Fragment `placed` conforms to all 
+        constraints that can be verified computationally
     """
 
     if placed.letters != original_letter_bank:
@@ -467,6 +486,11 @@ def hard_validate(
 def show_candidate(
     root: str, limit: int = 5, vocabulary: Set[str] = vocab, c1663: bool = True
 ):
+    """Retrieves the node `root` and calculates some statistics about it and its child
+    nodes, including how much of the next layer of search has been explored, the most
+    promising child nodes, and the most promising nodes that have been discovered in
+    this branch of the tree.
+    """
     if c1663:
         vocabulary = vocab_c1663
 
