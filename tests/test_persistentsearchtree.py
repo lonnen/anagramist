@@ -25,3 +25,57 @@ class TestPersistentSearchTree:
         assert [x[0] for x in cur.fetchall()] == ["visited"]
         con.commit()
         cur.close()
+
+    def test_database_push(self, temp_database):
+        psq = PersistentSearchTree(db_name=temp_database)
+        psq.push(
+            "placed letters",
+            "remaining letters",
+            "placed",
+            float(0),
+            float(0),
+            float(0),
+            0,
+        )
+
+        con = sqlite3.connect(temp_database)
+        cur = con.cursor()
+        cur.execute("""
+            SELECT *
+            FROM visited;
+        """)
+        assert cur.fetchone() == (
+            "placed letters",
+            "remaining letters",
+            "placed",
+            0.0,
+            0.0,
+            0.0,
+            0,
+        )
+        con.commit()
+        cur.close()
+
+    def test_database_push_min(self, temp_database):
+        psq = PersistentSearchTree(db_name=temp_database)
+        psq.push(
+            "placed letters", "remaining letters", "placed", None, None, None, None
+        )
+
+        con = sqlite3.connect(temp_database)
+        cur = con.cursor()
+        cur.execute("""
+            SELECT *
+            FROM visited;
+        """)
+        assert cur.fetchone() == (
+            "placed letters",
+            "remaining letters",
+            "placed",
+            None,
+            None,
+            None,
+            None,
+        )
+        con.commit()
+        cur.close()
