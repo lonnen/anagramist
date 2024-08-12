@@ -41,7 +41,7 @@ def search(
     use_gpu: bool = False,
     fp16: bool = False,
     c1663: bool = False,
-    do_profiling: bool = False,
+    do_profiling: bool = True,
 ):
     if do_profiling:
         with cProfile.Profile() as pr:
@@ -226,10 +226,10 @@ def selection(
 def simulation(
     node: str, letter_bank: Counter, vocabulary: Set[str], c1663: bool = False
 ) -> Fragment:
-    """Simulates a deep, uniform, random walk down the branch until soft validation 
+    """Simulates a deep, uniform, random walk down the branch until soft validation
     fails and no possible arrangement of additional letters could result in a winning
-    answer. 
-    
+    answer.
+
     Critically, this leaf node could itself be a winner, because placing any
     additional letters to the winner will never result in a winning answer.
 
@@ -300,7 +300,7 @@ def compute_valid_vocab(
             this puzzle
         remaining (`Counter`) - the letters remaining to be placed
         c1163 (`bool`) - whether or not to leverage comic 1663 specific hints
-    
+
     returns (`generator[str, None, None]`) - a generator that yields vocabular words
         that can be spelled with the remaining letters
     """
@@ -337,7 +337,7 @@ def soft_validate(
     soft validation. It also means when there are no remaining values, the final
     placed letter should be "w".
 
-    returns (`bool`) - indicating if the provided fragment `placed` conforms to the 
+    returns (`bool`) - indicating if the provided fragment `placed` conforms to the
         problem constraits given the letters placed so far
     """
     # the sentence uses only characters from the provided bank
@@ -428,7 +428,7 @@ def hard_validate(
     verified computationally. In an effort to return quickly it starts with the broadest
     and easiest to check constraints, saving expensive ones for later in the check.
 
-    returns (`bool`) - whether the provided Fragment `placed` conforms to all 
+    returns (`bool`) - whether the provided Fragment `placed` conforms to all
         constraints that can be verified computationally
     """
 
