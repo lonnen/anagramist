@@ -161,7 +161,9 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
-                logger.info(f"Recorded simulation '{sentence}' ({status}).")
+                logger.info(f"recorded simulation ({mean_score:.2g}, {status}): {sentence}")
+                if score == float("inf"):
+                    exit()
 
 
 def selection(
