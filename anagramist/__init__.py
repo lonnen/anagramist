@@ -143,13 +143,13 @@ def faux_uct_search(
                     # selected
                     score = float("-inf")
 
-                status = 1 if score == float("-inf") else 0
-
+                status = 0
                 scores.append(score)
                 cumulative_score = fsum(scores)
                 offset = abs(min(scores)) + 1
                 if score == float("-inf") or cumulative_score == float("-inf"):
                     mean_score = float("-inf")
+                    status = 1
                 else:
                     mean_score = geometric_mean([s + offset for s in scores]) - offset
                 search_tree.push(
@@ -161,7 +161,9 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
-                logger.info(f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}")
+                logger.info(
+                    f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}"
+                )
                 if score == float("inf"):
                     exit()
 
