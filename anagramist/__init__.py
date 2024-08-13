@@ -85,8 +85,10 @@ def faux_uct_search(
     root = ""
 
     if c1663:
+        logger.info("Using special constraints for comic 1663")
         vocabulary = vocab_c1663
         root = "I"
+    logger.info(f"loaded vocab ({len(vocabulary)})")
 
     loop_count = 0
     while True:
@@ -159,7 +161,7 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
-                logger.info(f"Recorded simulation '{sentence}'.")
+                logger.info(f"Recorded simulation '{sentence}' ({status}).")
 
 
 def selection(
