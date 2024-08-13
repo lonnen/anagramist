@@ -16074,6 +16074,7 @@ c1663_disallow = {
     "teri",
     "tes",
     "tesla",
+    "testamentary",
     "th",
     "theodore",
     "thermos",
