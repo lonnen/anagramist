@@ -37,7 +37,9 @@ def cli():
     comics 1663""",
 )
 def solve(letters, model_name_or_path, seed, use_gpu, fp16, c1663):
-    click.echo(f"Assembling anagrams of:{"".join(sorted(letters))}")
+    click.echo(f"Assembling anagrams from: {"".join(sorted(letters))}")
+    if c1663:
+        click.echo("Using special constraints for comic 1663")
     search(
         letters,
         model_name_or_path,
