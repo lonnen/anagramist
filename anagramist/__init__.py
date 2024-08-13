@@ -85,10 +85,10 @@ def faux_uct_search(
     root = ""
 
     if c1663:
-        logger.info("Using special constraints for comic 1663")
+        logger.info("using special constraints for comic 1663")
         vocabulary = vocab_c1663
         root = "I"
-    logger.info(f"loaded vocab ({len(vocabulary)})")
+    logger.info(f"loaded vocab ({len(vocabulary)} items)")
 
     loop_count = 0
     while True:
@@ -99,7 +99,7 @@ def faux_uct_search(
         node = root
         # selection
         node = selection(node, letter_bank, search_tree, vocabulary)
-        logger.info(f"Selected '{node}'.")
+        logger.info(f"selected: {node}")
 
         simulation_id = 0
         while simulation_id < MAX_NUM_OF_SIMULATIONS:
@@ -161,7 +161,7 @@ def faux_uct_search(
                     mean_score,
                     status,
                 )
-                logger.info(f"recorded simulation ({mean_score:.2g}, {status}): {sentence}")
+                logger.info(f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}")
                 if score == float("inf"):
                     exit()
 
