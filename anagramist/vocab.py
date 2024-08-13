@@ -15758,6 +15758,7 @@ c1663_disallow = {
     "muchas",
     "multivac",
     "mulver",
+    "mulvey",
     "murderee",
     "muriel",
     "murray",
