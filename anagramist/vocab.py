@@ -15033,6 +15033,7 @@ c1663_disallow = {
     "atas",
     "attaboy",
     "attenshon",
+    "austen",
     "australasia",
     "austronaut",
     "autantonyms",
