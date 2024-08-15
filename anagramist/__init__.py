@@ -535,9 +535,6 @@ def show_candidate(
     promising child nodes, and the most promising nodes that have been discovered in
     this branch of the tree.
     """
-    if c1663:
-        vocabulary = vocab_c1663
-
     pst = PersistentSearchTree()
     cached = pst.get(root)
     if cached is None:
