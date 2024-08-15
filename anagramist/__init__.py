@@ -36,6 +36,7 @@ MAX_NUM_OF_SIMULATIONS = 100
 # the exploration constant is the stand in score for unscored candidates
 EXPLORATION_SCORE = float(-40)
 
+
 def search(
     letters: str,
     model_name_or_path: str | PathLike[str],
@@ -64,10 +65,6 @@ def search(
             stats.print_stats()
         return
     faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663)
-
-
-# the exploration constant is the stand in score for unscored candidates
-EXPLORATION_SCORE = float(-40)
 
 
 def faux_uct_search(
@@ -110,53 +107,21 @@ def faux_uct_search(
             # take a deep, uniform, random walk until soft validation fails
             placed = simulation(node, letter_bank, vocabulary, c1663)
 
-            # preprocessing to get to word-level scores
-            scored_words = preprocess_word_scores(placed, oracle)
+            # get word-level scores from score_fragment
+            scored_words = score_fragment(placed, oracle)
 
-            # backpropogation
-            # add the new random walk information to the known table
-            sentence = ""
-            cumulative_score = 0
-            scores = []
-            for w, score in scored_words:
-                parent = sentence
-                if sentence == "":
-                    sentence = sentence + w
-                else:
-                    sentence = sentence + " " + w
-                if node.startswith(sentence):
-                    # avoid re-writing the tree up to the selected node
-                    continue
-                remaining = letter_bank.copy()
-                remaining.subtract(sentence)
-
-                # check for a winner
-                if hard_validate(
-                    Fragment(sentence), remaining, letter_bank, c1663=c1663
-                ):
-                    # we have a winner
-                    sentence += "!!"
-                    del remaining["!"]
-                    print("WINNER: {}".format(sentence))
-                    score = float("inf")
-                elif w == scored_words[-1][0]:
-                    # the final word failed validation and by definition cannot win
-                    # but we must keep track of it or it could keep getting randomly
-                    # selected
-                    score = float("-inf")
-
-                status = 0
-                scores.append(score)
-                cumulative_score = fsum(scores)
-                offset = abs(min(scores)) + 1
-                if score == float("-inf") or cumulative_score == float("-inf"):
-                    mean_score = float("-inf")
-                    status = 1
-                else:
-                    mean_score = geometric_mean([s + offset for s in scores]) - offset
+            for (
+                sentence,
+                remaining,
+                parent,
+                score,
+                cumulative_score,
+                mean_score,
+                status,
+            ) in backpropogation(node, letter_bank, scored_words, c1663):
                 search_tree.push(
                     sentence,
-                    "".join(remaining.elements()),
+                    remaining,
                     parent,
                     score,
                     cumulative_score,
@@ -265,7 +230,7 @@ def simulation(
     return placed
 
 
-def preprocess_word_scores(
+def score_fragment(
     placed: Fragment, oracle: TransformerOracle
 ) -> List[Tuple[str, float]]:
     """Passes a sentence to the provided oracle for scoring, and then post-processes
@@ -296,6 +261,77 @@ def preprocess_word_scores(
         accumulated_score = fsum([score for _, score in accumulated_tokens])
         scored_words.append((accumulated_word, accumulated_score))
     return scored_words
+
+
+def backpropogation(
+    node: str,
+    letter_bank: Counter[str],
+    scored_words: List[Tuple[str, float]],
+    c1663: bool,
+) -> List[Tuple[str, str, str, float, float, float, int]]:
+    # backpropogation
+    # calculate new table entries
+    entries = []
+    sentence = ""
+    cumulative_score = 0
+    scores = []
+    for w, score in scored_words:
+        parent = sentence
+        if sentence == "":
+            sentence = sentence + w
+        else:
+            sentence = sentence + " " + w
+
+        scores.append(score)
+
+        if node.startswith(sentence):
+            # scored_words has the whole sentence, some of which is already in the db
+            # so we build up the scores array for calculating mean_score later and
+            # skip everything else to avoid rewriting entries with the same data
+            continue
+
+        remaining = letter_bank.copy()
+        remaining.subtract(sentence)
+
+        # check for a winner
+        if hard_validate(Fragment(sentence), remaining, letter_bank, c1663=c1663):
+            # we have a winner
+            sentence += "!!"
+            del remaining["!"]
+            logger.critical("WINNER: {}".format(sentence))
+            score = float("inf")
+        elif w == scored_words[-1][0]:
+            # if the final word doesn't hard validate it must have failed,
+            # but we must write down the failure to avoid exploring it further
+            score = float("-inf")
+
+        cumulative_score = fsum(scores)
+        offset = abs(min(scores)) + 1
+        status = 0
+        if score == float("-inf") or cumulative_score == float("-inf"):
+            mean_score = float("-inf")
+            status = 1
+        else:
+            mean_score = geometric_mean([s + offset for s in scores]) - offset
+        entries.append(
+            [
+                sentence,
+                "".join(remaining.elements()),
+                parent,
+                score,
+                cumulative_score,
+                mean_score,
+                status,
+            ]
+        )
+        if (
+            score == float("inf")
+            or score == float("-inf")
+            or cumulative_score == float("-inf")
+            or mean_score == float("-inf")
+        ):
+            break  # we don't need to continue, infinity means this is a terminal node
+    return entries
 
 
 def compute_valid_vocab(
