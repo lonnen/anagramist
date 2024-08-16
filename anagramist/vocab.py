@@ -16304,5 +16304,6 @@ c1663_disallow = {
 
 vocab_c1663 = vocab_jadrian - c1663_disallow
 
+
 def corpus(c1663: bool = False):
     return vocab_c1663 if c1663 else vocab_jadrian
