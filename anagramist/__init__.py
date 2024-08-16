@@ -11,7 +11,7 @@ from pstats import Stats
 from .fragment import Fragment
 from .oracles import TransformerOracle
 from .persistentsearchtree import PersistentSearchTree
-from .vocab import vocab, vocab_c1663
+from .vocab import corpus
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -73,7 +73,7 @@ def faux_uct_search(
     seed: int,
     use_gpu: bool = False,
     fp16: bool = False,
-    vocabulary: Set[str] = vocab,
+    vocabulary: Set[str] = None,
     c1663: bool = False,
     max_iterations: Optional[int] = None,
 ):
@@ -85,8 +85,9 @@ def faux_uct_search(
 
     if c1663:
         logger.info("using special constraints for comic 1663")
-        vocabulary = vocab_c1663
         root = "I"
+
+    vocabulary = corpus(c1663)
     logger.info(f"loaded vocab ({len(vocabulary)} items)")
 
     loop_count = 0
@@ -358,7 +359,7 @@ def compute_valid_vocab(
 def soft_validate(
     placed: Fragment,
     remaining: Counter,
-    vocabulary: Set[str] = vocab,
+    vocabulary: Set[str],
     c1663: bool = False,
 ) -> bool:
     """Soft validation answers whether the candidate conforms to the problem
@@ -388,7 +389,7 @@ def soft_validate(
     if any([v < 0 for v in remaining.values()]):
         return False  # candidate uses letters not in the bank
 
-    if any([w not in vocab for w in placed.words]):
+    if any([w not in vocabulary for w in placed.words]):
         return False  # candidate uses words not in the bank
 
     if remaining.total() > 0:
@@ -465,7 +466,7 @@ def hard_validate(
     placed: Fragment,
     remaining: Counter,
     original_letter_bank: Counter,
-    vocabulary: Set[str] = vocab,
+    vocabulary: Set[str] = None,
     c1663: bool = False,
 ) -> bool:
     """Hard validation andswers whether this passes all the constraints that can be
@@ -479,7 +480,7 @@ def hard_validate(
     if placed.letters != original_letter_bank:
         return False  # placed must use exactly all the letters of the bank
 
-    if any([w not in vocab for w in placed.words]):
+    if any([w not in vocabulary for w in placed.words]):
         return False  # candidate uses words not in the bank
 
     if not c1663:
@@ -528,7 +529,7 @@ def hard_validate(
 
 
 def show_candidate(
-    root: str, limit: int = 5, vocabulary: Set[str] = vocab, c1663: bool = True
+    root: str, limit: int = 5, vocabulary: Set[str] = None, c1663: bool = True
 ):
     """Retrieves the node `root` and calculates some statistics about it and its child
     nodes, including how much of the next layer of search has been explored, the most
@@ -542,8 +543,7 @@ def show_candidate(
     _, remaining, _, _, _, _, _ = cached
     children = pst.get_children(root)
 
-    if c1663:
-        vocabulary = vocab_c1663
+    vocabulary = corpus(c1663)
     valid_vocab = [w for w in compute_valid_vocab(vocabulary, Counter(remaining))]
     explored_vocab = {entry[0]: entry for entry in children}
 
