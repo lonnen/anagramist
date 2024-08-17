@@ -73,7 +73,7 @@ def faux_uct_search(
     seed: int,
     use_gpu: bool = False,
     fp16: bool = False,
-    vocabulary: Set[str] = None,
+    vocabulary: Optional[Set[str]] = None,
     c1663: bool = False,
     max_iterations: Optional[int] = None,
 ):
@@ -466,7 +466,7 @@ def hard_validate(
     placed: Fragment,
     remaining: Counter,
     original_letter_bank: Counter,
-    vocabulary: Set[str] = None,
+    vocabulary: Optional[Set[str]] = None,
     c1663: bool = False,
 ) -> bool:
     """Hard validation andswers whether this passes all the constraints that can be
@@ -529,7 +529,7 @@ def hard_validate(
 
 
 def show_candidate(
-    root: str, limit: int = 5, vocabulary: Set[str] = None, c1663: bool = True
+    root: str, limit: int = 5, vocabulary: Optional[Set[str]] = None, c1663: bool = True
 ):
     """Retrieves the node `root` and calculates some statistics about it and its child
     nodes, including how much of the next layer of search has been explored, the most
