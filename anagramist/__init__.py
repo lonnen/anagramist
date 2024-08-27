@@ -3,7 +3,7 @@ from math import fsum
 from random import choices
 from os import PathLike
 from statistics import geometric_mean
-from typing import Counter, Generator, List, Optional, Set, Tuple
+from typing import Counter, Generator, List, Optional, Set, Tuple, Union
 
 import cProfile
 from pstats import Stats
@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 CANDIDATE_STATUS_CODES = {
     0: "OK",  # or None
     1: "Fails Validation",
+    5: "Fully Explored",
     7: "Manual Intervention",
 }
 
@@ -98,8 +99,13 @@ def faux_uct_search(
             loop_count += 1
         node = root
         # selection
-        node = selection(node, letter_bank, search_tree, vocabulary)
+        node, prune = selection(node, letter_bank, search_tree, vocabulary)
+
         logger.info(f"selected: {node}")
+        if prune:
+            logger.info(f"{node} is fully explored. pruning...")
+            search_tree.trim(node, status=5)
+            continue
 
         simulation_id = 0
         while simulation_id < MAX_NUM_OF_SIMULATIONS:
@@ -141,13 +147,14 @@ def selection(
     letter_bank: Counter,
     search_tree: PersistentSearchTree,
     vocabulary: Set[str],
-) -> str:
+) -> Union[str, bool]:
     """Take a random walk across a given `PersistentSearchTree` starting from a given
     root node. Each step of the walk is determined by a weighted random choice from the
     set of valid next steps, using Oracle scores as weights, a default score for
     unexplored nodes, and ignoring nodes already marked as known losers.
 
-    This method is guaranteed to return an unexplored node
+    This method is guaranteed to return an unexplored node or return a node that roots a
+    fully explored subtree that can be trimmed.
 
     args:
         root (`str`) - A sentence fragment corresponding to the placed letters of a
@@ -160,6 +167,7 @@ def selection(
             appear in the solution.
 
     returns (`str`) - A string containing an unexplored node chosen by the random walk
+            (`bool`) - `True` if the returned node has no unexplored children 
     """
     node = root
     # selection
@@ -186,6 +194,9 @@ def selection(
             )
             if w[6] == 0:  # see CANDIDATE_STATUS_CODES for details
                 words.append(w)
+        if len(words) == 0:
+            # all legal child nodes have non-zero status, so we're in a dead end
+            return placed_letters, True
         # weighted random sample based on score, or EXPLORATION_SCORE if unvisited
         weight_offset = (
             abs(min([w[3] for w in words])) + 1
@@ -194,7 +205,7 @@ def selection(
             [w[0] for w in words], weights=[w[3] + weight_offset for w in words]
         )[0]
         # loop repeats, breaking when we reach an unexpanded node (no score)
-    return node
+    return node, False
 
 
 def simulation(
