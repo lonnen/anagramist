@@ -598,3 +598,32 @@ def show_candidate(
         top_descendents[entry[0]] = entry
 
     return stats, top_children, top_descendents
+
+def rescore(root, oracle):
+    search_tree = PersistentSearchTree()
+    descendents = search_tree.get_descendents(root)
+    for d in descendents:
+        scored_words = score_fragment(Fragment(root))
+        for (
+                sentence,
+                remaining,
+                parent,
+                score,
+                cumulative_score,
+                mean_score,
+                status,
+            ) in backpropogation(root, letter_bank, scored_words, c1663):
+                search_tree.push(
+                    sentence,
+                    remaining,
+                    parent,
+                    score,
+                    cumulative_score,
+                    mean_score,
+                    status,
+                )
+                logger.info(
+                    f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}"
+                )
+                if score == float("inf"):
+                    exit()
