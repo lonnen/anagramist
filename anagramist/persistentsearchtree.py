@@ -226,7 +226,7 @@ class PersistentSearchTree:
         con.commit()
         return (modified, deleted)
 
-    def trim_containing(self, word: str, status: int = 7) -> int:
+    def trim_containing(self, word: str, status: int = 7) -> Tuple[int, int]:
         total_modified, total_deleted = 0, 0
         while True:
             rows = self.contains(word, limit=1, status=0)
