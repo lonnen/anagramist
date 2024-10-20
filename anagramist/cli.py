@@ -9,9 +9,40 @@ from anagramist.vocab import c1663_disallow
 
 @click.group()
 @click.version_option()
-def cli():
+@click.option(
+    "-d",
+    "--database",
+    "--database-file",
+    default="anagramist.db",
+    type=click.Path(),
+    help="sqlite database to use for persistence",
+)
+@click.option(
+    "-l",
+    "--letters",
+    default="ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
+    help="the total character",
+)
+@click.option(
+    "--c1663/--no-c1663",
+    default=False,
+    help="""Whether to apply rules specific to Comic 1663. If the letter bank of Comic 1663 is detected this will be inferred to be True. You should only need to set this manually if you are using the c1663 letter bank but don't want the additional rules, or if you want to apply the rules to a non-c1663 letter bank.""",
+)
+@click.option(
+    "-v", "--verbose", is_flag=True
+)
+@click.option(
+    "-y", "--yes", is_flag=True, help="Enable to automatically confirm all prompts, allowing the command to finish without user input"
+)
+@click.pass_context
+def cli(ctx, database, puzzle, c1663, verbose, yes):
     "a solver for dinocomics 1663-style cryptoanagrams"
-
+    ctx.ensure_object(dict)
+    ctx.obj["DATABSE"] = database
+    ctx.obj["PUZZLE"] = puzzle
+    ctx.obj["C1663"] = c1663
+    ctx.obj["VERBOSE"] = verbose
+    ctx.obj["YES"] = yes
 
 @click.command()
 @click.argument("letters")  # nee prompt
