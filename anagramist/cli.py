@@ -201,6 +201,16 @@ def prune(words: str):
     click.echo("")
 
 
+# @click.command()
+# def database(subcommand):
+#     subcommand in {"backup", "restore", "verify"}
+#     # dispatch:
+#     # > backup [optional arg: backup_destination]
+#     # > restore [arg: restore_source]
+#     # > verify [--puzzle=inferred]
+#     pass
+
+
 cli.add_command(solve)
 cli.add_command(trim)
 cli.add_command(show)
