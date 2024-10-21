@@ -40,6 +40,7 @@ EXPLORATION_SCORE = float(-40)
 
 def search(
     letters: str,
+    database: str | PathLike[str],
     model_name_or_path: str | PathLike[str],
     seed: int,
     use_gpu: bool = False,
@@ -51,6 +52,7 @@ def search(
         with cProfile.Profile() as pr:
             faux_uct_search(
                 letters,
+                database,
                 model_name_or_path,
                 seed,
                 use_gpu,
@@ -70,6 +72,7 @@ def search(
 
 def faux_uct_search(
     letters: str,
+    database: str | PathLike[str],
     model_name_or_path: str | PathLike[str],
     seed: int,
     use_gpu: bool = False,
@@ -81,7 +84,7 @@ def faux_uct_search(
     # setup
     letter_bank = Fragment(letters).letters
     oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
-    search_tree = PersistentSearchTree()
+    search_tree = PersistentSearchTree(db_name=database)
     root = ""
 
     if c1663:
@@ -167,7 +170,7 @@ def selection(
             appear in the solution.
 
     returns (`str`) - A string containing an unexplored node chosen by the random walk
-            (`bool`) - `True` if the returned node has no unexplored children 
+            (`bool`) - `True` if the returned node has no unexplored children
     """
     node = root
     # selection
@@ -540,14 +543,18 @@ def hard_validate(
 
 
 def show_candidate(
-    root: str, limit: int = 5, vocabulary: Optional[Set[str]] = None, c1663: bool = True
+    root: str,
+    database,
+    limit: int = 5,
+    vocabulary: Optional[Set[str]] = None,
+    c1663: bool = True,
 ):
     """Retrieves the node `root` and calculates some statistics about it and its child
     nodes, including how much of the next layer of search has been explored, the most
     promising child nodes, and the most promising nodes that have been discovered in
     this branch of the tree.
     """
-    pst = PersistentSearchTree()
+    pst = PersistentSearchTree(db_name=database)
     cached = pst.get(root)
     if cached is None:
         return {}, {}
@@ -599,12 +606,22 @@ def show_candidate(
 
     return stats, top_children, top_descendents
 
-def rescore(root, oracle):
-    search_tree = PersistentSearchTree()
+
+def rescore(root, oracle, letter_bank, database, c1663):
+    search_tree = PersistentSearchTree(db_name=database)
     descendents = search_tree.get_descendents(root)
     for d in descendents:
-        scored_words = score_fragment(Fragment(root))
+        scored_words = score_fragment(Fragment(d))
         for (
+            sentence,
+            remaining,
+            parent,
+            score,
+            cumulative_score,
+            mean_score,
+            status,
+        ) in backpropogation(root, letter_bank, scored_words, c1663):
+            search_tree.push(
                 sentence,
                 remaining,
                 parent,
@@ -612,18 +629,9 @@ def rescore(root, oracle):
                 cumulative_score,
                 mean_score,
                 status,
-            ) in backpropogation(root, letter_bank, scored_words, c1663):
-                search_tree.push(
-                    sentence,
-                    remaining,
-                    parent,
-                    score,
-                    cumulative_score,
-                    mean_score,
-                    status,
-                )
-                logger.info(
-                    f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}"
-                )
-                if score == float("inf"):
-                    exit()
+            )
+            logger.info(
+                f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}"
+            )
+            if score == float("inf"):
+                exit()
