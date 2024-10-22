@@ -43,7 +43,7 @@ from anagramist.vocab import c1663_disallow
 def cli(ctx, database, puzzle, c1663, verbose, yes):
     "a solver for dinocomics 1663-style cryptoanagrams"
     ctx.ensure_object(dict)
-    ctx.obj["DATABSE"] = database
+    ctx.obj["DATABASE"] = database
     ctx.obj["PUZZLE"] = puzzle
     ctx.obj["C1663"] = c1663
     ctx.obj["VERBOSE"] = verbose
@@ -208,7 +208,7 @@ def prune(words: str):
 #     # > backup [optional arg: backup_destination]
 #     # > restore [arg: restore_source]
 #     # > verify [--puzzle=inferred]
-#     pass
+#     passqs
 
 
 cli.add_command(solve)
