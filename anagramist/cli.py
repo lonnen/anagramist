@@ -12,7 +12,6 @@ from anagramist.vocab import c1663_disallow
 @click.option(
     "-d",
     "--database",
-    "--database-file",
     default="anagramist.db",
     type=click.Path(),
     help="path to the sqlite database to use for persistence",
@@ -32,33 +31,31 @@ from anagramist.vocab import c1663_disallow
     Only set this manually if you are using the c1663 letter bank but don't want the 
     additional rules, or if you want to apply the rules to a non-c1663 letter bank.""",
 )
-@click.option(
-    "-y",
-    "--yes",
-    is_flag=True,
-    help="""Enable to automatically confirm all prompts, allowing the command to finish
-    without user input""",
-)
+
 @click.option("-v", "--verbose", is_flag=True)
 @click.pass_context
-def cli(ctx, database, letters, c1663, yes, verbose):
+def cli(ctx, database, letters, c1663, verbose):
     "a solver for dinocomics 1663-style cryptoanagrams"
     ctx.ensure_object(dict)
     ctx.obj["DATABASE"] = database
     ctx.obj["LETTERS"] = letters
     ctx.obj["C1663"] = c1663
-    ctx.obj["YES"] = yes
     ctx.obj["VERBOSE"] = verbose
+
+    if letters == "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!":
+        # infer c1663
+        click.echo(c1663)
 
     if ctx.invoked_subcommand is None:
         click.echo("Anagramist was invoked without subcommand")
-        click.echo("Context:")
-        for k, v in ctx.obj.items():
-            click.echo(f"  {k}: {v}")
+    else:
+        click.echo(f"Anagramist was invoked with subcommand: {ctx.invoked_subcommand}")
+    click.echo("CLI - Context:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
 
 
-@click.command()
-@click.argument("letters")  # nee prompt
+@click.group(invoke_without_command=True)
 @click.option(
     "-m", "--model_name_or_path", default="microsoft/phi-1_5", type=click.Path()
 )
@@ -69,30 +66,41 @@ def cli(ctx, database, letters, c1663, yes, verbose):
     help="Whether or not to use cpu.",
 )
 @click.option(
-    "--fp16",
+    "--use_fp16",
     is_flag=True,
     help="""Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 
     32-bit""",
 )
-@click.option(
-    "--c1663",
-    is_flag=True,
-    help="""Leverage additional checks specific to the cryptoanagram puzzle in Dinosaur 
-    comics 1663""",
-)
-def solve(letters, database, model_name_or_path, seed, use_gpu, fp16, c1663):
-    click.echo(f"Assembling anagrams from: {"".join(sorted(letters))}")
-    if c1663:
-        click.echo("Using special constraints for comic 1663")
-    search(
-        letters,
-        database,
-        model_name_or_path,
-        seed,
-        use_gpu,
-        fp16,
-        c1663=c1663,
-    )
+@click.pass_context
+def transfomers(ctx, model_name_or_path, seed, use_gpu, use_fp16):
+    ctx.ensure_object(dict)
+    ctx.obj["MODEL"] = model_name_or_path
+    ctx.obj["SEED"] = seed
+    ctx.obj["USE_GPU"] = use_gpu
+    ctx.obj["USE_FP16"] = use_fp16
+
+    click.echo("TRANSFORMERS - Context:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
+
+
+@cli.command()
+@click.pass_context
+def solve(ctx):
+    # click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["PUZZLE"]))}")
+
+    click.echo("SOLVE - Context:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
+    # search(
+    #     ctx.obj["PUZZLE"],
+    #     ctx.obj["DATABASE"],
+    #     ctx.obj["MODEL_NAME_OR_PATH"],
+    #     ctx.obj["SEED"],
+    #     ctx.obj["USE_GPU"],
+    #     ctx.obj["USE_FP15"],
+    #     ctx.obj["C1663"],
+    # )
 
 
 @click.command()
@@ -209,6 +217,12 @@ def prune(words: str):
 
 
 # @click.command()
+# @click.option(
+#     "--yes",
+#     is_flag=True,
+#     help="""Enable to automatically confirm all prompts, allowing the command to finish
+#     without user input""",
+# )
 # def database(subcommand):
 #     subcommand in {"backup", "restore", "verify"}
 #     # dispatch:
