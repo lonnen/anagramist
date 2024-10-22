@@ -7,7 +7,7 @@ from anagramist.persistentsearchtree import PersistentSearchTree
 from anagramist.vocab import c1663_disallow
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.version_option()
 @click.option(
     "-d",
@@ -47,8 +47,14 @@ def cli(ctx, database, letters, c1663, yes, verbose):
     ctx.obj["DATABASE"] = database
     ctx.obj["LETTERS"] = letters
     ctx.obj["C1663"] = c1663
-    ctx.obj["VERBOSE"] = verbose
     ctx.obj["YES"] = yes
+    ctx.obj["VERBOSE"] = verbose
+
+    if ctx.invoked_subcommand is None:
+        click.echo("Anagramist was invoked without subcommand")
+        click.echo("Context:")
+        for k, v in ctx.obj.items():
+            click.echo(f"  {k}: {v}")
 
 
 @click.command()
