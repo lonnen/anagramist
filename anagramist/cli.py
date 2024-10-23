@@ -13,6 +13,7 @@ from anagramist.vocab import c1663_disallow
     "-d",
     "--database",
     default="anagramist.db",
+    show_default=True,
     type=click.Path(),
     help="path to the sqlite database to use for persistence",
 )
