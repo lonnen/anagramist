@@ -66,10 +66,10 @@ def cli(
     ctx.obj["DATABASE"] = database
     ctx.obj["LETTERS"] = letters
     ctx.obj["C1663"] = c1663
-    ctx.obj["model_name_or_path"] = model_name_or_path
-    ctx.obj["seed"] = seed
-    ctx.obj["use_gpu"] = use_gpu
-    ctx.obj["use_fp16"] = use_fp16
+    ctx.obj["MODEL_NAME_OR_PATH"] = model_name_or_path
+    ctx.obj["SEED"] = seed
+    ctx.obj["USE_GPU"] = use_gpu
+    ctx.obj["USE_FP16"] = use_fp16
     ctx.obj["VERBOSE"] = verbose
 
     _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiii
