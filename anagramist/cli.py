@@ -58,7 +58,7 @@ from anagramist.vocab import c1663_disallow
 @click.option("-v", "--verbose", is_flag=True)
 @click.pass_context
 def cli(
-    ctx, database, letters, suppress_c1663, model_name_or_path, seed, use_gpu, use_fp16, verbose
+    ctx: click.Context, database: str, letters: str, suppress_c1663: bool, model_name_or_path: str, seed: int, use_gpu: bool, use_fp16: bool, verbose: bool
 ):
     "a solver for dinocomics 1663-style cryptoanagrams"
 
@@ -93,7 +93,7 @@ def cli(
 
 @cli.command()
 @click.pass_context
-def solve(ctx):
+def solve(ctx: click.Context):
     # click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["PUZZLE"]))}")
 
     click.echo("SOLVE - Context:")
