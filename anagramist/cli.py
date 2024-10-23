@@ -25,13 +25,12 @@ from anagramist.vocab import c1663_disallow
     help="the bank of characters to use. Defaults to using the Comic 1663 letter bank",
 )
 @click.option(
-    "--c1663/--no-c1663",
+    "--suppress-c1663",
     default=False,
-    help="""Whether to apply rules specific to Comic 1663. If the letter bank of 
-    Comic 1663 is detected this will be inferred to be True. 
-    
-    Only set this manually if you are using the c1663 letter bank but don't want the 
-    additional rules, or if you want to apply the rules to a non-c1663 letter bank.""",
+    help="""This suppressed the application of additional rules and heuristics specific
+    to Comic 1663. The rules only apply if the letter bank matches c1663, so only set
+    this flag if you are using the c1663 letter bank AND you do not want the additional
+    heuristics to apply.""",
 )
 @click.option(
     "-m",
@@ -59,24 +58,29 @@ from anagramist.vocab import c1663_disallow
 @click.option("-v", "--verbose", is_flag=True)
 @click.pass_context
 def cli(
-    ctx, database, letters, c1663, model_name_or_path, seed, use_gpu, use_fp16, verbose
+    ctx, database, letters, suppress_c1663, model_name_or_path, seed, use_gpu, use_fp16, verbose
 ):
     "a solver for dinocomics 1663-style cryptoanagrams"
+
+    c1663 = False
+    _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiii
+        sssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""
+    if letters == _c1663_letters:
+        c1663 = True
+        if suppress_c1663:
+            c1663 = False
+
     ctx.ensure_object(dict)
     ctx.obj["DATABASE"] = database
     ctx.obj["LETTERS"] = letters
     ctx.obj["C1663"] = c1663
+    # transformers.py settings
     ctx.obj["MODEL_NAME_OR_PATH"] = model_name_or_path
     ctx.obj["SEED"] = seed
     ctx.obj["USE_GPU"] = use_gpu
     ctx.obj["USE_FP16"] = use_fp16
+    # utility
     ctx.obj["VERBOSE"] = verbose
-
-    _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiii
-        sssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""
-    if letters == _c1663_letters:
-        # infer c1663
-        click.echo(c1663)
 
     if ctx.invoked_subcommand is None:
         click.echo("Anagramist was invoked without subcommand")
