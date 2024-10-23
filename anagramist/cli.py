@@ -20,8 +20,9 @@ from anagramist.vocab import c1663_disallow
 @click.option(
     "-l",
     "--letters",
-    default="ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!",
-    help="the bank of characters to use. Defaults to using Comic 1663",
+    default="""ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssss
+    dddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""",
+    help="the bank of characters to use. Defaults to using the Comic 1663 letter bank",
 )
 @click.option(
     "--c1663/--no-c1663",
@@ -43,7 +44,9 @@ def cli(ctx, database, letters, c1663, verbose):
     ctx.obj["C1663"] = c1663
     ctx.obj["VERBOSE"] = verbose
 
-    if letters == "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!":
+    _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiii
+        sssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""
+    if letters == _c1663_letters:
         # infer c1663
         click.echo(c1663)
 
@@ -221,8 +224,8 @@ def prune(words: str):
 # @click.option(
 #     "--yes",
 #     is_flag=True,
-#     help="""Enable to automatically confirm all prompts, allowing the command to finish
-#     without user input""",
+#     help="""Enable to automatically confirm all prompts, allowing the command to
+#       finish without user input""",
 # )
 # def database(subcommand):
 #     subcommand in {"backup", "restore", "verify"}
