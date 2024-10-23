@@ -20,8 +20,7 @@ from anagramist.vocab import c1663_disallow
 @click.option(
     "-l",
     "--letters",
-    default="""ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssss
-    dddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""",
+    default="""ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""",  # noqa: E501
     help="the bank of characters to use. Defaults to using the Comic 1663 letter bank",
 )
 @click.option(
@@ -63,8 +62,7 @@ def cli(
     "a solver for dinocomics 1663-style cryptoanagrams"
 
     c1663 = False
-    _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiii
-        sssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""
+    _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""  # noqa: E501
     if letters == _c1663_letters:
         c1663 = True
         if suppress_c1663:
