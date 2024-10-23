@@ -33,15 +33,43 @@ from anagramist.vocab import c1663_disallow
     Only set this manually if you are using the c1663 letter bank but don't want the 
     additional rules, or if you want to apply the rules to a non-c1663 letter bank.""",
 )
-
+@click.option(
+    "-m",
+    "--model_name_or_path",
+    default="microsoft/phi-1_5",
+    type=click.Path(),
+    help="Model name or path to a model to use when evaluating candidates",
+)
+@click.option(
+    "--seed", type=int, default=42, help="Which seed to use for model evaluation"
+)
+@click.option(
+    "--use_gpu",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Whether to use the gpu (otherwise, cpu) for evaluating candidates",
+)
+@click.option(
+    "--use_fp16",
+    is_flag=True,
+    help="""Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 
+    32-bit""",
+)
 @click.option("-v", "--verbose", is_flag=True)
 @click.pass_context
-def cli(ctx, database, letters, c1663, verbose):
+def cli(
+    ctx, database, letters, c1663, model_name_or_path, seed, use_gpu, use_fp16, verbose
+):
     "a solver for dinocomics 1663-style cryptoanagrams"
     ctx.ensure_object(dict)
     ctx.obj["DATABASE"] = database
     ctx.obj["LETTERS"] = letters
     ctx.obj["C1663"] = c1663
+    ctx.obj["model_name_or_path"] = model_name_or_path
+    ctx.obj["seed"] = seed
+    ctx.obj["use_gpu"] = use_gpu
+    ctx.obj["use_fp16"] = use_fp16
     ctx.obj["VERBOSE"] = verbose
 
     _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiii
@@ -55,35 +83,6 @@ def cli(ctx, database, letters, c1663, verbose):
     else:
         click.echo(f"Anagramist was invoked with subcommand: {ctx.invoked_subcommand}")
     click.echo("CLI - Context:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-
-
-@click.group(invoke_without_command=True)
-@click.option(
-    "-m", "--model_name_or_path", default="microsoft/phi-1_5", type=click.Path()
-)
-@click.option("--seed", type=int, default=42, help="random seed for initialization")
-@click.option(
-    "--use_gpu",
-    is_flag=True,
-    help="Whether or not to use cpu.",
-)
-@click.option(
-    "--use_fp16",
-    is_flag=True,
-    help="""Whether to use 16-bit (mixed) precision (through NVIDIA apex) instead of 
-    32-bit""",
-)
-@click.pass_context
-def transfomers(ctx, model_name_or_path, seed, use_gpu, use_fp16):
-    ctx.ensure_object(dict)
-    ctx.obj["MODEL"] = model_name_or_path
-    ctx.obj["SEED"] = seed
-    ctx.obj["USE_GPU"] = use_gpu
-    ctx.obj["USE_FP16"] = use_fp16
-
-    click.echo("TRANSFORMERS - Context:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
 
