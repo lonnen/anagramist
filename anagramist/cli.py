@@ -89,12 +89,19 @@ def cli(
     ctx.obj["VERBOSE"] = verbose
 
     if ctx.invoked_subcommand is None:
-        click.echo("Anagramist was invoked without subcommand")
-    else:
-        click.echo(f"Anagramist was invoked with subcommand: {ctx.invoked_subcommand}")
-    click.echo("CLI - Context:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
+        if not ctx.obj["VERBOSE"]:
+            click.echo("This space intentionally left blank. Pass `-v` for more info.")
+            click.echo(
+                "Use `anagramist --help` for full list of arguments and options."
+            )
+
+    ctx.obj["SEARCH_TREE"] = PersistentSearchTree(db_name=database)
+    if ctx.obj["VERBOSE"]:
+        click.echo("Configuration:")
+        click.echo(f"* letter bank: {"".join(sorted(ctx.obj["LETTERS"]))}")
+        if ctx.obj["C1663"]:
+            click.echo("* C1663 heuristics enabled")
+        click.echo(f"* database: {database}")
 
 
 @cli.command()
