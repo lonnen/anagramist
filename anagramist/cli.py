@@ -129,10 +129,47 @@ def candidates(
     pass
 
 
-@click.command()
+@click.group(invoke_without_command=True)
 @click.pass_context
 def database(ctx: click.Context):
-    click.echo("CANDIDATES - Database:")
+    click.echo("DATABASE - Context:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
+    pass
+
+@database.command()
+@click.pass_context
+def verify(ctx: click.Context):
+    # verify that every entry in the database uses the same
+    click.echo("DATABASE -> VERIFY - Context:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
+    pass
+
+@database.command()
+@click.pass_context
+def backup(ctx: click.Context):
+    click.echo("DATABASE -> BACKUP - Context:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
+    pass
+
+@database.command()
+@click.confirmation_option(prompt='DESTROY THE CURRENT DB IN ORDER TO REPLACE IT?')
+@click.argument(
+    'restore_from',
+    type=click.Path(exists=True),
+)
+@click.pass_context
+def restore(ctx: click.Context, restore_from: click.Path):
+    """RESTORE_FROM: Path to the database which will replace the current DB"""
+    if restore_from == ctx.obj.get('DATABASE'):
+        click.echo(f"Cannot restore database `{restore_from}` from itself")
+        ctx.exit(code=1)
+    else:
+        click.echo(ctx.obj.get('DATABASE'))
+
+    click.echo("DATABASE -> RESTORE2 - Context:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
     pass
