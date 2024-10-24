@@ -61,7 +61,7 @@ def cli(
     database: str,
     letters: str,
     suppress_c1663: bool,
-    model_name_or_path: str,
+    model_name_or_path: click.Path,
     seed: int,
     use_gpu: bool,
     use_fp16: bool,
