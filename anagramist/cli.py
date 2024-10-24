@@ -67,7 +67,7 @@ def cli(
     use_fp16: bool,
     verbose: bool,
 ):
-    "a solver for dinocomics 1663-style cryptoanagrams"
+    """a solver utility for dinocomics 1663-style cryptoanagrams"""
 
     c1663 = False
     _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""  # noqa: E501
