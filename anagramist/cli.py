@@ -191,9 +191,11 @@ def backup(ctx: click.Context, backup_to: click.Path):
         click.echo(f"Destination file already exists")
         ctx.exit(1)
 
-    click.echo(f"Backing up {src} to {dest}!")
+    if ctx.obj["VERBOSE"]:
+        click.echo(f"Backing up {src} to {dest}!")
     # shutil.copy2(src, dest)
-    click.echo(f"Dry run completed!")
+    if ctx.obj["VERBOSE"]:
+        click.echo(f"Dry run completed!")
 
 
 @database.command()
