@@ -113,7 +113,7 @@ def cli(
 def solve(ctx: click.Context):
     # click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["PUZZLE"]))}")
 
-    click.echo("SOLVE - Context:")
+    click.echo("SOLVE\nContext:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
     # search(
@@ -134,7 +134,7 @@ def candidates(
     ctx: click.Context,
     candidate: str,
 ):
-    click.echo("CANDIDATES - Context:")
+    click.echo("CANDIDATES\nContext:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
     pass
@@ -143,7 +143,7 @@ def candidates(
 @click.group(invoke_without_command=True)
 @click.pass_context
 def database(ctx: click.Context):
-    click.echo("DATABASE - Context:")
+    click.echo("DATABASE\nContext:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
     pass
@@ -153,7 +153,7 @@ def database(ctx: click.Context):
 @click.pass_context
 def verify(ctx: click.Context):
     # verify that every entry in the database uses the same
-    click.echo("DATABASE -> VERIFY - Context:")
+    click.echo("DATABASE -> VERIFY\nContext:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
     pass
@@ -213,7 +213,7 @@ def restore(ctx: click.Context, restore_from: click.Path):
     else:
         click.echo(ctx.obj.get("DATABASE"))
 
-    click.echo("DATABASE -> RESTORE2 - Context:")
+    click.echo("DATABASE -> RESTORE2\nContext:")
     for k, v in ctx.obj.items():
         click.echo(f"  {k}: {v}")
     pass
