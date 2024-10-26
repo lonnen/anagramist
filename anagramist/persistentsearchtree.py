@@ -244,6 +244,8 @@ class PersistentSearchTree:
         """Verify that the database exists, the program can connect to it, and answer
         whether each row has the same set of letters (placed and unplaced).
 
+        WARNING: this is quite expensive, proportional to the size of the database
+
         Returns:
             (`bool`) - true if all the rows in the database are made from the same set
                 of letters
@@ -267,3 +269,13 @@ class PersistentSearchTree:
             bins.update((sorted("".join(combined.letters.elements())),))
         con.commit()
         return (len(bins) == 0, bins)
+
+    # def sample(self):
+    #     # https://blog.moertel.com/posts/2024-08-23-sampling-with-sql.html
+    #     """
+    #     SELECT *
+    #         FROM visited
+    #         WHERE status is 0
+    #     ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
+    #         LIMIT 100
+    #     """
