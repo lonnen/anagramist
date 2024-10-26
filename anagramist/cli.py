@@ -172,9 +172,9 @@ def backup(ctx: click.Context, backup_to: click.Path):
     This may lose some metadata. See Python `shutil.copy2()` and `shutil.copystat()`
     for more information.
     """
-    src = Path(ctx.obj['DATABASE'])
+    src = Path(ctx.obj["DATABASE"])
     dest = Path(backup_to)
-    
+
     if Path.samefile(src, dest):
         click.echo("Cannot backup the database to itself")
         ctx.exit(1)
@@ -188,14 +188,14 @@ def backup(ctx: click.Context, backup_to: click.Path):
 
     if dest.exists():
         click.echo(f"Cannot back up database {src} to {dest}")
-        click.echo(f"Destination file already exists")
+        click.echo("Destination file already exists")
         ctx.exit(1)
 
     if ctx.obj["VERBOSE"]:
         click.echo(f"Backing up {src} to {dest}!")
     # shutil.copy2(src, dest)
     if ctx.obj["VERBOSE"]:
-        click.echo(f"Dry run completed!")
+        click.echo("Dry run completed!")
 
 
 @database.command()
@@ -213,6 +213,7 @@ def restore(ctx: click.Context, restore_from: click.Path):
     else:
         if ctx.obj["VERBOSE"]:
             click.echo(f"Restoring {ctx.obj.get("DATABASE")}")
+
 
 cli.add_command(solve)
 cli.add_command(candidates)
