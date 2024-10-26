@@ -18,6 +18,12 @@ class Fragment:
         self.letters = Counter(candidate_sentence)
         self.letters[" "] = 0
 
+    def __add__(self, fragment):
+        return Fragment(self.sentence + fragment.sentence)
+
+    def __repr__(self):
+        return f"{type(self).__name__}({self.sentence})"
+
     @property
     def words(self) -> List[str]:
         """This defers computing the property `words` until it is accessed for the
