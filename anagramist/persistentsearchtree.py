@@ -1,7 +1,7 @@
 from collections import Counter
 import sqlite3
 from contextlib import closing
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from .fragment import Fragment
 
@@ -240,7 +240,18 @@ class PersistentSearchTree:
             total_modified += max(modified, 0)
             total_deleted += max(deleted, 0)
 
-    def verify(self, verbose: bool = False) -> Tuple[bool, str, int, int, int]:
+    def verify(self) -> Tuple[bool, Counter[str, int]]:
+        """Verify that the database exists, the program can connect to it, and answer
+        whether each row has the same set of letters (placed and unplaced).
+
+        Returns:
+            (`bool`) - true if all the rows in the database are made from the same set
+                of letters
+            (`Counter[str, int]`) - a counter containing buckets of each unique set of
+                letters and their counts. If the earlier value is true, this will be a 
+                single entry, but if it is false this may be useful in remediating or
+                reporting problems.
+        """
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
         cur.execute(
@@ -255,10 +266,4 @@ class PersistentSearchTree:
             combined = Fragment(placed) + Fragment(remaining)
             bins.update((sorted("".join(combined.letters.elements())),))
         con.commit()
-        return (
-            len(bins) == 0,
-            bins.most_common(1)[0],
-            bins.most_common(1)[0],
-            len(bins),
-            bins.total(),
-        )
+        return (len(bins) == 0, bins)
