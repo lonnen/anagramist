@@ -1,3 +1,4 @@
+from collections import Counter
 import sqlite3
 from contextlib import closing
 from typing import List, Optional, Tuple
@@ -238,3 +239,26 @@ class PersistentSearchTree:
             modified, deleted = self.trim(" ".join(truncated), status)
             total_modified += max(modified, 0)
             total_deleted += max(deleted, 0)
+
+    def verify(self, verbose: bool = False) -> Tuple[bool, str, int, int, int]:
+        con = sqlite3.connect(self.__db_name)
+        cur = con.cursor()
+        cur.execute(
+            """
+            SELECT placed, remaining
+            FROM visited
+            LIMIT 10
+            """,
+        )
+        bins = Counter()
+        for placed, remaining in cur:
+            combined = Fragment(placed) + Fragment(remaining)
+            bins.update((sorted("".join(combined.letters.elements())),))
+        con.commit()
+        return (
+            len(bins) == 0,
+            bins.most_common(1)[0],
+            bins.most_common(1)[0],
+            len(bins),
+            bins.total(),
+        )
