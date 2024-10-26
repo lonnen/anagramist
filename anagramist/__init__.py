@@ -159,7 +159,7 @@ def selection(
     This method is guaranteed to return an unexplored node or return a node that roots a
     fully explored subtree that can be trimmed.
 
-    args:
+    Args:
         root (`str`) - A sentence fragment corresponding to the placed letters of a
             puzzle candidate. This is the first half of a position in the search_tree.
         letter_bank (`Counter`) - The total characters to be placed. This is the
@@ -169,7 +169,7 @@ def selection(
         vocabulary (`Set[str]`) - The set known to contain at least all the words that
             appear in the solution.
 
-    returns (`str`) - A string containing an unexplored node chosen by the random walk
+    Returns (`str`) - A string containing an unexplored node chosen by the random walk
             (`bool`) - `True` if the returned node has no unexplored children
     """
     node = root
@@ -221,7 +221,7 @@ def simulation(
     Critically, this leaf node could itself be a winner, because placing any
     additional letters to the winner will never result in a winning answer.
 
-    returns (`str`) - the leaf node discovered at the end of the random walk
+    Returns (`str`) - the leaf node discovered at the end of the random walk
     """
     # expansion & simulation
     # take a deep, uniform, random walk until soft validation fails
@@ -252,14 +252,14 @@ def score_fragment(
     the resulting value to combine token-level log-scores from the oracle into a list of
     aligned word-level log-scores
 
-    args:
+    Args:
         placed: (`Fragment`) - A fragment containing the `str` sentence and `List[str]`
             of words parsed out of that sentence for alignment
         oracle: (`TransformerOracle`) - A wrapper around a transformer model that will
             accept the `str` sentence and return token-level scores for each token given
             the previously examined tokens
 
-    returns (`List[Tuple[str, float]]`) A list of 2-item tuples containing the
+    Returns (`List[Tuple[str, float]]`) A list of 2-item tuples containing the
         accumulated words and their combined score
     """
     scored_tokens = oracle.calc_candidate_scores(
@@ -360,7 +360,7 @@ def compute_valid_vocab(
         remaining (`Counter`) - the letters remaining to be placed
         c1163 (`bool`) - whether or not to leverage comic 1663 specific hints
 
-    returns (`generator[str, None, None]`) - a generator that yields vocabular words
+    Returns (`generator[str, None, None]`) - a generator that yields vocabular words
         that can be spelled with the remaining letters
     """
     for word in vocabulary:
@@ -396,7 +396,7 @@ def soft_validate(
     soft validation. It also means when there are no remaining values, the final
     placed letter should be "w".
 
-    returns (`bool`) - indicating if the provided fragment `placed` conforms to the
+    Returns (`bool`) - indicating if the provided fragment `placed` conforms to the
         problem constraits given the letters placed so far
     """
     # the sentence uses only characters from the provided bank
@@ -487,7 +487,7 @@ def hard_validate(
     verified computationally. In an effort to return quickly it starts with the broadest
     and easiest to check constraints, saving expensive ones for later in the check.
 
-    returns (`bool`) - whether the provided Fragment `placed` conforms to all
+    Returns (`bool`) - whether the provided Fragment `placed` conforms to all
         constraints that can be verified computationally
     """
 
