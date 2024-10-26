@@ -211,12 +211,8 @@ def restore(ctx: click.Context, restore_from: click.Path):
         click.echo(f"Cannot restore database `{restore_from}` from itself")
         ctx.exit(code=1)
     else:
-        click.echo(ctx.obj.get("DATABASE"))
-
-    click.echo("DATABASE -> RESTORE2\nContext:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-    pass
+        if ctx.obj["VERBOSE"]:
+            click.echo(f"Restoring {ctx.obj.get("DATABASE")}")
 
 cli.add_command(solve)
 cli.add_command(candidates)
