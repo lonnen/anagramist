@@ -139,5 +139,17 @@ def candidates(
         click.echo(f"  {k}: {v}")
     pass
 
+@click.command()
+@click.pass_context
+def check_database(ctx: click.Context):
+    # verify that the database exists and can be connected 
+    # verify that every entry in the database uses the same letter banks
+    # output basic stats about the size of the database
+    click.echo("DATABASE -> VERIFY\nContext:")
+    for k, v in ctx.obj.items():
+        click.echo(f"  {k}: {v}")
+    pass
+
 cli.add_command(solve)
 cli.add_command(candidates)
+cli.add_command(check_database)
