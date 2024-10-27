@@ -139,25 +139,5 @@ def candidates(
         click.echo(f"  {k}: {v}")
     pass
 
-
-@click.group(invoke_without_command=True)
-@click.pass_context
-def database(ctx: click.Context):
-    click.echo("DATABASE\nContext:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-    pass
-
-
-@database.command()
-@click.pass_context
-def verify(ctx: click.Context):
-    # verify that every entry in the database uses the same
-    click.echo("DATABASE -> VERIFY\nContext:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-    pass
-
 cli.add_command(solve)
 cli.add_command(candidates)
-cli.add_command(database)
