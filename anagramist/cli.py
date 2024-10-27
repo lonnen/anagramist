@@ -158,63 +158,6 @@ def verify(ctx: click.Context):
         click.echo(f"  {k}: {v}")
     pass
 
-
-@database.command()
-@click.argument(
-    "backup_to",
-    type=click.Path(),
-)
-@click.pass_context
-def backup(ctx: click.Context, backup_to: click.Path):
-    """BACKUP_TO: Path to the backup that will be created. If this is a directory the
-    backup will be created there. If it is a filename, it will be used for the backup.
-
-    This may lose some metadata. See Python `shutil.copy2()` and `shutil.copystat()`
-    for more information.
-    """
-    src = Path(ctx.obj["DATABASE"])
-    dest = Path(backup_to)
-
-    if Path.samefile(src, dest):
-        click.echo("Cannot backup the database to itself")
-        ctx.exit(1)
-
-    if dest.is_dir():
-        cur_time = datetime.datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%S")
-        # this might fail if you are running on one OS (say, POSIX) and accessing files
-        # from a different OS (say, Windows)
-        db_filename = os.path.basename(src)
-        dest = dest.with_suffix(f"{db_filename}-backup-{cur_time}")
-
-    if dest.exists():
-        click.echo(f"Cannot back up database {src} to {dest}")
-        click.echo("Destination file already exists")
-        ctx.exit(1)
-
-    if ctx.obj["VERBOSE"]:
-        click.echo(f"Backing up {src} to {dest}!")
-    # shutil.copy2(src, dest)
-    if ctx.obj["VERBOSE"]:
-        click.echo("Dry run completed!")
-
-
-@database.command()
-@click.confirmation_option(prompt="DESTROY THE CURRENT DB IN ORDER TO REPLACE IT?")
-@click.argument(
-    "restore_from",
-    type=click.Path(exists=True),
-)
-@click.pass_context
-def restore(ctx: click.Context, restore_from: click.Path):
-    """RESTORE_FROM: Path to the database which will replace the current DB"""
-    if restore_from == ctx.obj.get("DATABASE"):
-        click.echo(f"Cannot restore database `{restore_from}` from itself")
-        ctx.exit(code=1)
-    else:
-        if ctx.obj["VERBOSE"]:
-            click.echo(f"Restoring {ctx.obj.get("DATABASE")}")
-
-
 cli.add_command(solve)
 cli.add_command(candidates)
 cli.add_command(database)
