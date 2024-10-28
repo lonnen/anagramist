@@ -143,10 +143,18 @@ def check_database(ctx: click.Context):
     # verify that the database exists and can be connected 
     # verify that every entry in the database uses the same letter banks
     # output basic stats about the size of the database
-    click.echo("DATABASE -> VERIFY\nContext:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-    pass
+    pst = ctx.obj["SEARCH_TREE"]
+    integrity, counts = pst.verify_integrity()
+    if ctx.obj["VERBOSE"]:
+        if integrity:
+            click.echo("DB {ctx.obj["DATABASE"]} is internally consistent.")
+        else:
+            click.echo(f"Multiple letter banks found in DB {ctx.obj["DATABASE"]}")
+        click.echo("")
+        for l, c in counts:
+            click.echo(f"{l}, {c}")
+    # exit codes are integers, the reverse of a boolean success value
+    ctx.exit(int(not integrity)) 
 
 cli.add_command(solve)
 cli.add_command(candidates)
