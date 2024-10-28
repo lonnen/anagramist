@@ -268,7 +268,7 @@ class PersistentSearchTree:
             combined = Fragment(placed) + Fragment(remaining)
             bins.update((sorted("".join(combined.letters.elements())),))
         con.commit()
-        return (len(bins) == 0, bins)
+        return (len(bins) == 1, bins)
 
     # def sample(self):
     #     # https://blog.moertel.com/posts/2024-08-23-sampling-with-sql.html
