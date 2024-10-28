@@ -240,7 +240,7 @@ class PersistentSearchTree:
             total_modified += max(modified, 0)
             total_deleted += max(deleted, 0)
 
-    def verify(self) -> Tuple[bool, Counter[str, int]]:
+    def verify_integrity(self) -> Tuple[bool, Counter[str, int]]:
         """Verify that the database exists, the program can connect to it, and answer
         whether each row has the same set of letters (placed and unplaced).
 
