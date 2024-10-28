@@ -111,20 +111,16 @@ def cli(
 @cli.command()
 @click.pass_context
 def solve(ctx: click.Context):
-    # click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["PUZZLE"]))}")
-
-    click.echo("SOLVE\nContext:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-    # search(
-    #     ctx.obj["PUZZLE"],
-    #     ctx.obj["DATABASE"],
-    #     ctx.obj["MODEL_NAME_OR_PATH"],
-    #     ctx.obj["SEED"],
-    #     ctx.obj["USE_GPU"],
-    #     ctx.obj["USE_FP15"],
-    #     ctx.obj["C1663"],
-    # )
+    click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["PUZZLE"]))}")
+    search(
+        ctx.obj["PUZZLE"],
+        ctx.obj["DATABASE"],
+        ctx.obj["MODEL_NAME_OR_PATH"],
+        ctx.obj["SEED"],
+        ctx.obj["USE_GPU"],
+        ctx.obj["USE_FP15"],
+        ctx.obj["C1663"],
+    )
 
 
 @click.command()
