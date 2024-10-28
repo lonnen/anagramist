@@ -94,11 +94,7 @@ def cli(
 
     if ctx.invoked_subcommand is None:
         if not ctx.obj["VERBOSE"]:
-            click.echo("This space intentionally left blank. Pass `-v` for more info.")
-            click.echo(
-                "Use `anagramist --help` for full list of arguments and options."
-            )
-
+            click.echo(ctx.get_help())
     ctx.obj["SEARCH_TREE"] = PersistentSearchTree(db_name=database)
     if ctx.obj["VERBOSE"]:
         click.echo("Configuration:")
