@@ -86,22 +86,28 @@ def cli(
     ctx.obj["C1663"] = c1663
     # transformers.py settings
     ctx.obj["MODEL_NAME_OR_PATH"] = model_name_or_path
-    ctx.obj["SEED"] = seed
     ctx.obj["USE_GPU"] = use_gpu
     ctx.obj["USE_FP16"] = use_fp16
+    ctx.obj["SEED"] = seed
     # utility
     ctx.obj["VERBOSE"] = verbose
 
-    if ctx.invoked_subcommand is None:
-        if not ctx.obj["VERBOSE"]:
-            click.echo(ctx.get_help())
     ctx.obj["SEARCH_TREE"] = PersistentSearchTree(db_name=database)
-    if ctx.obj["VERBOSE"]:
-        click.echo("Configuration:")
-        click.echo(f"* letter bank: {"".join(sorted(ctx.obj["LETTERS"]))}")
-        if ctx.obj["C1663"]:
-            click.echo("* C1663 heuristics enabled")
-        click.echo(f"* database: {database}")
+
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+    else:
+        if ctx.obj["VERBOSE"]:
+            click.echo("General configuration:")
+            click.echo(f"  * letter bank: {"".join(sorted(ctx.obj["LETTERS"]))}")
+            if ctx.obj["C1663"]:
+                click.echo("  * C1663 heuristics enabled")
+            click.echo(f"  * database: {database}")
+            click.echo("Transformers.py configuration:")
+            click.echo(f"  * model: {model_name_or_path}")
+            click.echo(f"  * use gpu?: {use_gpu}")
+            click.echo(f"  * use FP16?: {use_fp16}")
+            click.echo(f"  * seed: {seed}")
 
 
 @cli.command()
