@@ -24,3 +24,10 @@ def test_check_database():
         result = runner.invoke(cli, ["check-database", "--help"])
         assert result.exit_code == 0
         assert result.output.startswith("Usage: cli check-database [OPTIONS]")
+
+def test_candidates():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(cli, ["candidates"])
+        assert result.exit_code == 1
+        assert "Candidate not yet explored" in result.output
