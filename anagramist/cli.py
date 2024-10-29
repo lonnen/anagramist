@@ -111,18 +111,21 @@ def cli(
 
 
 @cli.command()
+@click.argument('root', nargs=-1)
 @click.pass_context
-def solve(ctx: click.Context):
-    click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["PUZZLE"]))}")
-    search(
-        ctx.obj["PUZZLE"],
-        ctx.obj["DATABASE"],
-        ctx.obj["MODEL_NAME_OR_PATH"],
-        ctx.obj["SEED"],
-        ctx.obj["USE_GPU"],
-        ctx.obj["USE_FP15"],
-        ctx.obj["C1663"],
-    )
+def solve(ctx: click.Context, root=("",)):
+    r = ' '.join(root)
+    click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
+    click.echo(f"Starting with root: {r}")
+    # search(
+    #     ctx.obj["PUZZLE"],
+    #     ctx.obj["DATABASE"],
+    #     ctx.obj["MODEL_NAME_OR_PATH"],
+    #     ctx.obj["SEED"],
+    #     ctx.obj["USE_GPU"],
+    #     ctx.obj["USE_FP15"],
+    #     ctx.obj["C1663"],
+    # )
 
 
 @click.command()
