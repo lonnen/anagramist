@@ -147,7 +147,7 @@ def check_database(ctx: click.Context):
     integrity, counts = pst.verify_integrity()
     if ctx.obj["VERBOSE"]:
         if integrity:
-            click.echo("DB {ctx.obj["DATABASE"]} is internally consistent.")
+            click.echo(f"DB {ctx.obj["DATABASE"]} is internally consistent.")
         else:
             click.echo(f"Multiple letter banks found in DB {ctx.obj["DATABASE"]}")
         click.echo("")
