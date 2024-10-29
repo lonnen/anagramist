@@ -116,7 +116,7 @@ def cli(
 def solve(ctx: click.Context, root=("",)):
     r = ' '.join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
-    click.echo(f"Starting with root: {r}")
+    click.echo(f"Searching for solutions starting from: {r}")
     # search(
     #     ctx.obj["PUZZLE"],
     #     ctx.obj["DATABASE"],
