@@ -129,16 +129,54 @@ def solve(ctx: click.Context, root=("",)):
 
 
 @click.command()
-@click.argument("candidate")
+@click.option(
+    "-n",
+    "--number",
+    type=int,
+    default=5,
+    help="Maximum number of child nodes to show",
+)
+@click.argument("candidate", nargs=-1)
 @click.pass_context
 def candidates(
     ctx: click.Context,
-    candidate: str,
+    candidate: tuple,
+    number: int
 ):
-    click.echo("CANDIDATES\nContext:")
-    for k, v in ctx.obj.items():
-        click.echo(f"  {k}: {v}")
-    pass
+    c = ' '.join(candidate)
+    click.echo(f"'{c}'\n")
+    
+    stats, top_children, top_descendents = show_candidate(
+        c,
+        ctx.obj["SEARCH_TREE"],
+        limit=number,
+        c1663=ctx.obj["C1663"],
+    )
+
+    total = float(sum([x["count"] for x in stats.values()]))
+
+    click.echo(f"Child node demographics: ({total:4} children)")
+    click.echo("-----------------------")
+    for sc, v in sorted(stats.items(), key=lambda x: str(x[0])):
+        status = (str(sc)[0],)
+        count = v["count"]
+        percentage = float(v["percentage"]) * 100
+        click.echo(f"{status}: {count:4} ({percentage:.1f}%)")
+    click.echo("")
+
+    click.echo("Top next candidates:")
+    click.echo("--------------------")
+    for entry in top_children.values():
+        score = float(entry[5])
+        click.echo(f"{score:.2f}: {entry[0]}")
+    click.echo("")
+
+    click.echo("Top descendents: (mean score)")
+    click.echo("---------------")
+    for entry in top_descendents.values():
+        score = float(entry[5])
+        click.echo(f"{score:.2f}: {entry[0]}")
+    click.echo("")
 
 @click.command()
 @click.pass_context
