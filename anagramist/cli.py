@@ -153,6 +153,10 @@ def candidates(
         c1663=ctx.obj["C1663"],
     )
 
+    if len(stats) == 0:
+        click.echo("Candidate not yet explored")
+        ctx.exit(1)
+
     total = float(sum([x["count"] for x in stats.values()]))
 
     click.echo(f"Child node demographics: ({total:4} children)")

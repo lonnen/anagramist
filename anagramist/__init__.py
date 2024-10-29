@@ -544,7 +544,7 @@ def hard_validate(
 
 def show_candidate(
     root: str,
-    database,
+    pst: PersistentSearchTree,
     limit: int = 5,
     vocabulary: Optional[Set[str]] = None,
     c1663: bool = True,
@@ -554,10 +554,9 @@ def show_candidate(
     promising child nodes, and the most promising nodes that have been discovered in
     this branch of the tree.
     """
-    pst = PersistentSearchTree(db_name=database)
     cached = pst.get(root)
     if cached is None:
-        return {}, {}
+        return {}, {}, {}
     _, remaining, _, _, _, _, _ = cached
     children = pst.get_children(root)
 
