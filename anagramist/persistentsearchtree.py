@@ -266,7 +266,7 @@ class PersistentSearchTree:
         bins = Counter()
         for placed, remaining in cur:
             combined = Fragment(placed) + Fragment(remaining)
-            bins.update((sorted("".join(combined.letters.elements())),))
+            bins.update(("".join(sorted(combined.letters.elements())),))
         con.commit()
         return (len(bins) == 1, bins)
 
