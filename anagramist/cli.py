@@ -117,6 +117,21 @@ def cli(
 @click.argument("root", nargs=-1)
 @click.pass_context
 def solve(ctx: click.Context, root=("",)):
+    """Search for a valid arrangement of letters
+
+    Search proceeds from the root, or the empty string if no root is provided, or "I" if
+    the Comic 1663 heuristics are applied and no other root is provided.
+
+    Search proceeds in a loop by choosing either the root or one explored descendent of
+    the root at random, weighted by the recorded score of each in the `--database`.
+    Starting from the chosen candidate, words are pulled at random from the remaining
+    set of `--letters` and applied to the candidate until a hard validating solution is
+    found or the candidate fails soft validation. If hard validation passes record it,
+    output a message, and exit the program. If soft validation fails then no additional
+    placement of the remaining letters can improve the chances of this candidate. The
+    candidate and all of the intermediary parent states are scored and recorded. The
+    loop then starts over.
+    """
     r = " ".join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
     click.echo(f"Searching for solutions starting from: {r}")
