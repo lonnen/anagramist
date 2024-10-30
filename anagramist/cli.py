@@ -136,13 +136,53 @@ def solve(ctx: click.Context, root=("",)):
     default=5,
     help="Maximum number of child nodes to show",
 )
+@click.option(
+    "-t",
+    "--trim",
+    is_flag=True,
+    help="Remove all the descendents"
+)
+@click.option(
+    "--validate",
+    is_flag=True,
+    help="""(re-)validate and (re-)score the candidate. If the candidate is not in the
+    search tree this will create it. If the candidate passes validation all the parent
+    intermediary candidates will also be created and entered into the search tree.
+    """
+)
+@click.option(
+    "-s",
+    "--status",
+    type=int,
+    help="""Sets the candidate's status. See CANDIDATE_STATUS_CODES for more info
+    
+    In order for a status to be set, the candidate must have a score or the program will
+    exit with an error. If the candidate has never been examined, pass the `--validate`
+    flag to score it 
+    """
+)
+@click.option(
+    "-q",
+    "--quiet",
+    is_flag=True,
+    help="This will suppress the output summary of the candidate"
+)
 @click.argument("candidate", nargs=-1)
 @click.pass_context
 def candidates(
     ctx: click.Context,
     candidate: tuple,
-    number: int
+    number: int,
+    trim: bool,
+    validate: bool,
+    status: int,
+    quiet: bool
 ):
+    """Examine and manipulate individual candidate solutions.
+
+    Operations that modify a candidate will occur first. Then the entry will be 
+    retrieved. Then summary stats will then be formatted and output.
+    """
     c = ' '.join(candidate)
     click.echo(f"'{c}'\n")
     
