@@ -29,7 +29,7 @@ from anagramist.vocab import c1663_disallow
 )
 @click.option(
     "--suppress-c1663",
-    default=False,
+    is_flag=True,
     help="""This suppressed the application of additional rules and heuristics specific
     to Comic 1663. The rules only apply if the letter bank matches c1663, so only set
     this flag if you are using the c1663 letter bank AND you do not want the additional
