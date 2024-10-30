@@ -224,9 +224,12 @@ def candidates(
 @click.command()
 @click.pass_context
 def check_database(ctx: click.Context):
-    # verify that the database exists and can be connected
-    # verify that every entry in the database uses the same letter banks
-    # output basic stats about the size of the database
+    """Verify the integrity of the configured database
+
+    Connect to the database, examine every entry in the DB to determine the letter
+    bank(s) for the row, and exit 0 if all rows use the same bank. If `--verbose` flag
+    is passed it will also output some summary statistics about the entire database.
+    """
     pst = ctx.obj["SEARCH_TREE"]
     integrity, counts = pst.verify_integrity()
     if ctx.obj["VERBOSE"]:
