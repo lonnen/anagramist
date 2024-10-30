@@ -25,15 +25,15 @@ from anagramist.vocab import c1663_disallow
     "-l",
     "--letters",
     default="""ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""",  # noqa: E501
-    help="the bank of characters to use. Defaults to using the Comic 1663 letter bank",
+    help="the bank of characters to use. [default: the Comic 1663 letter bank]",
 )
 @click.option(
     "--suppress-c1663",
     is_flag=True,
-    help="""This suppressed the application of additional rules and heuristics specific
-    to Comic 1663. The rules only apply if the letter bank matches c1663, so only set
-    this flag if you are using the c1663 letter bank AND you do not want the additional
-    heuristics to apply.""",
+    help="""Enable to suppress the application of additional rules and heuristics 
+    specific to Comic 1663. These rules only apply if the letter bank matches c1663, so
+    only set this flag if you are using the c1663 letter bank AND you do not want the
+    additional heuristics to apply.""",
 )
 @click.option(
     "-m",
@@ -165,7 +165,7 @@ def solve(ctx: click.Context, root=("",)):
     "-q",
     "--quiet",
     is_flag=True,
-    help="This will suppress the output summary of the candidate"
+    help="This will suppress the output summary of the candidate",
 )
 @click.argument("candidate", nargs=-1)
 @click.pass_context
@@ -180,7 +180,7 @@ def candidates(
 ):
     """Examine and manipulate individual candidate solutions.
 
-    Operations that modify a candidate will occur first. Then the entry will be 
+    Operations that modify a candidate will occur first. Then the entry will be
     retrieved. Then summary stats will then be formatted and output.
     """
     c = ' '.join(candidate)
