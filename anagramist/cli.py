@@ -64,7 +64,17 @@ def cli(
     use_fp16: bool,
     verbose: bool,
 ):
-    """a solver utility for dinocomics 1663-style cryptoanagrams"""
+    """a solver utility for dinocomics 1663-style cryptoanagrams
+    
+    Options of anagramist must occur before any subcommands. Subcommands may have
+    their own options, which must be provided after the subcommand.
+
+    Searches are persisted to a SQLite DB. If the need arises external tools should be
+    used to back up the db with `cp database.db database.db-backup`, restore the db 
+    with with `mv` and `cp`, or by pointing `--database=` at a new file, or migrate the
+    db using the sqlite cli to output each DB row into a call to `anagramist candidates`
+    in order to directly enter into a new DB.
+    """
 
     c1663 = False
     _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""  # noqa: E501
