@@ -1,7 +1,7 @@
 from collections import Counter
 import sqlite3
 from contextlib import closing
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from .fragment import Fragment
 
@@ -250,7 +250,7 @@ class PersistentSearchTree:
             (`bool`) - true if all the rows in the database are made from the same set
                 of letters
             (`Counter[str, int]`) - a counter containing buckets of each unique set of
-                letters and their counts. If the earlier value is true, this will be a 
+                letters and their counts. If the earlier value is true, this will be a
                 single entry, but if it is false this may be useful in remediating or
                 reporting problems.
         """

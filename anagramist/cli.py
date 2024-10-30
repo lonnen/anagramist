@@ -1,14 +1,7 @@
-import datetime
-import os
-import shutil
 import click
 
-from pathlib import Path
-from typing import Set
-
-from anagramist import search, vocab, show_candidate
+from anagramist import search, show_candidate
 from anagramist.persistentsearchtree import PersistentSearchTree
-from anagramist.vocab import c1663_disallow
 
 
 @click.group(invoke_without_command=True)
@@ -111,21 +104,21 @@ def cli(
 
 
 @cli.command()
-@click.argument('root', nargs=-1)
+@click.argument("root", nargs=-1)
 @click.pass_context
 def solve(ctx: click.Context, root=("",)):
-    r = ' '.join(root)
+    r = " ".join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
     click.echo(f"Searching for solutions starting from: {r}")
-    # search(
-    #     ctx.obj["PUZZLE"],
-    #     ctx.obj["DATABASE"],
-    #     ctx.obj["MODEL_NAME_OR_PATH"],
-    #     ctx.obj["SEED"],
-    #     ctx.obj["USE_GPU"],
-    #     ctx.obj["USE_FP15"],
-    #     ctx.obj["C1663"],
-    # )
+    search(
+        ctx.obj["PUZZLE"],
+        ctx.obj["DATABASE"],
+        ctx.obj["MODEL_NAME_OR_PATH"],
+        ctx.obj["SEED"],
+        ctx.obj["USE_GPU"],
+        ctx.obj["USE_FP15"],
+        ctx.obj["C1663"],
+    )
 
 
 @click.command()
@@ -136,19 +129,14 @@ def solve(ctx: click.Context, root=("",)):
     default=5,
     help="Maximum number of child nodes to show",
 )
-@click.option(
-    "-t",
-    "--trim",
-    is_flag=True,
-    help="Remove all the descendents"
-)
+@click.option("-t", "--trim", is_flag=True, help="Remove all the descendents")
 @click.option(
     "--validate",
     is_flag=True,
     help="""(re-)validate and (re-)score the candidate. If the candidate is not in the
     search tree this will create it. If the candidate passes validation all the parent
     intermediary candidates will also be created and entered into the search tree.
-    """
+    """,
 )
 @click.option(
     "-s",
@@ -159,7 +147,7 @@ def solve(ctx: click.Context, root=("",)):
     In order for a status to be set, the candidate must have a score or the program will
     exit with an error. If the candidate has never been examined, pass the `--validate`
     flag to score it 
-    """
+    """,
 )
 @click.option(
     "-q",
@@ -176,16 +164,16 @@ def candidates(
     trim: bool,
     validate: bool,
     status: int,
-    quiet: bool
+    quiet: bool,
 ):
     """Examine and manipulate individual candidate solutions.
 
     Operations that modify a candidate will occur first. Then the entry will be
     retrieved. Then summary stats will then be formatted and output.
     """
-    c = ' '.join(candidate)
+    c = " ".join(candidate)
     click.echo(f"'{c}'\n")
-    
+
     stats, top_children, top_descendents = show_candidate(
         c,
         ctx.obj["SEARCH_TREE"],
@@ -222,10 +210,11 @@ def candidates(
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+
 @click.command()
 @click.pass_context
 def check_database(ctx: click.Context):
-    # verify that the database exists and can be connected 
+    # verify that the database exists and can be connected
     # verify that every entry in the database uses the same letter banks
     # output basic stats about the size of the database
     pst = ctx.obj["SEARCH_TREE"]
@@ -236,10 +225,11 @@ def check_database(ctx: click.Context):
         else:
             click.echo(f"Multiple letter banks found in DB {ctx.obj["DATABASE"]}")
         click.echo("")
-        for l, c in counts:
-            click.echo(f"{l}, {c}")
+        for bank, count in counts:
+            click.echo(f"{bank}, {count}")
     # exit codes are integers, the reverse of a boolean success value
-    ctx.exit(int(not integrity)) 
+    ctx.exit(int(not integrity))
+
 
 cli.add_command(solve)
 cli.add_command(candidates)
