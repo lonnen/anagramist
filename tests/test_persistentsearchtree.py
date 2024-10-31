@@ -79,3 +79,34 @@ class TestPersistentSearchTree:
         )
         con.commit()
         cur.close()
+
+    def test_database_verify_integrity(self, temp_database):
+        pst = PersistentSearchTree(db_name=temp_database)
+        pst.push("", "placedletters", "", None, None, None, None)
+        pst.push("placed", "letters", "", None, None, None, None)
+        pst.push("placed letters", "", "placed", None, None, None, None)
+        pst.push("letters", "placed", "", None, None, None, None)
+        pst.push("letters placed", "", "letters", None, None, None, None)
+
+        integrity, pools = pst.verify_integrity()
+        assert integrity
+        assert len(pools.items()) == 1
+
+    def test_database_verify_empty(self, temp_database):
+        pst = PersistentSearchTree(db_name=temp_database)
+
+        integrity, pools = pst.verify_integrity()
+        assert integrity
+        assert len(pools.items()) == 0
+
+    def test_database_verify_integrity_failure(self, temp_database):
+        pst = PersistentSearchTree(db_name=temp_database)
+        pst.push("", "placedletters", "", None, None, None, None)
+        pst.push("p", "placedletters", "", None, None, None, None)
+        pst.push("pl", "placedletters", "", None, None, None, None)
+        pst.push("pl ace d", "placedletters", "pl ace", None, None, None, None)
+        pst.push("pl ace d l", "pleacedletters", "pl ace d", None, None, None, None)
+
+        integrity, pools = pst.verify_integrity()
+        assert not integrity
+        assert len(pools.items()) == 5
