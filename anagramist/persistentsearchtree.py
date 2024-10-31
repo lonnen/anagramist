@@ -248,11 +248,12 @@ class PersistentSearchTree:
 
         Returns:
             (`bool`) - true if all the rows in the database are made from the same set
-                of letters
+                of letters, or if there are no rows in the database
             (`Counter[str, int]`) - a counter containing buckets of each unique set of
-                letters and their counts. If the earlier value is true, this will be a
-                single entry, but if it is false this may be useful in remediating or
-                reporting problems.
+                letters and their counts. If the database is empty this will be 0. If
+                this is a single entry the database integrity is intact. If this has
+                more than one try the database integity is *not* intact but the details
+                of the entries may be useful in remediating or recovering the db.
         """
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
@@ -268,6 +269,8 @@ class PersistentSearchTree:
             combined = Fragment(placed) + Fragment(remaining)
             bins.update(("".join(sorted(combined.letters.elements())),))
         con.commit()
+        if cur.rowcount < 1:
+            return (True, bins)
         return (len(bins) == 1, bins)
 
     # def sample(self):
