@@ -265,11 +265,13 @@ class PersistentSearchTree:
             """,
         )
         bins = Counter()
+        rowcount = 0
         for placed, remaining in cur:
             combined = Fragment(placed) + Fragment(remaining)
             bins.update(("".join(sorted(combined.letters.elements())),))
+            rowcount += 1
         con.commit()
-        if cur.rowcount < 1:
+        if rowcount < 1:
             return (True, bins)
         return (len(bins) == 1, bins)
 
