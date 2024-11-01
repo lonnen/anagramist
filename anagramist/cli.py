@@ -196,6 +196,13 @@ def candidates(
     Operations that modify a candidate will occur first. Then the entry will be
     retrieved. Then summary stats will then be formatted and output.
     """
+
+    # modify
+
+    # display
+    if quiet:
+        return
+
     c = " ".join(candidate)
     click.echo(f"'{c}'\n")
 
