@@ -155,6 +155,43 @@ class PersistentSearchTree:
         )
         con.commit()
 
+    def status(self, placed: str, status: int) -> int:
+        con = sqlite3.connect(self.__db_name)
+        cur = con.cursor()
+        cur.execute(
+            """
+            SELECT 1
+            FROM visited
+            WHERE
+                placed = ?
+            """,
+            (placed),
+        ).fetchall()
+
+        entry = cur.fetchone()
+
+        if not entry:
+            # nothing found
+            return 0
+
+        if entry[-1] == status:
+            # status is already correctly set
+            modified = -1
+        else:
+            # mark the root with the appropriate status
+            cur = con.cursor()
+            cur.execute(
+                """
+                UPDATE visited
+                SET status = ?
+                WHERE placed = ?
+                """,
+                (status, placed),
+            )
+            con.commit()
+
+        return cur.rowcount
+
     def trim(self, placed: str, status: int = 7) -> Tuple[int, int]:
         """Changes a root node to the provided status code and deleted all descendents.
 
