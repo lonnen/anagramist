@@ -1,5 +1,3 @@
-import os
-from pathlib import Path
 from anagramist.cli import cli
 
 from click.testing import CliRunner
@@ -20,12 +18,6 @@ def test_base():
         assert result.exit_code == 0
         assert result.output.startswith("Usage: cli [OPTIONS] COMMAND [ARGS]...")
 
-def test_candidates():
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        result = runner.invoke(cli, ["candidates"])
-        assert result.exit_code == 1
-        assert "Candidate not yet explored" in result.output
 
 def test_candidates():
     runner = CliRunner()
