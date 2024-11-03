@@ -165,8 +165,8 @@ class PersistentSearchTree:
             WHERE
                 placed = ?
             """,
-            (placed),
-        ).fetchall()
+            (placed,),
+        )
 
         entry = cur.fetchone()
 
@@ -176,7 +176,7 @@ class PersistentSearchTree:
 
         if entry[-1] == status:
             # status is already correctly set
-            modified = -1
+            return -1
         else:
             # mark the root with the appropriate status
             cur = con.cursor()
