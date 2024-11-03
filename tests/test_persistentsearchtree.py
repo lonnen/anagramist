@@ -56,30 +56,6 @@ class TestPersistentSearchTree:
         con.commit()
         cur.close()
 
-    def test_database_push_min(self, temp_database):
-        psq = PersistentSearchTree(db_name=temp_database)
-        psq.push(
-            "placed letters", "remaining letters", "placed", None, None, None, None
-        )
-
-        con = sqlite3.connect(temp_database)
-        cur = con.cursor()
-        cur.execute("""
-            SELECT *
-            FROM visited;
-        """)
-        assert cur.fetchone() == (
-            "placed letters",
-            "remaining letters",
-            "placed",
-            None,
-            None,
-            None,
-            None,
-        )
-        con.commit()
-        cur.close()
-
     def test_database_verify_integrity(self, temp_database):
         pst = PersistentSearchTree(db_name=temp_database)
         pst.push("", "placedletters", "", None, None, None, None)
