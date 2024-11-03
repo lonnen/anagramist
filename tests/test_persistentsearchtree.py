@@ -56,6 +56,39 @@ class TestPersistentSearchTree:
         con.commit()
         cur.close()
 
+    def test_status_change(self, temp_database):
+        psq = PersistentSearchTree(db_name=temp_database)
+        psq.push(
+            "placed letters",
+            "remaining letters",
+            "placed",
+            float(0),
+            float(0),
+            float(0),
+            0,
+        )
+
+        changed = psq.status("placed letters", 7)
+        assert changed == 1
+
+        con = sqlite3.connect(temp_database)
+        cur = con.cursor()
+        cur.execute("""
+            SELECT *
+            FROM visited;
+        """)
+        assert cur.fetchone() == (
+            "placed letters",
+            "remaining letters",
+            "placed",
+            0.0,
+            0.0,
+            0.0,
+            7,
+        )
+        con.commit()
+        cur.close()
+
     def test_database_verify_integrity(self, temp_database):
         pst = PersistentSearchTree(db_name=temp_database)
         pst.push("", "placedletters", "", None, None, None, None)
