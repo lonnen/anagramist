@@ -3,7 +3,7 @@ name = "anagramist"
 version = "0.1"
 description = "a solver for dinocomics 1663-style cryptoanagrams"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 authors = [{name = "lonnen"}]
 license = {text = "Apache-2.0"}
 classifiers = [
