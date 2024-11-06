@@ -227,9 +227,9 @@ class PersistentSearchTree:
             rows = rows[1:]
         else:
             # invalid state?
-            # some node is prefixed with `placed`, but not rooted at ''. It could be 
+            # some node is prefixed with `placed`, but not rooted at ''. It could be
             # that the search was initiated after `placed` as an optimization
-            # e.g. c1663 does not start with the empty string since the first word is 
+            # e.g. c1663 does not start with the empty string since the first word is
             # given
             pass
 
