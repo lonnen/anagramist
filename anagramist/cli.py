@@ -197,13 +197,23 @@ def candidates(
     retrieved. Then summary stats will then be formatted and output.
     """
 
+    c = " ".join(candidate)
+
     # modify
+    pst = ctx.obj["SEARCH_TREE"]
+    if status >= 0:
+        pst.status(c, status)
+
+    if trim:
+        pass  # trim descendents
+
+    if validate:
+        pass  # validate; score;
 
     # display
     if quiet:
         return
 
-    c = " ".join(candidate)
     click.echo(f"'{c}'\n")
 
     stats, top_children, top_descendents = show_candidate(
