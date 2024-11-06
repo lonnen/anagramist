@@ -192,21 +192,15 @@ class PersistentSearchTree:
 
         return cur.rowcount
 
-    def trim(self, placed: str, status: int = 7) -> Tuple[int, int]:
-        """Changes a root node to the provided status code and deleted all descendents.
+    def trim(self, placed: str) -> int:
+        """Deleted all descendents of a given root node `placed`
 
         Args:
-            placed (`str`) - The string indicating the root node to mark
-            status (`int`) - The status code to use per CANDIDATE_STATUS_CODES
+            placed (`str`) - The string indicating the root node
 
         Returns:
-            Tuple[int, int] - two integers indicating how many records were deleted and
-                modified, respectively. If (0, 0) is returned the root was not found.
-                If negative numbers are returned, it indicates that no modifications
-                were necessary. Repeated issuing of a command should indicate (-1, -1).
-                If the root's status was somehow modified to match the status already,
-                but descendents needed to be cleaned up the response would be
-                (-1, {:num_descendents}).
+            int - an integer indicating how many records were deleted. Negative numbers
+            indicate that the root node was not found.
         """
         con = sqlite3.connect(self.__db_name)
         cur = con.cursor()
@@ -222,34 +216,22 @@ class PersistentSearchTree:
         ).fetchall()
         con.commit()
 
-        modified = 0
         deleted = 0
 
-        if len(rows) < 1:
+        if len(rows) == 0:
             # nothing found
-            return modified, deleted
+            return -1
 
         if rows[0][0] == placed:
-            if rows[0][-1] == status:
-                # root found but status is already set correctly
-                modified = -1
-            else:
-                # mark the root with the appropriate status
-                cur = con.cursor()
-                cur.execute(
-                    """
-                    UPDATE visited
-                    SET status = ?
-                    WHERE placed = ?
-                    """,
-                    (status, placed),
-                )
-                modified = cur.rowcount
-                con.commit()
+            # ignore the entry itself
             rows = rows[1:]
-
-        if len(rows) == 0:
-            return (modified, deleted)
+        else:
+            # invalid state?
+            # some node is prefixed with `placed`, but not rooted at ''. It could be 
+            # that the search was initiated after `placed` as an optimization
+            # e.g. c1663 does not start with the empty string since the first word is 
+            # given
+            pass
 
         # discard the rest
         cur = con.cursor()
@@ -262,7 +244,7 @@ class PersistentSearchTree:
         )
         deleted = cur.rowcount
         con.commit()
-        return (modified, deleted)
+        return deleted
 
     def trim_containing(self, word: str, status: int = 7) -> Tuple[int, int]:
         total_modified, total_deleted = 0, 0
