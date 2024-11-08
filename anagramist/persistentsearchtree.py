@@ -159,6 +159,17 @@ class PersistentSearchTree:
             con.commit()
 
     def status(self, placed: str, status: int) -> int:
+        """Change the status of entry `placed` to `status`
+
+        Args:
+            placed (`str`) - The string indicating the node to change
+            status (`int`) - The status code from CANDIDATE_STATUS_CODES in the module
+
+        Returns:
+            int - an integer code indicating how many rows have changed. -1 indicates
+            that the status was already set to `status`, 0 indicates no entry found for
+            `placed`, 1 indicates the entry was found and status set.    
+        """
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
             cursor.execute(
