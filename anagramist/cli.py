@@ -204,7 +204,14 @@ def candidates(
     # modify
     pst = ctx.obj["SEARCH_TREE"]
     if status >= 0:
-        pst.status(c, status)
+        modified = pst.status(c, status)
+        if verbose:
+            if modified < 0:
+                click.echo(f"Status was already set to {status}")
+            elif modified == 0:
+                click.echo(f"'{candidate}' not found. No status was changed")
+            else:
+                click.echo(f"Status changed to {status} for {modified} candidates")
 
     if trim:
         modified = pst.trim(c)
