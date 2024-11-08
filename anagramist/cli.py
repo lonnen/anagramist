@@ -167,6 +167,7 @@ def solve(ctx: click.Context, root=("",)):
     "-s",
     "--status",
     type=int,
+    default=-1,
     help="""Sets the candidate's status. See CANDIDATE_STATUS_CODES for more info
     
     In order for a status to be set, the candidate must have a score or the program will
