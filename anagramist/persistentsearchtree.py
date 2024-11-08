@@ -246,19 +246,6 @@ class PersistentSearchTree:
         con.commit()
         return deleted
 
-    def trim_containing(self, word: str, status: int = 7) -> Tuple[int, int]:
-        total_modified, total_deleted = 0, 0
-        while True:
-            rows = self.contains(word, limit=1, status=0)
-            entry = rows[0][0] if len(rows) > 0 else None
-            if entry is None:
-                return total_modified, total_deleted
-            frag = Fragment(entry).words
-            truncated = frag[: frag.index(word) + 1]
-            modified, deleted = self.trim(" ".join(truncated), status)
-            total_modified += max(modified, 0)
-            total_deleted += max(deleted, 0)
-
     def verify_integrity(self) -> Tuple[bool, Counter[str, int]]:
         """Verify that the database exists, the program can connect to it, and answer
         whether each row has the same set of letters (placed and unplaced).
