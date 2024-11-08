@@ -1,10 +1,22 @@
 from collections import Counter
 import sqlite3
-from contextlib import closing
+from contextlib import closing, contextmanager
 from typing import List, Optional, Tuple
 
 from .fragment import Fragment
 
+@contextmanager
+def db_connection_manager(path: str):
+    """A context manager for the sqlite db at `path`
+    
+    This is necessary because the connect method operates over db transactions, not over
+    database connections. This wrapper ensures the connection closes.
+    """
+    conn = sqlite3.connect(path)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 class PersistentSearchTree:
     """A persistence structure for storing the tree-search-space in a SQL lite db.
@@ -35,10 +47,9 @@ class PersistentSearchTree:
     def __init__(self, db_name="anagramist.db"):
         self.__db_name = db_name
         con = sqlite3.connect(self.__db_name)
-        with con:
+        with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
             cursor.execute(self.__TABLE_SCHEMA_VISITED)
-        con.close()
 
     def __len__(self) -> int:
         with closing(sqlite3.connect(self.__db_name)) as conn:  # auto-closes
