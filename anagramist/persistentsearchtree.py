@@ -267,7 +267,6 @@ class PersistentSearchTree:
             """
             SELECT placed, remaining
             FROM visited
-            LIMIT 10
             """,
         )
         bins = Counter()
