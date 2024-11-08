@@ -197,6 +197,8 @@ def candidates(
     retrieved. Then summary stats will then be formatted and output.
     """
 
+    verbose = ctx.obj["VERBOSE"]
+
     c = " ".join(candidate)
 
     # modify
@@ -205,7 +207,10 @@ def candidates(
         pst.status(c, status)
 
     if trim:
-        pass  # trim descendents
+        modified = pst.trim(c)
+        if verbose:
+            click.echo(f"{modified} child nodes removed")
+
 
     if validate:
         pass  # validate; score;
