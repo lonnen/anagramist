@@ -34,8 +34,8 @@ PROFILING_ITERATIONS = 10
 MAX_NUM_OF_SIMULATIONS = 100
 """maximum number of simulations for each selection"""
 
-# the exploration constant is the stand in score for unscored candidates
 EXPLORATION_SCORE = float(-40)
+"""a score used for as-yet unscored candidates"""
 
 
 def search(
