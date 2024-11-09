@@ -40,7 +40,7 @@ EXPLORATION_SCORE = float(-40)
 
 def search(
     letters: str,
-    database: str | PathLike[str],
+    search_tree: PersistentSearchTree,
     oracle: TransformerOracle,
     c1663: bool = False,
     do_profiling: bool = True,
@@ -49,7 +49,7 @@ def search(
         with cProfile.Profile() as pr:
             faux_uct_search(
                 letters,
-                database,
+                search_tree,
                 oracle,
                 c1663=c1663,
                 max_iterations=PROFILING_ITERATIONS,
@@ -61,12 +61,12 @@ def search(
             stats.dump_stats(".prof_stats")
             stats.print_stats()
         return
-    faux_uct_search(letters, database, oracle, c1663=c1663)
+    faux_uct_search(letters, search_tree, oracle, c1663=c1663)
 
 
 def faux_uct_search(
     letters: str,
-    database: str | PathLike[str],
+    search_tree: PersistentSearchTree,
     oracle: TransformerOracle,
     vocabulary: Optional[Set[str]] = None,
     c1663: bool = False,
@@ -74,7 +74,6 @@ def faux_uct_search(
 ):
     # setup
     letter_bank = Fragment(letters).letters
-    search_tree = PersistentSearchTree(db_name=database)
     root = ""
 
     if c1663:
@@ -596,8 +595,7 @@ def show_candidate(
     return stats, top_children, top_descendents
 
 
-def rescore(root, oracle, letter_bank, database, c1663):
-    search_tree = PersistentSearchTree(db_name=database)
+def rescore(root, oracle, letter_bank, search_tree, c1663):
     descendents = search_tree.get_descendents(root)
     for d in descendents:
         scored_words = score_fragment(Fragment(d))

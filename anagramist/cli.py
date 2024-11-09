@@ -143,7 +143,7 @@ def solve(ctx: click.Context, root=("",)):
     click.echo(f"Searching for solutions starting from: {r}")
     search(
         ctx.obj["PUZZLE"],
-        ctx.obj["DATABASE"],
+        ctx.obj["SEARCH_TREE"],
         ctx.obj["MODEL_NAME_OR_PATH"],
         ctx.obj["SEED"],
         ctx.obj["USE_GPU"],
