@@ -41,10 +41,7 @@ EXPLORATION_SCORE = float(-40)
 def search(
     letters: str,
     database: str | PathLike[str],
-    model_name_or_path: str | PathLike[str],
-    seed: int,
-    use_gpu: bool = False,
-    fp16: bool = False,
+    oracle: TransformerOracle,
     c1663: bool = False,
     do_profiling: bool = True,
 ):
@@ -53,10 +50,7 @@ def search(
             faux_uct_search(
                 letters,
                 database,
-                model_name_or_path,
-                seed,
-                use_gpu,
-                fp16,
+                oracle,
                 c1663=c1663,
                 max_iterations=PROFILING_ITERATIONS,
             )
@@ -67,23 +61,19 @@ def search(
             stats.dump_stats(".prof_stats")
             stats.print_stats()
         return
-    faux_uct_search(letters, model_name_or_path, seed, use_gpu, fp16, c1663=c1663)
+    faux_uct_search(letters, database, oracle, c1663=c1663)
 
 
 def faux_uct_search(
     letters: str,
     database: str | PathLike[str],
-    model_name_or_path: str | PathLike[str],
-    seed: int,
-    use_gpu: bool = False,
-    fp16: bool = False,
+    oracle: TransformerOracle,
     vocabulary: Optional[Set[str]] = None,
     c1663: bool = False,
     max_iterations: Optional[int] = None,
 ):
     # setup
     letter_bank = Fragment(letters).letters
-    oracle = TransformerOracle(model_name_or_path, seed, (not use_gpu), fp16, c1663)
     search_tree = PersistentSearchTree(db_name=database)
     root = ""
 

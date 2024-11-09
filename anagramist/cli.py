@@ -1,6 +1,8 @@
 import click
 
 from anagramist import search, show_candidate
+from anagramist.fragment import Fragment
+from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
 
 
@@ -95,7 +97,11 @@ def cli(
     # utility
     ctx.obj["VERBOSE"] = verbose
 
+    # heavy objects
     ctx.obj["SEARCH_TREE"] = PersistentSearchTree(db_name=database)
+    ctx.obj["ORACLE"] = TransformerOracle(
+        model_name_or_path, seed, (not use_gpu), use_fp16, c1663
+    )
 
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
