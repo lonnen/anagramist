@@ -5,10 +5,11 @@ from typing import List, Optional, Tuple
 
 from .fragment import Fragment
 
+
 @contextmanager
 def db_connection_manager(path: str):
     """A context manager for the sqlite db at `path`
-    
+
     This is necessary because the connect method operates over db transactions, not over
     database connections. This wrapper ensures the connection closes.
     """
@@ -17,6 +18,7 @@ def db_connection_manager(path: str):
         yield conn
     finally:
         conn.close()
+
 
 class PersistentSearchTree:
     """A persistence structure for storing the tree-search-space in a SQL lite db.
@@ -52,7 +54,7 @@ class PersistentSearchTree:
 
     def __len__(self) -> int:
         with db_connection_manager(self.__db_name) as con:
-            return con.cursor().execute("SELECT COUNT(*) FROM visited").fetchone()[0]                    
+            return con.cursor().execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
     def contains(
         self, word: str, limit: Optional[int] = None, status: Optional[int] = None
@@ -154,7 +156,15 @@ class PersistentSearchTree:
                     mean_score = excluded.mean_score,
                     status = excluded.status
                 """,
-                (placed, remaining, parent, score, cumulative_score, mean_score, status),
+                (
+                    placed,
+                    remaining,
+                    parent,
+                    score,
+                    cumulative_score,
+                    mean_score,
+                    status,
+                ),
             )
             con.commit()
 
@@ -168,7 +178,7 @@ class PersistentSearchTree:
         Returns:
             int - an integer code indicating how many rows have changed. -1 indicates
             that the status was already set to `status`, 0 indicates no entry found for
-            `placed`, 1 indicates the entry was found and status set.    
+            `placed`, 1 indicates the entry was found and status set.
         """
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
@@ -241,8 +251,8 @@ class PersistentSearchTree:
                 # invalid state?
                 # some node is prefixed with `placed`, but not rooted at ''. It could be
                 # that the search was initiated after `placed` as an optimization
-                # e.g. c1663 does not start with the empty string since the first word is
-                # given
+                # e.g. c1663 does not start with the empty string since the first word 
+                # is given
                 pass
 
             # discard the rest
