@@ -251,7 +251,7 @@ class PersistentSearchTree:
                 # invalid state?
                 # some node is prefixed with `placed`, but not rooted at ''. It could be
                 # that the search was initiated after `placed` as an optimization
-                # e.g. c1663 does not start with the empty string since the first word 
+                # e.g. c1663 does not start with the empty string since the first word
                 # is given
                 pass
 
