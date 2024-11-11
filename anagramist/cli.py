@@ -216,7 +216,7 @@ def candidates(
             if modified < 0:
                 click.echo(f"Status was already set to {status}")
             elif modified == 0:
-                click.echo(f"'{candidate}' not found. No status was changed")
+                click.echo(f"'{c}' not found. No status was changed")
             else:
                 click.echo(f"Status changed to {status} for {modified} candidates")
 
