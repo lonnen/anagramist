@@ -1,7 +1,6 @@
 import logging
 from math import fsum
 from random import choices
-from os import PathLike
 from statistics import geometric_mean
 from typing import Counter, Generator, List, Optional, Set, Tuple, Union
 
