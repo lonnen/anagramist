@@ -1,6 +1,6 @@
 from collections import Counter
 import sqlite3
-from contextlib import closing, contextmanager
+from contextlib import contextmanager
 from typing import List, Optional, Tuple
 
 from .fragment import Fragment
@@ -48,7 +48,6 @@ class PersistentSearchTree:
 
     def __init__(self, db_name="anagramist.db"):
         self.__db_name = db_name
-        con = sqlite3.connect(self.__db_name)
         with db_connection_manager(self.__db_name) as con:
             con.cursor().execute(self.__TABLE_SCHEMA_VISITED)
 
