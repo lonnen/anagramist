@@ -1,9 +1,18 @@
 import click
 
-from anagramist import search, show_candidate
+from anagramist import (
+    backpropogation,
+    compute_valid_vocab,
+    score_fragment,
+    score_one,
+    search,
+    show_candidate,
+    soft_validate,
+)
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
+from anagramist.vocab import corpus
 
 
 @click.group(invoke_without_command=True)
@@ -178,7 +187,12 @@ def solve(ctx: click.Context, root=("",)):
     
     In order for a status to be set, the candidate must have a score or the program will
     exit with an error. If the candidate has never been examined, pass the `--validate`
-    flag to score it 
+    flag to score it. 
+    
+    If `--status` and `--validate` are passed, `--validate` happens first.
+
+    If a candidate that fails validation has a status set to 0, the next time the
+    candidate is chosen for exploration it will fail immedietly.
     """,
 )
 @click.option(
@@ -205,11 +219,22 @@ def candidates(
     """
 
     verbose = ctx.obj["VERBOSE"]
+    c1663 = ctx.obj["C1663"]
 
     c = " ".join(candidate)
 
     # modify
     pst = ctx.obj["SEARCH_TREE"]
+
+    # validate and rescore happens before changing status
+    if validate:
+        if verbose:
+            click.echo(f"Scoring '{c}'")
+        entry = score_one(c, ctx.obj["LETTERS"], ctx.obj["ORACLE"], pst, c1663)
+        if verbose:
+            if entry:
+                click.echo(f"recorded entry: ({entry[-2]:2.2f}, {entry[-1]}): {c}")
+
     if status >= 0:
         modified = pst.status(c, status)
         if verbose:
@@ -224,10 +249,6 @@ def candidates(
         modified = pst.trim(c)
         if verbose:
             click.echo(f"{modified} child nodes removed")
-
-
-    if validate:
-        pass  # validate; score;
 
     # display
     if quiet:
