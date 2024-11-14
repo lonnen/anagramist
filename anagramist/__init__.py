@@ -108,6 +108,8 @@ def faux_uct_search(
             # get word-level scores from score_fragment
             scored_words = score_fragment(placed, oracle)
 
+            # construct every stop on a walk out to the candidate node c, with scores
+            entries = backpropogation(node, letter_bank, scored_words, c1663)
             for (
                 sentence,
                 remaining,
