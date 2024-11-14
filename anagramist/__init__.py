@@ -118,7 +118,7 @@ def faux_uct_search(
                 cumulative_score,
                 mean_score,
                 status,
-            ) in backpropogation(node, letter_bank, scored_words, c1663):
+            ) in entries:
                 search_tree.push(
                     sentence,
                     remaining,
@@ -596,30 +596,21 @@ def show_candidate(
     return stats, top_children, top_descendents
 
 
-def rescore(root, oracle, letter_bank, search_tree, c1663):
-    descendents = search_tree.get_descendents(root)
-    for d in descendents:
-        scored_words = score_fragment(Fragment(d))
-        for (
-            sentence,
-            remaining,
-            parent,
-            score,
-            cumulative_score,
-            mean_score,
-            status,
-        ) in backpropogation(root, letter_bank, scored_words, c1663):
-            search_tree.push(
-                sentence,
-                remaining,
-                parent,
-                score,
-                cumulative_score,
-                mean_score,
-                status,
-            )
-            logger.info(
-                f"recorded simulation ({mean_score:2.2f}, {status}): {sentence}"
-            )
-            if score == float("inf"):
-                exit()
+def score_one(root, letter_bank, oracle, search_tree, c1663):
+    placed = Fragment(root)
+    remaining = Fragment(letter_bank)
+    remaining.subtract(placed.letters)
+
+    valid_vocab = [
+        w for w in compute_valid_vocab(corpus(c1663), remaining.letters)
+    ]
+    if not soft_validate(placed, remaining, valid_vocab, c1663):
+        return None
+    scored_words = score_fragment(placed, oracle)
+    entry = backpropogation(placed, remaining, scored_words, c1663)
+    if len(entry) > 0:
+        search_tree.push(
+            *entry
+        )
+        search_tree.push(*entry[-1])
+    return entry
