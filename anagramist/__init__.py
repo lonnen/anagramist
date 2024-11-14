@@ -601,16 +601,12 @@ def score_one(root, letter_bank, oracle, search_tree, c1663):
     remaining = Fragment(letter_bank)
     remaining.subtract(placed.letters)
 
-    valid_vocab = [
-        w for w in compute_valid_vocab(corpus(c1663), remaining.letters)
-    ]
+    valid_vocab = [w for w in compute_valid_vocab(corpus(c1663), remaining.letters)]
     if not soft_validate(placed, remaining, valid_vocab, c1663):
         return None
     scored_words = score_fragment(placed, oracle)
     entry = backpropogation(placed, remaining, scored_words, c1663)
     if len(entry) > 0:
-        search_tree.push(
-            *entry
-        )
+        search_tree.push(*entry)
         search_tree.push(*entry[-1])
     return entry
