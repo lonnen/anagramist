@@ -282,12 +282,13 @@ def check_database(ctx: click.Context):
     is passed it will also output some summary statistics about the entire database.
     """
     pst = ctx.obj["SEARCH_TREE"]
+    database_path = ctx.obj["DATABASE"]
     integrity, counts = pst.verify_integrity()
     if ctx.obj["VERBOSE"]:
         if integrity:
-            click.echo(f"DB {ctx.obj["DATABASE"]} is internally consistent.")
+            click.echo(f"DB {database_path} is internally consistent.")
         else:
-            click.echo(f"Multiple letter banks found in DB {ctx.obj["DATABASE"]}")
+            click.echo(f"Multiple letter banks found in DB {database_path}")
         click.echo("")
         for bank, count in counts:
             click.echo(f"{bank}, {count}")
