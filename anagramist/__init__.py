@@ -13,8 +13,7 @@ from .persistentsearchtree import PersistentSearchTree
 from .vocab import corpus
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    datefmt="%m/%d/%Y %H:%M:%S",
+    format="[%(asctime)s] %(message)s",
     level=logging.DEBUG,
 )
 logger = logging.getLogger(__name__)
