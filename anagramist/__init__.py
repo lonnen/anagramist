@@ -16,6 +16,7 @@ logging.basicConfig(
     format="[%(asctime)s] %(message)s",
     level=logging.DEBUG,
 )
+logging.captureWarnings(capture=True)
 logger = logging.getLogger(__name__)
 
 
