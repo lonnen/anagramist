@@ -301,12 +301,20 @@ class PersistentSearchTree:
                 return (True, bins)
             return (len(bins) == 1, bins)
 
-    # def sample(self):
-    #     # https://blog.moertel.com/posts/2024-08-23-sampling-with-sql.html
-    #     """
-    #     SELECT *
-    #         FROM visited
-    #         WHERE status is 0
-    #     ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
-    #         LIMIT 100
-    #     """
+    def sample(self) -> Tuple[str, str, str, float, float, float, int]:
+        """Retrieve one record at random, weighted by `mean_score`, with a status of 0.
+
+        see: https://blog.moertel.com/posts/2024-08-23-sampling-with-sql.html
+        """
+        with db_connection_manager(self.__db_name) as con:
+            cursor = con.cursor()
+            fetch = cursor.execute(
+                """
+                SELECT *
+                    FROM visited
+                    WHERE status is 0
+                ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
+                    LIMIT 100
+                """
+            ).fetchone()
+            return fetch
