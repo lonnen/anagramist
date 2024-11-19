@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Optional
+from typing import Union
 
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
@@ -17,8 +17,8 @@ class Solver:
         search_tree: PersistentSearchTree,
         oracle: TransformerOracle,
         c1663: bool = False,
-        max_iterations: Optional[int] = None,
-        max_time: Optional[int] = None,
+        max_iterations: Union[int, None] = None,
+        max_time: Union[int, None] = None,
     ):
         self.letter_bank = Fragment(letters).letters
         self.search_tree = search_tree
@@ -34,8 +34,18 @@ class Solver:
 
         self.current_iteration = 0
 
-    def solve(self) -> None:
+    def solve(self, root_candidate: Union[str, None] = None) -> None:
+        """Compute candidate solutions to the cryptoanagram.
+
+        Args:
+            root_candidate (Union[str, None]) - The candidate prefix to explore from. If
+                this is not provided the solver will begin from an empty solution, or
+                start from a known hint in the case of Comic 1663
+        """
         start_time = time.time()
+
+        if root_candidate is None:
+            root_candidate = self.root
 
         while True:
             if (
@@ -59,7 +69,7 @@ class Solver:
                 )
                 break
 
-            candidate = self.root
+            candidate = root_candidate
 
             # selection
             candidate = self.select(candidate)
