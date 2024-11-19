@@ -35,7 +35,7 @@ class Oracle(ABC):
         bulk-evaluation optimizations.
 
         Args:
-            candidates `List[str]` - a list of strings representing candidate answers
+            candidates `List[str]`: a list of strings representing candidate answers
         """
         return [self.score_candidate(candidate) for candidate in candidates]
 
@@ -44,7 +44,7 @@ class Oracle(ABC):
         """Evaluate a single candidate answer
 
         Args:
-            candidate `str` - a string representing a candidate answer
+            candidate `str`: a string representing a candidate answer
         """
         raise NotImplementedError(
             f"""{self.__class__} is an abstract class. Only classes inheriting this

@@ -38,7 +38,7 @@ class Solver:
         """Compute candidate solutions to the cryptoanagram.
 
         Args:
-            root_candidate (Union[str, None]) - The candidate prefix to explore from. If
+            root_candidate (Union[str, None]): The candidate prefix to explore from. If
                 this is not provided the solver will begin from an empty solution, or
                 start from a known hint in the case of Comic 1663
         """
