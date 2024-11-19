@@ -319,7 +319,7 @@ class PersistentSearchTree:
                     FROM visited
                     WHERE status is 0
                 ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
-                    LIMIT 100
+                    LIMIT 1
                 """
                 ).fetchone()
             else:
@@ -330,7 +330,7 @@ class PersistentSearchTree:
                         WHERE status is 0
                             AND visited LIKE ?
                     ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
-                        LIMIT 100
+                        LIMIT 1
                     """,
                     (f"{prefix} %",),
                 ).fetchone()
