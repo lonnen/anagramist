@@ -171,8 +171,8 @@ class PersistentSearchTree:
         """Change the status of entry `placed` to `status`
 
         Args:
-            placed (`str`): The string indicating the node to change
-            status (`int`): The status code from CANDIDATE_STATUS_CODES in the module
+            placed (str): The string indicating the node to change
+            status (int): The status code from CANDIDATE_STATUS_CODES in the module
 
         Returns:
             int - an integer code indicating how many rows have changed. -1 indicates
@@ -218,7 +218,7 @@ class PersistentSearchTree:
         """Deleted all descendents of a given root node `placed`
 
         Args:
-            placed (`str`): The string indicating the root node
+            placed (str): The string indicating the root node
 
         Returns:
             int: an integer indicating how many records were deleted. Negative numbers
@@ -274,9 +274,9 @@ class PersistentSearchTree:
         WARNING: this is quite expensive, proportional to the size of the database
 
         Returns:
-            (`bool`): true if all the rows in the database are made from the same set
+            (bool): true if all the rows in the database are made from the same set
                 of letters, or if there are no rows in the database
-            (`Counter[str, int]`): a counter containing buckets of each unique set of
+            (Counter[str, int]): a counter containing buckets of each unique set of
                 letters and their counts. If the database is empty this will be 0. If
                 this is a single entry the database integrity is intact. If this has
                 more than one try the database integity is *not* intact but the details

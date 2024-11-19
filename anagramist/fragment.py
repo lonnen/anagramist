@@ -9,7 +9,7 @@ class Fragment:
     make up that sentence (ignoring spaces, per the rules of the puzzle)
 
     Args:
-        candidate_sentence (`String`): a single string containing a sentence fragment
+        candidate_sentence (String): a single string containing a sentence fragment
             that could have come from Dinosaur Comics
     """
 
@@ -40,7 +40,7 @@ def parse_sentence(candidate_sentence: str) -> List[str]:
     punctuation is split out as an independent word.
 
     Args:
-        candidate_sentence (`String`): a single string containing a sentence fragment
+        candidate_sentence (String): a single string containing a sentence fragment
         that could have come from Dinosaur Comics
     """
     words = [""]
