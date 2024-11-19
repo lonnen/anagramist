@@ -2,7 +2,7 @@ import logging
 from math import fsum
 from random import choices
 from statistics import geometric_mean
-from typing import Counter, Generator, List, Optional, Set, Tuple, Union
+from typing import Counter, Generator, List, Set, Tuple, Union
 
 import cProfile
 from pstats import Stats
@@ -67,9 +67,9 @@ def faux_uct_search(
     letters: str,
     search_tree: PersistentSearchTree,
     oracle: TransformerOracle,
-    vocabulary: Optional[Set[str]] = None,
+    vocabulary: Union[Set[str], None] = None,
     c1663: bool = False,
-    max_iterations: Optional[int] = None,
+    max_iterations: Union[int, None] = None,
 ):
     # setup
     letter_bank = Fragment(letters).letters
@@ -470,7 +470,7 @@ def hard_validate(
     placed: Fragment,
     remaining: Counter,
     original_letter_bank: Counter,
-    vocabulary: Optional[Set[str]] = None,
+    vocabulary: Union[Set[str], None] = None,
     c1663: bool = False,
 ) -> bool:
     """Hard validation andswers whether this passes all the constraints that can be
@@ -536,7 +536,7 @@ def show_candidate(
     root: str,
     pst: PersistentSearchTree,
     limit: int = 5,
-    vocabulary: Optional[Set[str]] = None,
+    vocabulary: Union[Set[str], None] = None,
     c1663: bool = True,
 ):
     """Retrieves the node `root` and calculates some statistics about it and its child
