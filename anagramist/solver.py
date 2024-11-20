@@ -1,7 +1,9 @@
 import logging
+from random import choices
 import time
 from typing import Union
 
+from anagramist import compute_valid_vocab, soft_validate
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
@@ -23,6 +25,7 @@ class Solver:
         self.letter_bank = Fragment(letters).letters
         self.search_tree = search_tree
         self.oracle = oracle
+        self.c1663 = c1663
 
         self.root = ""
         if c1663:
@@ -97,3 +100,31 @@ class Solver:
             raise ValueError("No records found prefixed by 'f{candidate}'")
         else:
             record[0]
+
+    def expansion(self, candidate: str) -> str:
+        """Take a deep, uniform, random walk adding words until soft validation fails
+        and there are no words in the vocabulary that can be placed with the remaining
+        letters.
+
+        Critically, this will occur when the leaf node itself is a winning candidate.
+
+        Returns:
+            The candidate discovered at the end of the random walk
+        """
+        while True:
+            placed = Fragment(candidate)
+            remaining = self.letter_bank.copy()
+            remaining.subtract(placed.letters)
+
+            if not soft_validate(placed, remaining, self.vocabulary, self.c1663):
+                break
+
+            next_words = [w for w in compute_valid_vocab(self.vocabulary, remaining)]
+
+            if len(next_words) == 0:
+                break
+            
+            next = choices(next_words)[0]
+            candidate = " ".join(candidate, next)
+
+        return placed
