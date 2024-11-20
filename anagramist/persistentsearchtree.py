@@ -306,7 +306,7 @@ class PersistentSearchTree:
     ) -> Tuple[str, str, str, float, float, float, int]:
         """Retrieve one record at random, weighted by `mean_score`, with a status of 0.
 
-        For more on the algorithm see 
+        For more on the algorithm see
         https://blog.moertel.com/posts/2024-08-23-sampling-with-sql.html
 
         Args:
