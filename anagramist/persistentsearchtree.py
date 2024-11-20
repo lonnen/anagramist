@@ -315,12 +315,12 @@ class PersistentSearchTree:
             if prefix is None:
                 fetch = cursor.execute(
                     """
-                SELECT *
-                    FROM visited
-                    WHERE status is 0
-                ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
-                    LIMIT 1
-                """
+                    SELECT *
+                        FROM visited
+                        WHERE status is 0
+                    ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
+                        LIMIT 1
+                    """
                 ).fetchone()
             else:
                 fetch = cursor.execute(
