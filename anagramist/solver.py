@@ -1,9 +1,10 @@
+from collections import Counter
 import logging
 from random import choices
 import time
-from typing import Union
+from typing import Generator, Union
 
-from anagramist import compute_valid_vocab, soft_validate
+from anagramist import soft_validate
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
@@ -119,12 +120,30 @@ class Solver:
             if not soft_validate(placed, remaining, self.vocabulary, self.c1663):
                 break
 
-            next_words = [w for w in compute_valid_vocab(self.vocabulary, remaining)]
+            next_words = [w for w in self.compute_valid_vocab(remaining)]
 
             if len(next_words) == 0:
                 break
-            
+
             next = choices(next_words)[0]
             candidate = " ".join(candidate, next)
 
         return placed
+
+    def compute_valid_vocab(
+        self, remaining_letters: Counter
+    ) -> Generator[str, None, None]:
+        """Lazily compute the vocabulary words that can be placed with the remaining
+        letters.
+
+        Args:
+            remaining_letters (Counter): the letters remaining to be placed
+
+        Returns:
+            a generator of valid words from the Solver's vocabulary
+        """
+        for word in self.vocabulary:
+            next_word = Fragment(word)
+            if not next_word.letters <= remaining_letters:
+                continue
+            yield next_word.sentence
