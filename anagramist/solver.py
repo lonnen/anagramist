@@ -81,3 +81,19 @@ class Solver:
             self.backpropogation(candidate)
 
             self.current_iteration += 1
+
+    def select(self, candidate: str) -> str:
+        """Select a random starting node from the tree by considering all nodes prefixed
+        with `candidate` and weighing the selection by the score of each node.
+
+        Args:
+            candidate (str): a candidate node from which to search. Only the candidate
+                and its child nodes will be considered.
+        Raises:
+            ValueError: If no nodes exist prefixed by `candidate`
+        """
+        record = self.search_tree.sample(candidate=candidate)
+        if record is None:
+            raise ValueError("No records found prefixed by 'f{candidate}'")
+        else:
+            record[0]
