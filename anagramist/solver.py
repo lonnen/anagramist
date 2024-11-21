@@ -1,8 +1,12 @@
 from collections import Counter
 import logging
+from math import fsum
 from random import choices
+from statistics import geometric_mean
 import time
-from typing import Generator, Union
+from typing import Generator, List, Union
+
+from click import Tuple
 
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
@@ -76,10 +80,16 @@ class Solver:
             candidate = self.select(candidate)
             # expansion
             candidate = self.expansion(candidate)
-            # assessment
-            candidate = self.assessment(candidate)
             # backpropogation
-            self.backpropogation(candidate)
+            updated_candidates = self.assessment(candidate)
+            for c in updated_candidates:
+                self.search_tree.push(*c)
+                logging.info(f"recorded simulation ({c[5]:2.2f}, {c[6]}): {c[0]}")
+                if c[3] == float("inf"):
+                    logging.info(
+                        "Found solution after %d seconds, stopping.", self.max_time
+                    )
+                    exit()
 
             self.current_iteration += 1
 
