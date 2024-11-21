@@ -172,6 +172,7 @@ class Solver:
         Returns:
             a boolean indicating whether the candidate passed soft validation
         """
+        candidate = Fragment(candidate)
         # the sentence uses only characters from the provided bank
         if any([v < 0 for v in remaining_letters.values()]):
             return False  # candidate uses letters not in the bank
