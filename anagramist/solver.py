@@ -141,7 +141,7 @@ class Solver:
 
         return placed
 
-    def assessment(self, candidate: str) -> List[Tuple[str, float]]:
+    def assessment(self, candidate: str) -> List[List[str, str, str, float, float, float, int]]:
         """Score the candidate node and every intermediary node leading to it.
 
         Args:
