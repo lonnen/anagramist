@@ -7,9 +7,10 @@ from typing import Counter, Generator, List, Set, Tuple, Union
 import cProfile
 from pstats import Stats
 
-from .fragment import Fragment
-from .oracles import TransformerOracle
-from .persistentsearchtree import PersistentSearchTree
+from .fragment import Fragment as Fragment
+from .oracles import TransformerOracle as TransformerOracle
+from .persistentsearchtree import PersistentSearchTree as PersistentSearchTree
+from .solver import Solver as Solver
 from .vocab import corpus
 
 logging.basicConfig(
