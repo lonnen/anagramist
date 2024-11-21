@@ -158,10 +158,10 @@ class Solver:
         that are not in the original letter bank), but will pass if there are
         constraints that have not yet been satisfied if there is some arrangement of the
         remaining letters that could possible satisfy it (e.g. there are enough letters
-        to form more words from the vocab list). 
+        to form more words from the vocab list).
 
         The function does not produce false negatives, but it's predictive power over
-        future states is limited and it may produce false positives. For example, 
+        future states is limited and it may produce false positives. For example,
         because it only looks one word ahead it may be that each next word would leave
         behind a handful of letters that cannot form a second word. soft_validate would
         return True, unable to see far enough to know the candidate is already doomed.
