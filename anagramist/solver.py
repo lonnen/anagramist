@@ -4,9 +4,7 @@ from math import fsum
 from random import choices
 from statistics import geometric_mean
 import time
-from typing import Generator, List, Union
-
-from click import Tuple
+from typing import Generator, List, Tuple, Union
 
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
@@ -141,7 +139,7 @@ class Solver:
 
         return placed
 
-    def assessment(self, candidate: str) -> List[List[str, str, str, float, float, float, int]]:
+    def assessment(self, candidate: str) -> List[Tuple[str, str, str, float, float, float, int]]:
         """Score the candidate node and every intermediary node leading to it.
 
         Args:
