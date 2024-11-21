@@ -181,9 +181,7 @@ class Solver:
             remaining.subtract(sentence)
 
             # check for a winner
-            if hard_validate(
-                Fragment(sentence), remaining, self.letter_bank, c1663=self.c1663
-            ):
+            if self.hard_validate(Fragment(sentence), remaining):
                 # we have a winner
                 sentence += "!!"
                 del remaining["!"]
