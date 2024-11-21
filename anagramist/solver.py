@@ -4,7 +4,6 @@ from random import choices
 import time
 from typing import Generator, Union
 
-from anagramist import soft_validate
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
@@ -118,7 +117,7 @@ class Solver:
             remaining = self.letter_bank.copy()
             remaining.subtract(placed.letters)
 
-            if not soft_validate(placed, remaining, self.vocabulary, self.c1663):
+            if not self.soft_validate(placed, remaining):
                 break
 
             next_words = [w for w in self.compute_valid_vocab(remaining)]
@@ -148,3 +147,103 @@ class Solver:
             if not next_word.letters <= remaining_letters:
                 continue
             yield next_word.sentence
+
+    def soft_validate(self, candidate: str, remaining_letters: Counter) -> bool:
+        """Answers whether the words placed conform to the problem constraints and that
+        the letters remaining allow for at least one more valid word to be placed.
+
+        Soft validation will fail if the current placement violates a constraint that
+        cannot be remedied with the placement of additional words (e.g. placing letters
+        that are not in the original letter bank), but will pass if there are
+        constraints that have not yet been satisfied if there is some arrangement of the
+        remaining letters that could possible satisfy it (e.g. there are enough letters
+        to form more words from the vocab list). 
+
+        The function does not produce false negatives, but it's predictive power over
+        future states is limited and it may produce false positives. For example, 
+        because it only looks one word ahead it may be that each next word would leave
+        behind a handful of letters that cannot form a second word. soft_validate would
+        return True, unable to see far enough to know the candidate is already doomed.
+
+        Args:
+            candidate (str): a partial arrangement of letters
+            remaining_letters (Counter): the letters available for maiking new words
+
+        Returns:
+            a boolean indicating whether the candidate passed soft validation
+        """
+        # the sentence uses only characters from the provided bank
+        if any([v < 0 for v in remaining_letters.values()]):
+            return False  # candidate uses letters not in the bank
+
+        if any([w not in self.vocabulary for w in candidate.words]):
+            return False  # candidate uses words not in the bank
+
+        if remaining_letters.total() > 0:
+            for w in self.vocabulary:
+                if Fragment(w).letters <= remaining_letters:
+                    # at least one valid word can be spelled with the remaining letters
+                    break
+            else:
+                return False  # candidate can't make a valid word with remaining letters
+
+        if not self.c1663:
+            return True
+
+        # from here on out, the constraints are derived from hints about comic 1663
+
+        # the first word is "I"
+        if candidate.words[0] != "I":
+            return False
+
+        # punctuation is in the solution in the order :,!!
+        expected_punctuation = [":", ",", "!", "!"]
+        punctuation_position = 0
+        for w in candidate.words:
+            if len(w) == 1 and w not in set(
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            ):
+                if expected_punctuation[punctuation_position] != w:
+                    return False
+                punctuation_position += 1
+
+        # longest word is 11 characters long
+        # second longest word is 8 characters long
+        # the words are side by side in the solution
+        word_lengths = [len(w) for w in candidate.words]
+        for pos, length in enumerate(word_lengths):
+            if length <= 8:
+                continue
+            if length != 11:
+                # we have a word longer than 8 chars that is not 11 letters
+                return False
+            # now we have our 11 letter word
+            # if it is the most recently placed, the next word could be length 8
+            if pos == len(word_lengths) - 1:
+                continue
+            if word_lengths[pos - 1] != 8 and word_lengths[pos + 1] != 8:
+                # either the word before or after must be 8
+                return False
+
+        # the final letter is "w"
+        # so the final three characters must be "w!!"
+        if remaining_letters.total() == 2:
+            if candidate.sentence[-1] != "w" or remaining_letters["!"] != 2:
+                return False
+
+        # so word bank must contain a "w!!" until the end
+        if remaining_letters.total() > 3:
+            if remaining_letters["w"] == 0 or remaining_letters["!"] < 2:
+                return False
+
+        # so there must be a word in the vocab ending in "w" until the last
+        if remaining_letters.total() > 2:
+            for w in self.vocabulary:
+                if Fragment(w).letters <= remaining_letters and w[-1] == "w":
+                    # at least one valid word ending in "w" remains
+                    break
+            else:
+                # remaining letters do not allow for a word ending in "w"
+                return False
+
+        return True
