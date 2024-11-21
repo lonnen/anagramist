@@ -249,3 +249,61 @@ class Solver:
                 return False
 
         return True
+
+    def hard_validate(self, candidate: str, remaining_letters: Counter) -> bool:
+        """Hard validation answers whether this satisfies all the constraints that can
+        be verified computationally. In order to return quickly, it starts with the
+        broadest and easiest to check constraints, saving expensive checks for last.
+
+        Returns (bool): whether the provided candidate passed the check
+        """
+        placed = Fragment(candidate)
+        if placed.letters != self.letter_bank:
+            return False  # placed must use exactly all the letters of the bank
+
+        if any([w not in self.vocabulary for w in placed.words]):
+            return False  # candidate uses words not in the bank
+
+        if not self.c1663:
+            return True
+
+        # from here on out, the constraints are derived from hints about comic 1663
+
+        # the first word is "I"
+        if placed.words[0] != "I":
+            return False
+
+        # the final three characters are "w!!"
+        if placed.sentence[-3:] != "w!!":
+            return False
+
+        # punctuation is in the solution in the order :,!!
+        expected_punctuation = [":", ",", "!", "!"]
+        punctuation_position = 0
+        for w in placed.words:
+            if len(w) == 1 and w not in set(
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            ):
+                if expected_punctuation[punctuation_position] != w:
+                    return False
+                punctuation_position += 1
+
+        # longest word is 11 characters long
+        # second longest word is 8 characters long
+        # the words are side by side in the solution
+        word_lengths = [len(w) for w in placed.words]
+        for pos, length in enumerate(word_lengths):
+            if length <= 8:
+                continue
+            if length != 11:
+                # we have a word longer than 8 chars that is not 11 letters
+                return False
+            # now we have our 11 letter word
+            # if it is the most recently placed, the next word could be length 8
+            if pos == len(word_lengths) - 1:
+                continue
+            if word_lengths[pos - 1] != 8 and word_lengths[pos + 1] != 8:
+                # either the word before or after must be 8
+                return False
+
+        return True
