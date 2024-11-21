@@ -35,6 +35,7 @@ class Solver:
         self.vocabulary = corpus(c1663)
         logger.info(f"loaded vocab ({len(self.vocabulary)} items)")
         self.max_iterations = max_iterations
+        self.max_time = max_time
 
         self.current_iteration = 0
 
@@ -64,12 +65,12 @@ class Solver:
                 break
 
             if (
-                self._max_time is not None
-                and (time.time() - start_time) > self._max_time
+                self.max_time is not None
+                and (time.time() - start_time) > self.max_time
             ):
                 logging.info(
                     "Timeout after %d seconds, stopping.",
-                    self._max_time,
+                    self.max_time,
                 )
                 break
 
