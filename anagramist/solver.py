@@ -63,10 +63,7 @@ class Solver:
                 )
                 break
 
-            if (
-                self.max_time is not None
-                and (time.time() - start_time) > self.max_time
-            ):
+            if self.max_time is not None and (time.time() - start_time) > self.max_time:
                 logging.info(
                     "Timeout after %d seconds, stopping.",
                     self.max_time,
@@ -86,13 +83,14 @@ class Solver:
 
             self.current_iteration += 1
 
-    def select(self, candidate: str) -> str:
+    def select(self, candidate: str = None) -> str:
         """Select a random starting node from the tree by considering all nodes prefixed
         with `candidate` and weighing the selection by the score of each node.
 
         Args:
             candidate (str): a candidate node from which to search. Only the candidate
-                and its child nodes will be considered.
+                and its child nodes will be considered. If no candidate is provided the
+                entire database will be considered.
         Raises:
             ValueError: If no nodes exist prefixed by `candidate`
         """
@@ -108,6 +106,9 @@ class Solver:
         letters.
 
         Critically, this will occur when the leaf node itself is a winning candidate.
+
+        Args:
+            candidate (str): a canddiate node from which to start expansion
 
         Returns:
             The candidate discovered at the end of the random walk
@@ -137,7 +138,7 @@ class Solver:
         letters.
 
         Args:
-            remaining_letters (Counter): the letters remaining to be placed
+            remaining_letters (Counter): the letters available for making new words
 
         Returns:
             a generator of valid words from the Solver's vocabulary
