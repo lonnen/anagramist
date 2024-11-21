@@ -14,8 +14,9 @@ class TestSolver:
             "dromiceiomimus is a dinosaur",
             PersistentSearchTree(PST_DATABASE),
             TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED),
+            c1663=True,
         )
-        assert solver.root == ""
+        assert solver.root == "I"
         assert solver.letter_bank == Counter(
             {
                 "a": 2,
