@@ -331,7 +331,7 @@ class PersistentSearchTree:
                     SELECT *
                         FROM visited
                         WHERE status is 0
-                            AND visited LIKE ?
+                            AND placed LIKE ?
                     ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
                         LIMIT 1
                     """,
