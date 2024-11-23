@@ -4,16 +4,19 @@ from anagramist.persistentsearchtree import PersistentSearchTree
 from anagramist.solver import Solver
 
 PST_DATABASE = "file::memory:?cache=shared"
+SHARED_PST = PersistentSearchTree(PST_DATABASE)
+
 TRANSFOMER_MODEL = "microsoft/phi-1_5"
 TRANSFORMER_SEED = 42
+SHARED_ORACLE = TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED)
 
 
 class TestSolver:
     def test_init(self):
         solver = Solver(
             "dromiceiomimus is a dinosaur",
-            PersistentSearchTree(PST_DATABASE),
-            TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED),
+            SHARED_PST,
+            SHARED_ORACLE,
             c1663=True,
         )
         assert solver.root == "I"
