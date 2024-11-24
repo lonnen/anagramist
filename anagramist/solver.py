@@ -62,10 +62,14 @@ class Solver:
 
         if not self.search_tree.get(self.root):
             # first run, get the root in the tree
+            placed = Fragment(self.root)
+            remaining = self.letter_bank.copy()
+            remaining.subtract(Fragment(self.root).letters)
             self.search_tree.push(
-                self.root,
-                "".join(self.letter_bank.elements()),
-                "",
+                placed.sentence,
+                "".join(remaining.elements()),
+                " ".join(placed.words[:-1]),
+                # if the root is non-empty, it will be re-scored later
                 EXPLORATION_SCORE,
                 EXPLORATION_SCORE,
                 EXPLORATION_SCORE,
