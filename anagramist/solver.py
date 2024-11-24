@@ -195,9 +195,9 @@ class Solver:
         for w, score in scored_words:
             parent = sentence
             if sentence == "":
-                sentence = sentence + w
+                sentence = w
             else:
-                sentence = sentence + " " + w
+                sentence = f"{sentence} {w}"
 
             scores.append(score)
 
