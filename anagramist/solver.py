@@ -20,6 +20,7 @@ class Solver:
         letters: str,
         search_tree: PersistentSearchTree,
         oracle: TransformerOracle,
+        vocabulary: Union[List[str], None] = None,
         c1663: bool = False,
         max_iterations: Union[int, None] = None,
         max_time: Union[int, None] = None,
@@ -33,7 +34,10 @@ class Solver:
         if c1663:
             logger.info("using special constraints for comic 1663")
             self.root = "I"
-        self.vocabulary = corpus(c1663)
+        if vocabulary is None:
+            self.vocabulary = corpus(c1663)
+        else:
+            self.vocabulary = vocabulary
         logger.info(f"loaded vocab ({len(self.vocabulary)} items)")
         self.max_iterations = max_iterations
         self.max_time = max_time
