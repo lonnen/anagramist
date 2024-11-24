@@ -147,7 +147,7 @@ class Solver:
             else:
                 candidate = f"{candidate} {next}"
 
-        return placed
+        return placed.sentence
 
     def assessment(self, candidate: str) -> List[Tuple[str, str, str, float, float, float, int]]:
         """Score the candidate node and every intermediary node leading to it.
