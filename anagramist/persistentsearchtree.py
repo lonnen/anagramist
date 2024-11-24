@@ -315,7 +315,7 @@ class PersistentSearchTree:
         """
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
-            if prefix is None:
+            if prefix is None or prefix == "":
                 fetch = cursor.execute(
                     """
                     SELECT *
