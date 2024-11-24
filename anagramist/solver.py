@@ -142,7 +142,10 @@ class Solver:
                 break
 
             next = choices(next_words)[0]
-            candidate = " ".join(candidate, next)
+            if candidate == "":
+                candidate = next
+            else:
+                candidate = f"{candidate} {next}"
 
         return placed
 
