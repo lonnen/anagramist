@@ -113,7 +113,7 @@ class Solver:
                 return ""
             raise ValueError("No records found prefixed by 'f{candidate}'")
         else:
-            record[0]
+            return record[0]
 
     def expansion(self, candidate: str) -> str:
         """Take a deep, uniform, random walk adding words until soft validation fails
