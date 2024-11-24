@@ -201,11 +201,11 @@ class Solver:
 
             scores.append(score)
 
-            if placed.sentence.startswith(sentence):
-                # scored_words has the whole sentence, some of which is already in the
-                # db so we build up the scores array for calculating mean_score later
-                # and skip everything else to avoid rewriting entries with the same data
-                continue
+            # if placed.sentence.startswith(sentence):
+            #     # scored_words has the whole sentence, some of which is already in the
+            #     # db so we build up the scores array for calculating mean_score later
+            #     # and skip everything else to avoid rewriting entries with the same data
+            #     continue
 
             remaining = self.letter_bank.copy()
             remaining.subtract(sentence)
