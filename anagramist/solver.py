@@ -106,7 +106,7 @@ class Solver:
         Raises:
             ValueError: If no nodes exist prefixed by `candidate`
         """
-        record = self.search_tree.sample(candidate=candidate)
+        record = self.search_tree.sample(candidate)
         if record is None:
             raise ValueError("No records found prefixed by 'f{candidate}'")
         else:
