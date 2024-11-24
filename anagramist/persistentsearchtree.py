@@ -129,7 +129,7 @@ class PersistentSearchTree:
                 FROM visited
                 WHERE placed LIKE ?
             """,
-                (parent + " %",),
+                (f"{parent} %",),
             ).fetchall()
 
     def push(
@@ -233,7 +233,7 @@ class PersistentSearchTree:
                     placed LIKE ? OR placed = ?
                 ORDER BY placed
                 """,
-                (placed + " %", placed),
+                (f"{placed} %", placed),
             ).fetchall()
 
             deleted = 0
