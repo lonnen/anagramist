@@ -211,7 +211,7 @@ class Solver:
             remaining.subtract(sentence)
 
             # check for a winner
-            if self.hard_validate(Fragment(sentence), remaining):
+            if self.hard_validate(sentence, remaining):
                 # we have a winner
                 sentence += "!!"
                 del remaining["!"]
