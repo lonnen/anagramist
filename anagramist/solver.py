@@ -44,7 +44,7 @@ class Solver:
 
         self.current_iteration = 0
 
-    def solve(self, root_candidate: Union[str, None] = None) -> None:
+    def solve(self, root_candidate: Union[str, None] = None) -> str:
         """Compute candidate solutions to the cryptoanagram.
 
         Args:
@@ -91,7 +91,7 @@ class Solver:
                     logging.info(
                         "Found solution after %d seconds, stopping.", self.max_time
                     )
-                    exit()
+                    return c[0]
 
             self.current_iteration += 1
 
