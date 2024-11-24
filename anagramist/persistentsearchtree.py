@@ -71,9 +71,8 @@ class PersistentSearchTree:
                 AND (placed LIKE ? OR placed LIKE ?)
                 ORDER BY placed
             """,
-                (status, "% " + word + " %", "% " + word),
+                (status, f"% {word} %", f"% {word}"),
             ).fetchall()
-            # SQLite is case insensitive, so double filter for case issues
             rows = []
             for row in fetch:
                 placed = row[0]
