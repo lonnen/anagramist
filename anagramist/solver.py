@@ -108,6 +108,9 @@ class Solver:
         """
         record = self.search_tree.sample(candidate)
         if record is None:
+            if len(self.search_tree) == 0:
+                # nothing in the db to retrieve, must be a new puzzle
+                return ""
             raise ValueError("No records found prefixed by 'f{candidate}'")
         else:
             record[0]
