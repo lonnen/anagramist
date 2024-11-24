@@ -14,6 +14,9 @@ from anagramist.vocab import corpus
 logger = logging.getLogger(__name__)
 
 
+EXPLORATION_SCORE = float(-40)
+"""a score used for as-yet unscored candidates"""
+
 class Solver:
     def __init__(
         self,
@@ -56,6 +59,18 @@ class Solver:
 
         if root_candidate is None:
             root_candidate = self.root
+
+        if not self.search_tree.get(self.root):
+            # first run, get the root in the tree
+            self.search_tree.push(
+                self.root,
+                "".join(self.letter_bank.elements()),
+                "",
+                EXPLORATION_SCORE,
+                EXPLORATION_SCORE,
+                EXPLORATION_SCORE,
+                0,
+            )
 
         while True:
             if (
@@ -108,9 +123,6 @@ class Solver:
         """
         record = self.search_tree.sample(candidate)
         if record is None:
-            if len(self.search_tree) == 0:
-                # nothing in the db to retrieve, must be a new puzzle
-                return ""
             raise ValueError("No records found prefixed by 'f{candidate}'")
         else:
             return record[0]
