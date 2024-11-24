@@ -133,7 +133,7 @@ class Solver:
             remaining = self.letter_bank.copy()
             remaining.subtract(placed.letters)
 
-            if not self.soft_validate(placed, remaining):
+            if not self.soft_validate(placed.sentence, remaining):
                 break
 
             next_words = [w for w in self.compute_valid_vocab(remaining)]
