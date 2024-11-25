@@ -1,4 +1,5 @@
 from collections import Counter
+import itertools
 import os
 import sqlite3
 
@@ -77,3 +78,20 @@ class TestSolver:
             solver.select("problems")
         # when called with a prefix that exactly matches, it should return
         assert expected == solver.select("no")
+
+    def test_expansion(self, temp_database):
+        vocab = ['bish', 'bash', 'bosh']
+        solver = Solver(
+            "bishbashbosh",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=vocab,
+            c1663=False,
+        )
+        actual = solver.expansion("bish")
+        assert "bish bash bosh" == actual or "bish bosh bash" == actual
+        # immediate soft validation fail will return the candidate
+        assert "Richmond" == solver.expansion("Richmond")
+        # verify an empty string arg comes back as a space separated sentence
+        expected = set(" ".join(v) for v in itertools.combinations(vocab, 3))
+        assert solver.expansion("") in expected
