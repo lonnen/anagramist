@@ -95,3 +95,26 @@ class TestSolver:
         # verify an empty string arg comes back as a space separated sentence
         expected = set(" ".join(v) for v in itertools.combinations(vocab, 3))
         assert solver.expansion("") in expected
+
+    def test_assessment(self, temp_database):
+        vocab = ['bish', 'bash', 'bosh']
+        solver = Solver(
+            "bishbashbosh",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=vocab,
+            c1663=False,
+        )
+        actual = solver.assessment("bish bash bosh")
+        # a hard validating winners score is infinite
+        assert float("inf") == actual[-1][3]
+        # one response per word
+        assert len(actual) == 3
+        # responses should build up towards the provided sentence
+        # '!!' is appended after hard validation
+        expected = ["bish", "bish bash", "bish bash bosh!!"]
+        for e, a in zip(expected, [a[0] for a in actual]):
+            assert e == a
+        # remaining letters should diminish as words are added
+        for e, a in zip(['bbsshhao', 'bsho', ''], [a[1] for a in actual]):
+            assert e == a
