@@ -127,7 +127,7 @@ class Solver:
         """
         record = self.search_tree.sample(candidate)
         if record is None:
-            raise ValueError("No records found prefixed by 'f{candidate}'")
+            raise ValueError(f"No records found prefixed by '{candidate}'")
         else:
             return record[0]
 
