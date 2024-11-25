@@ -118,3 +118,30 @@ class TestSolver:
         # remaining letters should diminish as words are added
         for e, a in zip(['bbsshhao', 'bsho', ''], [a[1] for a in actual]):
             assert e == a
+
+    def test_compute_valid_vocab(self, temp_database):
+        vocab = ['bish', 'bash', 'bosh']
+        solver = Solver(
+            "bishbash",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=vocab,
+            c1663=False,
+        )
+        actual = solver.compute_valid_vocab(solver.letter_bank)
+        expected = ["bish", "bash"]
+        for e, a in zip(expected, actual):
+            assert e == a
+        
+        # this puzzle is insolvable given the mix of letters and vocab words but
+        # the compute_valid_vocab method should still work
+        solver = Solver(
+            "bishbshbsh",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=vocab,
+            c1663=False,
+        )
+        actual = solver.compute_valid_vocab(solver.letter_bank)
+        expected = ["bish"]
+        assert expected == [a for a in actual]
