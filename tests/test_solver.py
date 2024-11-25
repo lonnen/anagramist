@@ -44,3 +44,36 @@ class TestSolver:
                 " ": 0,
             }
         )
+
+    # def test_solve(self, temp_database):
+    #     expected = "no problem"
+    #     solver = Solver(
+    #         expected,
+    #         PersistentSearchTree(db_name=temp_database),
+    #         SHARED_ORACLE,
+    #         vocabulary=['no', 'problems', 'nope', 'robs', 'ml'],
+    #         c1663=False,
+    #     )
+    #     assert expected == solver.solve()
+
+    def test_select(self, temp_database):
+        expected = "no"
+        solver = Solver(
+            "",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=['no', 'problems'],
+            c1663=False,
+        )
+        solver.search_tree.push(expected, "", "", 0, 0, 0, 0)
+        # only one entry should always return that entry
+        assert expected == solver.select()
+        # it can be repeatedly sampled
+        assert expected == solver.select()
+        #when called with a prefix, it should return iff the prefix matches
+        assert expected == solver.select("n")
+        # when called with a prefix that doesn't match, it should fall over
+        with pytest.raises(ValueError):
+            solver.select("problems")
+        # when called with a prefix that exactly matches, it should return
+        assert expected == solver.select("no")
