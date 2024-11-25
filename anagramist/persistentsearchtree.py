@@ -334,6 +334,6 @@ class PersistentSearchTree:
                     ORDER BY -ln(1.0 - RANDOM()) / exp(mean_score)
                         LIMIT 1
                     """,
-                    (f"{prefix} %",),
+                    (f"{prefix}%",),
                 ).fetchone()
             return fetch
