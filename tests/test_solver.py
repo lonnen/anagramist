@@ -145,3 +145,23 @@ class TestSolver:
         actual = solver.compute_valid_vocab(solver.letter_bank)
         expected = ["bish"]
         assert expected == [a for a in actual]
+
+    def test_soft_validate(self, temp_database):
+        vocab = ['bish', 'bash', 'bosh']
+        solver = Solver(
+            "bishbash",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=vocab,
+            c1663=False,
+        )
+        # a perfect answer should return true
+        assert solver.soft_validate("bish bash", solver.letter_bank)
+        # a partial answer that breaks no rules should return true
+        assert solver.soft_validate("bish", solver.letter_bank)
+        assert solver.soft_validate("bash", solver.letter_bank)
+        # cannot use letters not in the bank
+        assert not solver.soft_validate("pete", solver.letter_bank)
+        # cannot use words not in the bank, even though the letters are there
+        assert not solver.soft_validate("shabba", solver.letter_bank)
+        
