@@ -196,7 +196,7 @@ class TestSolver:
              "ball hush id leds duty fyi I fo : tada yo , toy of")
         )
         # There must be a w remaining if any characters are remaining
-        assert solver.soft_validate(
+        assert not solver.soft_validate(
             ("I behave rate outdone instinctual throttle honking serum lean stout "
              "ball hush id leds duty fyi I fo : tada yow , toy of")
         )
