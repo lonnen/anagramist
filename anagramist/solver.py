@@ -149,7 +149,7 @@ class Solver:
             remaining = self.letter_bank.copy()
             remaining.subtract(placed.letters)
 
-            if not self.soft_validate(placed.sentence, remaining):
+            if not self.soft_validate(placed.sentence):
                 break
 
             next_words = [w for w in self.compute_valid_vocab(remaining)]
@@ -215,7 +215,7 @@ class Solver:
             remaining.subtract(sentence)
 
             # check for a winner
-            if self.hard_validate(sentence, remaining):
+            if self.hard_validate(sentence):
                 # we have a winner
                 sentence += "!!"
                 del remaining["!"]
