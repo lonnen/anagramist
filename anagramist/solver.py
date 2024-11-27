@@ -217,8 +217,9 @@ class Solver:
             # check for a winner
             if self.hard_validate(sentence):
                 # we have a winner
-                sentence += "!!"
-                del remaining["!"]
+                if self.c1663:
+                    sentence += "!!"
+                    del remaining["!"]
                 logger.critical("WINNER: {}".format(sentence))
                 score = float("inf")
             elif w == scored_words[-1][0]:
