@@ -178,30 +178,25 @@ class TestSolver:
         )
         assert solver.soft_validate(
             ("I behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo : tada yo , toy of"),
-            solver.letter_bank
+             "ball hush id leds duty fyi I fo : tada yo , toy of")
         )
         # must start with "I"
         assert not solver.soft_validate(
             ("behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo : tada yo , toy of"),
-            solver.letter_bank
+             "ball hush id leds duty fyi I fo : tada yo , toy of")
         )
         # punctuation must appear in order :,!!
         assert not solver.soft_validate(
             ("I behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo , tada yo : toy of"),
-            solver.letter_bank
+             "ball hush id leds duty fyi I fo , tada yo : toy of")
         )
         # longest word must be 11 letters, and it must occur next to an 8 letter word
         assert not solver.soft_validate(
             ("I behave rate outdone instinctual honking serum throttle lean stout "
-             "ball hush id leds duty fyi I fo : tada yo , toy of"),
-            solver.letter_bank
+             "ball hush id leds duty fyi I fo : tada yo , toy of")
         )
         # There must be a w remaining if any characters are remaining
         assert solver.soft_validate(
             ("I behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo : tada yow , toy of"),
-            solver.letter_bank
+             "ball hush id leds duty fyi I fo : tada yow , toy of")
         )
