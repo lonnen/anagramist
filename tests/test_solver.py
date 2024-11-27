@@ -200,3 +200,26 @@ class TestSolver:
             ("I behave rate outdone instinctual throttle honking serum lean stout "
              "ball hush id leds duty fyi I fo : tada yow , toy of")
         )
+
+    def test_hard_validate(self, temp_database):
+        """Hard validation will only pass when theres an exact solution, which is
+        unknown for c1663. We can only test it for non-c1663 puzzles, which will not
+        excercise the full set of constraints
+        """
+        vocab = ['bish', 'bash', 'bosh']
+        solver = Solver(
+            "bishbash",
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=vocab,
+            c1663=False,
+        )
+        # a perfect answer should return true
+        assert solver.hard_validate("bish bash")
+        # a partial answer that with letters remaining should return false
+        assert not solver.hard_validate("bish")
+        assert not solver.hard_validate("bash")
+        # cannot use letters not in the bank
+        assert not solver.hard_validate("pete")
+        # cannot use words not in the bank, even though the letters are there
+        assert not solver.hard_validate("shabba")
