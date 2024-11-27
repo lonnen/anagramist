@@ -47,7 +47,7 @@ class Solver:
 
         self.current_iteration = 0
 
-    def solve(self, root_candidate: Union[str, None] = None) -> str:
+    def solve(self, root_candidate: Union[str, None] = None) -> Union[str, None]:
         """Compute candidate solutions to the cryptoanagram.
 
         Args:
@@ -113,6 +113,7 @@ class Solver:
                     return c[0]
 
             self.current_iteration += 1
+        return None
 
     def select(self, candidate: str = None) -> str:
         """Select a random starting node from the tree by considering all nodes prefixed
