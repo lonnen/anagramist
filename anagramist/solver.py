@@ -384,7 +384,7 @@ class Solver:
         """
         placed = Fragment(candidate)
         remaining_letters = self.letter_bank.copy()
-        remaining_letters.subtract(candidate.letters)
+        remaining_letters.subtract(placed.letters)
 
         if placed.letters != self.letter_bank:
             return False  # placed must use exactly all the letters of the bank
