@@ -375,7 +375,7 @@ class Solver:
 
         return True
 
-    def hard_validate(self, candidate: str, remaining_letters: Counter) -> bool:
+    def hard_validate(self, candidate: str) -> bool:
         """Hard validation answers whether this satisfies all the constraints that can
         be verified computationally. In order to return quickly, it starts with the
         broadest and easiest to check constraints, saving expensive checks for last.
@@ -383,6 +383,9 @@ class Solver:
         Returns (bool): whether the provided candidate passed the check
         """
         placed = Fragment(candidate)
+        remaining_letters = self.letter_bank.copy()
+        remaining_letters.subtract(candidate.letters)
+
         if placed.letters != self.letter_bank:
             return False  # placed must use exactly all the letters of the bank
 
