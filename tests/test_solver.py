@@ -156,12 +156,11 @@ class TestSolver:
             c1663=False,
         )
         # a perfect answer should return true
-        assert solver.soft_validate("bish bash", solver.letter_bank)
+        assert solver.soft_validate("bish bash")
         # a partial answer that breaks no rules should return true
-        assert solver.soft_validate("bish", solver.letter_bank)
-        assert solver.soft_validate("bash", solver.letter_bank)
+        assert solver.soft_validate("bish")
+        assert solver.soft_validate("bash")
         # cannot use letters not in the bank
-        assert not solver.soft_validate("pete", solver.letter_bank)
+        assert not solver.soft_validate("pete")
         # cannot use words not in the bank, even though the letters are there
-        assert not solver.soft_validate("shabba", solver.letter_bank)
-        
+        assert not solver.soft_validate("shabba")

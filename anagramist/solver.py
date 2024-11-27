@@ -272,7 +272,7 @@ class Solver:
                 continue
             yield next_word.sentence
 
-    def soft_validate(self, candidate: str, remaining_letters: Counter) -> bool:
+    def soft_validate(self, candidate: str) -> bool:
         """Answers whether the words placed conform to the problem constraints and that
         the letters remaining allow for at least one more valid word to be placed.
 
@@ -291,12 +291,14 @@ class Solver:
 
         Args:
             candidate (str): a partial arrangement of letters
-            remaining_letters (Counter): the letters available for maiking new words
 
         Returns:
             a boolean indicating whether the candidate passed soft validation
         """
         candidate = Fragment(candidate)
+        remaining_letters = self.letter_bank.copy()
+        remaining_letters.subtract(candidate.letters)
+
         # the sentence uses only characters from the provided bank
         if any([v < 0 for v in remaining_letters.values()]):
             return False  # candidate uses letters not in the bank
