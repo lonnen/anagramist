@@ -46,17 +46,6 @@ class TestSolver:
             }
         )
 
-    # def test_solve(self, temp_database):
-    #     expected = "no problem"
-    #     solver = Solver(
-    #         expected,
-    #         PersistentSearchTree(db_name=temp_database),
-    #         SHARED_ORACLE,
-    #         vocabulary=['no', 'problems', 'nope', 'robs', 'ml'],
-    #         c1663=False,
-    #     )
-    #     assert expected == solver.solve()
-
     def test_select(self, temp_database):
         expected = "no"
         solver = Solver(
@@ -223,3 +212,19 @@ class TestSolver:
         assert not solver.hard_validate("pete")
         # cannot use words not in the bank, even though the letters are there
         assert not solver.hard_validate("shabba")
+
+    def test_solve(self, temp_database):
+        """this depends on the exact seed. In order for it to complete in a reasonable
+        time it has to be short, which blunts the ability of the oracle to converge
+        search towards the highest scoring outcome. At best, this is a barely convincing
+        test of the happy path through the wiring of the solver task.
+        """
+        expected = "bash bish bosh"
+        solver = Solver(
+            expected, # the letter bank
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            vocabulary=['bish', 'bash', 'bosh'],
+            c1663=False,
+        )
+        assert expected == solver.solve()
