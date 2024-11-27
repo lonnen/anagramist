@@ -18,7 +18,7 @@ def temp_database():
 TRANSFOMER_MODEL = "microsoft/phi-1_5"
 TRANSFORMER_SEED = 42
 SHARED_ORACLE = TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED)
-
+C1663_LETTERS = "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!" #noqa
 
 class TestSolver:
     def test_init(self, temp_database):
@@ -164,3 +164,44 @@ class TestSolver:
         assert not solver.soft_validate("pete")
         # cannot use words not in the bank, even though the letters are there
         assert not solver.soft_validate("shabba")
+
+    def test_soft_validate_c1663(self, temp_database):
+        """It is difficult to propery test all the validation criteria without having a
+        solution. This draws a candidate from the database that excercises most of the
+        rules, but which is comically low scoring because it makes no sense.
+        """
+        solver = Solver(
+            C1663_LETTERS,
+            PersistentSearchTree(db_name=temp_database),
+            SHARED_ORACLE,
+            c1663=True,
+        )
+        assert solver.soft_validate(
+            ("I behave rate outdone instinctual throttle honking serum lean stout "
+             "ball hush id leds duty fyi I fo : tada yo , toy of"),
+            solver.letter_bank
+        )
+        # must start with "I"
+        assert not solver.soft_validate(
+            ("behave rate outdone instinctual throttle honking serum lean stout "
+             "ball hush id leds duty fyi I fo : tada yo , toy of"),
+            solver.letter_bank
+        )
+        # punctuation must appear in order :,!!
+        assert not solver.soft_validate(
+            ("I behave rate outdone instinctual throttle honking serum lean stout "
+             "ball hush id leds duty fyi I fo , tada yo : toy of"),
+            solver.letter_bank
+        )
+        # longest word must be 11 letters, and it must occur next to an 8 letter word
+        assert not solver.soft_validate(
+            ("I behave rate outdone instinctual honking serum throttle lean stout "
+             "ball hush id leds duty fyi I fo : tada yo , toy of"),
+            solver.letter_bank
+        )
+        # There must be a w remaining if any characters are remaining
+        assert solver.soft_validate(
+            ("I behave rate outdone instinctual throttle honking serum lean stout "
+             "ball hush id leds duty fyi I fo : tada yow , toy of"),
+            solver.letter_bank
+        )
