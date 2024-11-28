@@ -25,6 +25,7 @@ CANDIDATE_STATUS_CODES = {
     0: "OK",  # or None
     1: "Fails Validation",
     5: "Fully Explored",
+    6: "Unexplored",
     7: "Manual Intervention",
 }
 
