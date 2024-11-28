@@ -87,7 +87,7 @@ class PersistentSearchTree:
 
     def get(
         self, placed: str, default=None
-    ) -> Tuple[str, str, str, float, float, float, int]:
+    ) -> Union[Tuple[str, str, str, float, float, float, int], None]:
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
             fetch = cursor.execute(
