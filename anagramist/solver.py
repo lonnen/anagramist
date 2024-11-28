@@ -4,7 +4,7 @@ from math import fsum
 from random import choices
 from statistics import geometric_mean
 import time
-from typing import Generator, List, Tuple, Union
+from typing import Dict, Generator, List, Tuple, Union
 
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
@@ -437,3 +437,61 @@ class Solver:
                 return False
 
         return True
+    
+    def retrieve_candidate(self, candidate: str, limit: int = 5) -> Tuple[Dict, Dict, Dict]:
+        """Retrieves the `canddiate` and calculates statistics about it and its child
+        nodes, including how many have been explored, which immediate children have the
+        highest scores, and which explored descendents have the highest scores
+
+        Args:
+            candidate (str): a candidate node to retrieve
+            limit (int): upper bound on how many children and descendents to return
+        """
+        cached = self.search_tree.get(candidate)
+        if cached is None:
+            return {}, {}, {}
+        _, remaining, _, _, _, _, _ = cached
+
+        valid_vocab = [w for w in self.compute_valid_vocab(remaining)]
+        explored_vocab = {entry[0]: entry for entry in self.search_tree.get_children(candidate)}
+
+        status_codes = {0: 0, 7: 0}
+        children = []
+        for word in valid_vocab:
+            new_candidate = f"{candidate} {word}"
+            child = explored_vocab.get(
+                new_candidate,
+                (new_candidate, "", "", None, None, None, 6)
+            )
+            status_code = child[6]
+            if status_codes.get(status_code) is None:
+                status_codes[status_code] = 0
+            status_codes[status_code] += 1
+            if status_code == 0:
+                children.append(child)
+        total = float(sum(status_codes.values()))
+
+        stats = {}
+        for status_code, count in sorted(status_codes.items(), key=lambda x: str(x)):
+            s = str(status_code)[0]
+            percentage = float(count) / total
+            stats[str(s)] = {"status_code": s, "count": v, "percentage": percentage}
+
+        top_children = {}
+        for entry in sorted(
+            children,
+            key=lambda x: x[5] if x[5] is not None else EXPLORATION_SCORE,
+            reverse=True,
+        )[:limit]:
+            top_children[entry[0]] = entry
+        
+        descendents = self.search_tree.get_descendents(candidate)
+        top_descendents = {}
+        for entry in sorted(
+            descendents,
+            key=lambda x: x[5] if x[5] is not None else EXPLORATION_SCORE,
+            reverse=True,
+        )[:limit]:
+            top_descendents[entry[0]] = entry
+
+        return stats, top_children, top_descendents
