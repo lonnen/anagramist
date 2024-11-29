@@ -8,6 +8,7 @@ from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
 from anagramist.solver import Solver
 
+
 @pytest.fixture
 def temp_database():
     db_name = "test_anagramist.db"
@@ -15,10 +16,12 @@ def temp_database():
     yield db_name
     os.remove(db_name)
 
+
 TRANSFOMER_MODEL = "microsoft/phi-1_5"
 TRANSFORMER_SEED = 42
 SHARED_ORACLE = TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED)
-C1663_LETTERS = "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!" #noqa
+C1663_LETTERS = "ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"  # noqa
+
 
 class TestSolver:
     def test_init(self, temp_database):
@@ -52,7 +55,7 @@ class TestSolver:
             "",
             PersistentSearchTree(db_name=temp_database),
             SHARED_ORACLE,
-            vocabulary=['no', 'problems'],
+            vocabulary=["no", "problems"],
             c1663=False,
         )
         solver.search_tree.push(expected, "", "", 0, 0, 0, 0)
@@ -60,7 +63,7 @@ class TestSolver:
         assert expected == solver.select()
         # it can be repeatedly sampled
         assert expected == solver.select()
-        #when called with a prefix, it should return iff the prefix matches
+        # when called with a prefix, it should return iff the prefix matches
         assert expected == solver.select("n")
         # when called with a prefix that doesn't match, it should fall over
         with pytest.raises(ValueError):
@@ -69,7 +72,7 @@ class TestSolver:
         assert expected == solver.select("no")
 
     def test_expansion(self, temp_database):
-        vocab = ['bish', 'bash', 'bosh']
+        vocab = ["bish", "bash", "bosh"]
         solver = Solver(
             "bishbashbosh",
             PersistentSearchTree(db_name=temp_database),
@@ -86,7 +89,7 @@ class TestSolver:
         assert solver.expansion("") in expected
 
     def test_assessment(self, temp_database):
-        vocab = ['bish', 'bash', 'bosh']
+        vocab = ["bish", "bash", "bosh"]
         solver = Solver(
             "bishbashbosh",
             PersistentSearchTree(db_name=temp_database),
@@ -105,11 +108,11 @@ class TestSolver:
         for e, a in zip(expected, [a[0] for a in actual]):
             assert e == a
         # remaining letters should diminish as words are added
-        for e, a in zip(['bbsshhao', 'bsho', ''], [a[1] for a in actual]):
+        for e, a in zip(["bbsshhao", "bsho", ""], [a[1] for a in actual]):
             assert e == a
 
     def test_compute_valid_vocab(self, temp_database):
-        vocab = ['bish', 'bash', 'bosh']
+        vocab = ["bish", "bash", "bosh"]
         solver = Solver(
             "bishbash",
             PersistentSearchTree(db_name=temp_database),
@@ -121,7 +124,7 @@ class TestSolver:
         expected = ["bish", "bash"]
         for e, a in zip(expected, actual):
             assert e == a
-        
+
         # this puzzle is insolvable given the mix of letters and vocab words but
         # the compute_valid_vocab method should still work
         solver = Solver(
@@ -136,7 +139,7 @@ class TestSolver:
         assert expected == [a for a in actual]
 
     def test_soft_validate(self, temp_database):
-        vocab = ['bish', 'bash', 'bosh']
+        vocab = ["bish", "bash", "bosh"]
         solver = Solver(
             "bishbash",
             PersistentSearchTree(db_name=temp_database),
@@ -166,28 +169,38 @@ class TestSolver:
             c1663=True,
         )
         assert solver.soft_validate(
-            ("I behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo : tada yo , toy of")
+            (
+                "I behave rate outdone instinctual throttle honking serum lean stout "
+                "ball hush id leds duty fyi I fo : tada yo , toy of"
+            )
         )
         # must start with "I"
         assert not solver.soft_validate(
-            ("behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo : tada yo , toy of")
+            (
+                "behave rate outdone instinctual throttle honking serum lean stout "
+                "ball hush id leds duty fyi I fo : tada yo , toy of"
+            )
         )
         # punctuation must appear in order :,!!
         assert not solver.soft_validate(
-            ("I behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo , tada yo : toy of")
+            (
+                "I behave rate outdone instinctual throttle honking serum lean stout "
+                "ball hush id leds duty fyi I fo , tada yo : toy of"
+            )
         )
         # longest word must be 11 letters, and it must occur next to an 8 letter word
         assert not solver.soft_validate(
-            ("I behave rate outdone instinctual honking serum throttle lean stout "
-             "ball hush id leds duty fyi I fo : tada yo , toy of")
+            (
+                "I behave rate outdone instinctual honking serum throttle lean stout "
+                "ball hush id leds duty fyi I fo : tada yo , toy of"
+            )
         )
         # There must be a w remaining if any characters are remaining
         assert not solver.soft_validate(
-            ("I behave rate outdone instinctual throttle honking serum lean stout "
-             "ball hush id leds duty fyi I fo : tada yow , toy of")
+            (
+                "I behave rate outdone instinctual throttle honking serum lean stout "
+                "ball hush id leds duty fyi I fo : tada yow , toy of"
+            )
         )
 
     def test_hard_validate(self, temp_database):
@@ -195,7 +208,7 @@ class TestSolver:
         unknown for c1663. We can only test it for non-c1663 puzzles, which will not
         excercise the full set of constraints
         """
-        vocab = ['bish', 'bash', 'bosh']
+        vocab = ["bish", "bash", "bosh"]
         solver = Solver(
             "bishbash",
             PersistentSearchTree(db_name=temp_database),
@@ -221,10 +234,10 @@ class TestSolver:
         """
         expected = "bash bish bosh"
         solver = Solver(
-            expected, # the letter bank
+            expected,  # the letter bank
             PersistentSearchTree(db_name=temp_database),
             SHARED_ORACLE,
-            vocabulary=['bish', 'bash', 'bosh'],
+            vocabulary=["bish", "bash", "bosh"],
             c1663=False,
         )
         assert expected == solver.solve()
