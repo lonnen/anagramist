@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 EXPLORATION_SCORE = float(-40)
 """a score used for as-yet unscored candidates"""
 
+
 class Solver:
     def __init__(
         self,
@@ -166,7 +167,9 @@ class Solver:
 
         return placed.sentence
 
-    def assessment(self, candidate: str) -> List[Tuple[str, str, str, float, float, float, int]]:
+    def assessment(
+        self, candidate: str
+    ) -> List[Tuple[str, str, str, float, float, float, int]]:
         """Score the candidate node and every intermediary node leading to it.
 
         Args:
@@ -437,8 +440,10 @@ class Solver:
                 return False
 
         return True
-    
-    def retrieve_candidate(self, candidate: str, limit: int = 5) -> Tuple[Dict, Dict, Dict]:
+
+    def retrieve_candidate(
+        self, candidate: str, limit: int = 5
+    ) -> Tuple[Dict, Dict, Dict]:
         """Retrieves the `canddiate` and calculates statistics about it and its child
         nodes, including how many have been explored, which immediate children have the
         highest scores, and which explored descendents have the highest scores
@@ -450,18 +455,20 @@ class Solver:
         cached = self.search_tree.get(candidate)
         if cached is None:
             return {}, {}, {}
-        _, remaining, _, _, _, _, _ = cached
+        _, r, _, _, _, _, _ = cached
+        remaining = Fragment(r).letters
 
         valid_vocab = [w for w in self.compute_valid_vocab(remaining)]
-        explored_vocab = {entry[0]: entry for entry in self.search_tree.get_children(candidate)}
+        explored_vocab = {
+            entry[0]: entry for entry in self.search_tree.get_children(candidate)
+        }
 
-        status_codes = {0: 0, 7: 0}
+        status_codes = {}
         children = []
         for word in valid_vocab:
             new_candidate = f"{candidate} {word}"
             child = explored_vocab.get(
-                new_candidate,
-                (new_candidate, "", "", None, None, None, 6)
+                new_candidate, (new_candidate, "", "", None, None, None, 6)
             )
             status_code = child[6]
             if status_codes.get(status_code) is None:
@@ -475,7 +482,7 @@ class Solver:
         for status_code, count in sorted(status_codes.items(), key=lambda x: str(x)):
             s = str(status_code)[0]
             percentage = float(count) / total
-            stats[str(s)] = {"status_code": s, "count": v, "percentage": percentage}
+            stats[str(s)] = {"status_code": s, "count": count, "percentage": percentage}
 
         top_children = {}
         for entry in sorted(
@@ -484,7 +491,7 @@ class Solver:
             reverse=True,
         )[:limit]:
             top_children[entry[0]] = entry
-        
+
         descendents = self.search_tree.get_descendents(candidate)
         top_descendents = {}
         for entry in sorted(
