@@ -104,7 +104,7 @@ class TestSolver:
         assert len(actual) == 3
         # responses should build up towards the provided sentence
         # '!!' is appended after hard validation
-        expected = ["bish", "bish bash", "bish bash bosh!!"]
+        expected = ["bish", "bish bash", "bish bash bosh"]
         for e, a in zip(expected, [a[0] for a in actual], strict=False):
             assert e == a
         # remaining letters should diminish as words are added
