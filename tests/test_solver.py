@@ -228,3 +228,42 @@ class TestSolver:
             c1663=False,
         )
         assert expected == solver.solve()
+
+    def test_retrieve_candidate(self, temp_database):
+        pst = PersistentSearchTree(db_name=temp_database)
+        # insert rows taken from the solved prior test
+        pst.push("", "bbbassshhhio", "", -40, -40, -40, 0)
+        pst.push("bash", "bbsshhio", "", -21.8, -21.8, -21.8, 0)
+        pst.push("bash bish", "bsho", "bash", -29.7, -51, -27.7, 0)
+        solver = Solver(
+            "bish bash bosh",
+            pst,
+            SHARED_ORACLE,
+            vocabulary=["bish", "bash", "bosh"],
+            c1663=False,
+        )
+        stats, top_children, top_descendents = solver.retrieve_candidate("bash")
+
+        assert len(stats.items()) == 2
+        assert sum([v["count"] for v in stats.values()]) == 2
+        assert stats["0"]["percentage"] == 0.5
+
+        assert len(top_children) == 1
+        assert top_children["bash bish"] == (
+            "bash bish",
+            "bsho",
+            "bash",
+            -29.7,
+            -51.0,
+            -27.7,
+            0,
+        )
+        assert top_descendents["bash bish"] == (
+            "bash bish",
+            "bsho",
+            "bash",
+            -29.7,
+            -51.0,
+            -27.7,
+            0,
+        )
