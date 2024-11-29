@@ -90,7 +90,10 @@ class TransformerOracle:
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            [self.tokenizer.bos_token + self.puzzle_context + c.sentence for c in candidates],
+            [
+                self.tokenizer.bos_token + self.puzzle_context + c.sentence
+                for c in candidates
+            ],
             padding=True,
             return_tensors="pt",
         ).input_ids
