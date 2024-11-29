@@ -71,6 +71,10 @@ class TransformerOracle:
         # Puzzle Specific Initialization
         self.puzzle_context = puzzle_context
         if c1663:
+            if self.puzzle_context != "":
+                raise RuntimeError(
+                    "Puzzle context is automatically configured when c1663 is Enabled"
+                )
             self.puzzle_context = """In comparison, being an anagramist today is 
             totally boring, as nobody is encoding fundamental discoveries into word 
             games anymore.
