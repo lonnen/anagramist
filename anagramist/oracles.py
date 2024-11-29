@@ -83,9 +83,21 @@ class TransformerOracle:
             [self.puzzle_context], padding=False, return_tensors="pt"
         ).input_ids.shape[1]
 
-    def calc_candidate_scores(
-        self, candidates: List[Fragment]
-    ) -> List[List[Tuple[str, float]]]:
+    def score_candidates(self, candidates: List[Fragment]) -> List[List[Tuple[str, float]]]:
+        """Calculate the log scores of a given set of candidate sentences. This is
+        theoretically more efficient than looping over single candidates, but too many
+        at once can cause issues. It is recommended that consumers experiment with their
+        hardware and chunk candidates into batches for improved efficiency.
+
+        adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
+
+        Args:
+            candidates (List[Fragment]): a list of candidate Fragments to be graded
+
+        Returns:
+            a list of `(word, score)` pairs that can be aggregated with `Match.fsum`
+        """
+
         self.tokenizer.pad_token = self.tokenizer.bos_token
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
@@ -117,22 +129,22 @@ class TransformerOracle:
                     self.puzzle_context_token_count :
                 ]  # trim off the puzzle_context
             batch.append(text_sequence)
-
-        return batch
-
-    def score_candidates(self, candidates: List[Fragment]) -> List[float]:
-        """Calculate the log scores of a given set of candidate sentences. This is
-        theoretically more efficient than looping over single candidates, but too many
-        at once can cause issues. It is recommended that consumers experiment with their
-        hardware and chunk candidates into batches for improved efficiency.
-
-        adapted from: https://discuss.huggingface.co/t/announcement-generation-get-probabilities-for-generated-output/30075/17
-        """
-        batch = self.calc_candidate_scores(candidates)
-
+        
         batch_scores = []
-        for sequence in batch:
-            batch_scores.append(fsum([log_score for _, log_score in sequence]))
+        for candidate, scored_tokens in zip(candidates, batch, strict=True):
+            scored_words = []
+            for word in candidate.words:
+                accumulated_tokens = []
+                while (
+                    "".join([token.strip() for token, _ in accumulated_tokens]) != word
+                ):
+                    accumulated_tokens.append(scored_tokens.pop(0))
+                accumulated_word = "".join(
+                    [token.strip() for token, _ in accumulated_tokens]
+                )
+                accumulated_score = fsum([score for _, score in accumulated_tokens])
+                scored_words.append((accumulated_word, accumulated_score))
+            batch_scores.append(scored_words)               
 
         return batch_scores
 
