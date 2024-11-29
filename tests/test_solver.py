@@ -105,10 +105,10 @@ class TestSolver:
         # responses should build up towards the provided sentence
         # '!!' is appended after hard validation
         expected = ["bish", "bish bash", "bish bash bosh!!"]
-        for e, a in zip(expected, [a[0] for a in actual]):
+        for e, a in zip(expected, [a[0] for a in actual], strict=False):
             assert e == a
         # remaining letters should diminish as words are added
-        for e, a in zip(["bbsshhao", "bsho", ""], [a[1] for a in actual]):
+        for e, a in zip(["bbsshhao", "bsho", ""], [a[1] for a in actual], strict=False):
             assert e == a
 
     def test_compute_valid_vocab(self, temp_database):
@@ -122,7 +122,7 @@ class TestSolver:
         )
         actual = solver.compute_valid_vocab(solver.letter_bank)
         expected = ["bish", "bash"]
-        for e, a in zip(expected, actual):
+        for e, a in zip(expected, actual, strict=False):
             assert e == a
 
         # this puzzle is insolvable given the mix of letters and vocab words but
