@@ -1,6 +1,6 @@
 import click
 
-from anagramist import score_one, search, show_candidate
+from anagramist import solver
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
 
@@ -283,30 +283,5 @@ def candidates(
     click.echo("")
 
 
-@click.command()
-@click.pass_context
-def check_database(ctx: click.Context):
-    """Verify the integrity of the configured database
-
-    Connect to the database, examine every entry in the DB to determine the letter
-    bank(s) for the row, and exit 0 if all rows use the same bank. If `--verbose` flag
-    is passed it will also output some summary statistics about the entire database.
-    """
-    pst = ctx.obj["SEARCH_TREE"]
-    database_path = ctx.obj["DATABASE"]
-    integrity, counts = pst.verify_integrity()
-    if ctx.obj["VERBOSE"]:
-        if integrity:
-            click.echo(f"DB {database_path} is internally consistent.")
-        else:
-            click.echo(f"Multiple letter banks found in DB {database_path}")
-        click.echo("")
-        for bank, count in counts:
-            click.echo(f"{bank}, {count}")
-    # exit codes are integers, the reverse of a boolean success value
-    ctx.exit(int(not integrity))
-
-
 cli.add_command(solve)
 cli.add_command(candidates)
-cli.add_command(check_database)
