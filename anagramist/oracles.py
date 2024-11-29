@@ -133,6 +133,6 @@ class TransformerOracle:
 
         return batch_scores
 
-    def score_candidate(self, candidate: List[Fragment]) -> float:
+    def score_candidate(self, candidate: Fragment) -> float:
         """Calculate the log scores of a single candidate sentence"""
         return self.score_candidates([candidate])[0]
