@@ -235,7 +235,7 @@ class Solver:
                 score = float("inf")
             elif w == scored_words[-1][0]:
                 # if the final word doesn't hard validate it must have failed,
-                # but we must write down the failure to avoid exploring it further
+                # but we must write down the failure to avoid exploring it again
                 score = float("-inf")
 
             cumulative_score = fsum(scores)
