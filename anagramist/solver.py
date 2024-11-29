@@ -187,7 +187,7 @@ class Solver:
         placed = Fragment(candidate)
         scored_tokens = self.oracle.calc_candidate_scores(
             [
-                placed.sentence,
+                placed,
             ]
         )[0]
         scored_words = []

@@ -21,6 +21,8 @@ from transformers import (
     AutoTokenizer,
 )
 
+from anagramist.fragment import Fragment
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,13 +80,13 @@ class TransformerOracle:
         ).input_ids.shape[1]
 
     def calc_candidate_scores(
-        self, candidates: List[str]
+        self, candidates: List[Fragment]
     ) -> List[List[Tuple[str, float]]]:
         self.tokenizer.pad_token = self.tokenizer.bos_token
         # logits scores are all conditional on the next token
         # so the input needs ~ 1 token of padding in order to get the actual first token
         input_ids = self.tokenizer(
-            [self.tokenizer.bos_token + self.puzzle_context + c for c in candidates],
+            [self.tokenizer.bos_token + self.puzzle_context + c.sentence for c in candidates],
             padding=True,
             return_tensors="pt",
         ).input_ids
@@ -111,7 +113,7 @@ class TransformerOracle:
 
         return batch
 
-    def score_candidates(self, candidates: List[str]) -> List[float]:
+    def score_candidates(self, candidates: List[Fragment]) -> List[float]:
         """Calculate the log scores of a given set of candidate sentences. This is
         theoretically more efficient than looping over single candidates, but too many
         at once can cause issues. It is recommended that consumers experiment with their
@@ -127,6 +129,6 @@ class TransformerOracle:
 
         return batch_scores
 
-    def score_candidate(self, candidate: List[str]) -> float:
+    def score_candidate(self, candidate: List[Fragment]) -> float:
         """Calculate the log scores of a single candidate sentence"""
         return self.score_candidates([candidate])[0]
