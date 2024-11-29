@@ -28,6 +28,7 @@ class Solver:
         c1663: bool = False,
         max_iterations: Union[int, None] = None,
         max_time: Union[int, None] = None,
+        max_expansions_per_iteration: Union[int, None] = 100,
     ):
         self.letter_bank = Fragment(letters).letters
         self.search_tree = search_tree
@@ -45,6 +46,7 @@ class Solver:
         logger.info(f"loaded vocab ({len(self.vocabulary)} items)")
         self.max_iterations = max_iterations
         self.max_time = max_time
+        self.max_expansions_per_iteration = max_expansions_per_iteration
 
         self.current_iteration = 0
 
@@ -100,18 +102,22 @@ class Solver:
 
             # selection
             candidate = self.select(candidate)
-            # expansion
-            candidate = self.expansion(candidate)
-            # backpropogation
-            updated_candidates = self.assessment(candidate)
-            for c in updated_candidates:
-                self.search_tree.push(*c)
-                logging.info(f"recorded simulation ({c[5]:2.2f}, {c[6]}): {c[0]}")
-                if c[3] == float("inf"):
-                    logging.info(
-                        "Found solution after %d seconds, stopping.", self.max_time
-                    )
-                    return c[0]
+
+            expansion_count = 0
+            while expansion_count < self.max_expansions_per_iteration:
+                # expansion
+                candidate = self.expansion(candidate)
+                # backpropogation
+                updated_candidates = self.assessment(candidate)
+                for c in updated_candidates:
+                    self.search_tree.push(*c)
+                    logging.info(f"recorded simulation ({c[5]:2.2f}, {c[6]}): {c[0]}")
+                    if c[3] == float("inf"):
+                        logging.info(
+                            "Found solution after %d seconds, stopping.", self.max_time
+                        )
+                        return c[0]
+                expansion_count += 1
 
             self.current_iteration += 1
         return None
