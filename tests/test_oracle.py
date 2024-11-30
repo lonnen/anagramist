@@ -1,3 +1,4 @@
+from math import fsum
 import pytest
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
@@ -23,5 +24,8 @@ class TestOracle:
             )
 
     def test_score_candidate(self):
+        expected = Fragment("I cannot believe")
         oracle = TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED, c1663=True)
-        oracle.score_candidate(Fragment("I cannot believe"))
+        word_scores = oracle.score_candidate(expected)
+        assert expected.words == [w for w, _ in word_scores]
+        assert -26 == round(fsum([s for _, s in word_scores]), 0)
