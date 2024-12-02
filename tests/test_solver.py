@@ -99,7 +99,7 @@ class TestSolver:
         )
         actual = solver.assessment("bish bash bosh")
         # a hard validating winners score is infinite
-        assert float("inf") == actual[-1][3]
+        assert float("inf") == actual[-1][-2]
         # one response per word
         assert len(actual) == 3
         # responses should build up towards the provided sentence

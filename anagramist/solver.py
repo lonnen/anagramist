@@ -112,7 +112,7 @@ class Solver:
                 for c in updated_candidates:
                     self.search_tree.push(*c)
                     logging.info(f"recorded simulation ({c[5]:2.2f}, {c[6]}): {c[0]}")
-                    if c[3] == float("inf"):
+                    if c[-2] == float("inf"):
                         logging.info(
                             "Found solution after %d seconds, stopping.", self.max_time
                         )
