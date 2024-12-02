@@ -83,7 +83,9 @@ class TransformerOracle:
             [self.puzzle_context], padding=False, return_tensors="pt"
         ).input_ids.shape[1]
 
-    def score_candidates(self, candidates: List[Fragment]) -> List[List[Tuple[str, float]]]:
+    def score_candidates(
+        self, candidates: List[Fragment]
+    ) -> List[List[Tuple[str, float]]]:
         """Calculate the log scores of a given set of candidate sentences. This is
         theoretically more efficient than looping over single candidates, but too many
         at once can cause issues. It is recommended that consumers experiment with their
@@ -129,7 +131,7 @@ class TransformerOracle:
                     self.puzzle_context_token_count :
                 ]  # trim off the puzzle_context
             batch.append(text_sequence)
-        
+
         batch_scores = []
         for candidate, scored_tokens in zip(candidates, batch, strict=True):
             scored_words = []
@@ -144,7 +146,7 @@ class TransformerOracle:
                 )
                 accumulated_score = fsum([score for _, score in accumulated_tokens])
                 scored_words.append((accumulated_word, accumulated_score))
-            batch_scores.append(scored_words)               
+            batch_scores.append(scored_words)
 
         return batch_scores
 
