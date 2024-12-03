@@ -2,7 +2,6 @@ from collections import Counter
 import logging
 from math import fsum
 from random import choices
-from statistics import geometric_mean
 import time
 from typing import Dict, Generator, List, Tuple, Union
 
