@@ -184,35 +184,20 @@ class Solver:
             A list of 2-tuples containing nodes and scores
         """
         placed = Fragment(candidate)
-        scored_tokens = self.oracle.calc_candidate_scores(
+        scored_tokens = self.oracle.score_candidates(
             [
                 placed,
             ]
         )[0]
-        scored_words = []
-        for w in placed.words:
-            accumulated_tokens = []
-            while "".join([token.strip() for token, _ in accumulated_tokens]) != w:
-                accumulated_tokens.append(scored_tokens.pop(0))
-            accumulated_word = "".join(
-                [token.strip() for token, _ in accumulated_tokens]
-            )
-            accumulated_score = fsum([score for _, score in accumulated_tokens])
-            scored_words.append((accumulated_word, accumulated_score))
 
         entries = []
-        sentence = ""
-        cumulative_score = 0
-        scores = []
-        # calculate node scores
-        for w, score in scored_words:
-            parent = sentence
-            if sentence == "":
-                sentence = w
-            else:
-                sentence = f"{sentence} {w}"
-
-            scores.append(score)
+        for i, _ in enumerate(scored_tokens, start=1):
+            words = [w for w, _ in scored_tokens[:i]]
+            scores = [s for _, s in scored_tokens[:i]]
+            sentence = " ".join(words)
+            parent = " ".join(words[:-1])
+            score = fsum(scores)
+            status = 0
 
             # if placed.sentence.startswith(sentence):
             #     # scored_words has the whole sentence, some of which is already in
@@ -232,36 +217,25 @@ class Solver:
                     del remaining["!"]
                 logger.critical("WINNER: {}".format(sentence))
                 score = float("inf")
-            elif w == scored_words[-1][0]:
-                # if the final word doesn't hard validate it must have failed,
-                # but we must write down the failure to avoid exploring it again
+            elif i == len(scored_tokens):
+                # all candidates here were out of letters, so if it didn't hard_validate
+                # it must be a dud. We need to record that so we don't re-consider it
+                # later
                 score = float("-inf")
-
-            cumulative_score = fsum(scores)
-            offset = abs(min(scores)) + 1
-            status = 0
-            if score == float("-inf") or cumulative_score == float("-inf"):
-                mean_score = float("-inf")
                 status = 1
-            else:
-                mean_score = geometric_mean([s + offset for s in scores]) - offset
+
             entries.append(
                 [
                     sentence,
                     "".join(remaining.elements()),
                     parent,
+                    0,
+                    0,
                     score,
-                    cumulative_score,
-                    mean_score,
                     status,
                 ]
             )
-            if (
-                score == float("inf")
-                or score == float("-inf")
-                or cumulative_score == float("-inf")
-                or mean_score == float("-inf")
-            ):
+            if score == float("inf") or score == float("-inf"):
                 break  # we don't need to continue, infinity means we can finally rest
         return entries
 
