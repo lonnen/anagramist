@@ -15,15 +15,6 @@ logging.basicConfig(
 logging.captureWarnings(capture=True)
 logger = logging.getLogger(__name__)
 
-
-CANDIDATE_STATUS_CODES = {
-    0: "OK",  # or None
-    1: "Fails Validation",
-    5: "Fully Explored",
-    6: "Unexplored",
-    7: "Manual Intervention",
-}
-
 PROFILING_ITERATIONS = 10
 """how many iterations of search to do while profiling"""
 
