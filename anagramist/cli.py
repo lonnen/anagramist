@@ -140,16 +140,13 @@ def solve(ctx: click.Context, root=("",)):
     r = " ".join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
     click.echo(f"Searching for solutions starting from: {r}")
-    search(
+    solver = solver.Solver(
         ctx.obj["PUZZLE"],
         ctx.obj["SEARCH_TREE"],
-        ctx.obj["MODEL_NAME_OR_PATH"],
-        ctx.obj["SEED"],
-        ctx.obj["USE_GPU"],
-        ctx.obj["USE_FP15"],
+        ctx.obj["ORACLE"],
         ctx.obj["C1663"],
     )
-
+    solver.solve()
 
 @click.command()
 @click.option(
