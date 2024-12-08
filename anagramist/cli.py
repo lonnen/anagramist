@@ -243,11 +243,15 @@ def candidates(
 
     click.echo(f"'{c}'\n")
 
-    stats, top_children, top_descendents = show_candidate(
-        c,
+    solver = Solver(
+        ctx.obj["PUZZLE"],
         ctx.obj["SEARCH_TREE"],
-        limit=number,
-        c1663=ctx.obj["C1663"],
+        ctx.obj["ORACLE"],
+        ctx.obj["C1663"],
+    )
+    stats, top_children, top_descendents = solver.retrieve_candidate(
+        c,
+        limit = number
     )
 
     if len(stats) == 0:
