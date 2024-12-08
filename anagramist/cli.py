@@ -1,6 +1,6 @@
 import click
 
-from anagramist import solver
+from anagramist.solver import Solver
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
 
@@ -140,7 +140,7 @@ def solve(ctx: click.Context, root=("",)):
     r = " ".join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
     click.echo(f"Searching for solutions starting from: {r}")
-    solver = solver.Solver(
+    solver = Solver(
         ctx.obj["PUZZLE"],
         ctx.obj["SEARCH_TREE"],
         ctx.obj["ORACLE"],
