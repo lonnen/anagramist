@@ -146,7 +146,7 @@ def solve(ctx: click.Context, root=("",)):
         ctx.obj["ORACLE"],
         ctx.obj["C1663"],
     )
-    solver.solve()
+    solver.solve(r)
 
 @click.command()
 @click.option(
