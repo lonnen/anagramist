@@ -158,28 +158,14 @@ def solve(ctx: click.Context, root=("",)):
 )
 @click.option("-t", "--trim", is_flag=True, help="Remove all the descendents")
 @click.option(
-    "--validate",
-    is_flag=True,
-    help="""(re-)validate and (re-)score the candidate. If the candidate is not in the
-    search tree this will create it. If the candidate passes validation all the parent
-    intermediary candidates will also be created and entered into the search tree.
-    """,
-)
-@click.option(
     "-s",
     "--status",
     type=int,
     default=-1,
     help="""Sets the candidate's status. See CANDIDATE_STATUS_CODES for more info
     
-    In order for a status to be set, the candidate must have a score or the program will
-    exit with an error. If the candidate has never been examined, pass the `--validate`
-    flag to score it. 
-    
-    If `--status` and `--validate` are passed, `--validate` happens first.
-
-    If a candidate that fails validation has a status set to 0, the next time the
-    candidate is chosen for exploration it will fail immedietly.
+    In order for a status to be set, the candidate must already have a score or the
+    program will exit with an error.
     """,
 )
 @click.option(
@@ -195,7 +181,6 @@ def candidates(
     candidate: tuple,
     number: int,
     trim: bool,
-    validate: bool,
     status: int,
     quiet: bool,
 ):
@@ -206,21 +191,11 @@ def candidates(
     """
 
     verbose = ctx.obj["VERBOSE"]
-    c1663 = ctx.obj["C1663"]
 
     c = " ".join(candidate)
 
     # modify
     pst = ctx.obj["SEARCH_TREE"]
-
-    # validate and rescore happens before changing status
-    if validate:
-        if verbose:
-            click.echo(f"Scoring '{c}'")
-        entry = score_one(c, ctx.obj["LETTERS"], ctx.obj["ORACLE"], pst, c1663)
-        if verbose:
-            if entry:
-                click.echo(f"recorded entry: ({entry[-2]:2.2f}, {entry[-1]}): {c}")
 
     if status >= 0:
         modified = pst.status(c, status)
