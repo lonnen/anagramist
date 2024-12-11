@@ -101,6 +101,12 @@ def cli(
     ctx.obj["ORACLE"] = TransformerOracle(
         model_name_or_path, seed, (not use_gpu), use_fp16, c1663
     )
+    ctx.obj["solver"] = Solver(
+        ctx.obj["PUZZLE"],
+        ctx.obj["SEARCH_TREE"],
+        ctx.obj["ORACLE"],
+        ctx.obj["C1663"],
+    )
 
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
@@ -140,12 +146,7 @@ def solve(ctx: click.Context, root=("",)):
     r = " ".join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
     click.echo(f"Searching for solutions starting from: {r}")
-    solver = Solver(
-        ctx.obj["PUZZLE"],
-        ctx.obj["SEARCH_TREE"],
-        ctx.obj["ORACLE"],
-        ctx.obj["C1663"],
-    )
+    solver: Solver = ctx.obj["solver"]
     solver.solve(r)
 
 @click.command()
@@ -218,12 +219,7 @@ def candidates(
 
     click.echo(f"'{c}'\n")
 
-    solver = Solver(
-        ctx.obj["PUZZLE"],
-        ctx.obj["SEARCH_TREE"],
-        ctx.obj["ORACLE"],
-        ctx.obj["C1663"],
-    )
+    solver: Solver = ctx.obj["solver"]
     stats, top_children, top_descendents = solver.retrieve_candidate(
         c,
         limit = number
