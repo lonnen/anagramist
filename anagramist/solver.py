@@ -181,7 +181,8 @@ class Solver:
             candidate (str): a partial arrangement of letters
 
         Returns:
-            A list of 2-tuples containing nodes and scores
+            A list of tuples containing nodes and scores for the whole path from root 
+            to candidate
         """
         placed = Fragment(candidate)
         scored_tokens = self.oracle.score_candidates(
