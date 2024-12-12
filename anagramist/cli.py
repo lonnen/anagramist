@@ -149,7 +149,7 @@ def solve(ctx: click.Context, root=("",)):
     solver: Solver = ctx.obj["solver"]
     solver.solve(r)
 
-@click.command()
+@cli.command()
 @click.option(
     "-n",
     "--number",
