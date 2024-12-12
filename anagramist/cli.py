@@ -102,10 +102,10 @@ def cli(
         model_name_or_path, seed, (not use_gpu), use_fp16, c1663
     )
     ctx.obj["solver"] = Solver(
-        ctx.obj["PUZZLE"],
+        ctx.obj["LETTERS"],
         ctx.obj["SEARCH_TREE"],
         ctx.obj["ORACLE"],
-        ctx.obj["C1663"],
+        c1663=ctx.obj["C1663"],
     )
 
     if ctx.invoked_subcommand is None:
