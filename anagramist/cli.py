@@ -254,6 +254,26 @@ def candidates(
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+@cli.command()
+@click.argument("candidate", nargs=-1)
+@click.pass_context
+def check(
+    ctx: click.Context,
+    candidate: tuple
+):
+    if candidate == ():
+        click.echo("Please provide a candidate to check")
+        ctx.exit(1)
+
+    sentence = " ".join(candidate)
+    solver: Solver = ctx.obj["solver"]
+
+    path = solver.assessment(sentence)
+    click.echo("Status | Score | Sentence")
+    click.echo("-------------------------")
+    for s, _remaining, _parent, _, _, score, status in path[::-1]:
+        click.echo(f"   {status}   | {score: =5.1f} | {s}")
 
 cli.add_command(solve)
 cli.add_command(candidates)
+cli.add_command(check)
