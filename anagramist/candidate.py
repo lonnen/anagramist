@@ -12,11 +12,13 @@ CANDIDATE_STATUS_CODES = {
     7: "Manual Intervention",
 }
 
+
 @dataclass()
 class Candidate:
     """A candidate solution model, complete with all the fields necessary to record
     this entry in a database.
     """
+
     placed: Fragment
     remaining: Counter
     parent: Fragment

@@ -181,7 +181,7 @@ class Solver:
             candidate (str): a partial arrangement of letters
 
         Returns:
-            A list of tuples containing nodes and scores for the whole path from root 
+            A list of tuples containing nodes and scores for the whole path from root
             to candidate
         """
         placed = Fragment(candidate)

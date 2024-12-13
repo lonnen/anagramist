@@ -145,7 +145,7 @@ class TransformerOracle:
                     [token.strip() for token, _ in accumulated_tokens]
                 )
                 # why fsum? https://huggingface.co/blog/how-to-generate
-                # "auto-regressive language generation is based on the assumption that 
+                # "auto-regressive language generation is based on the assumption that
                 # the probability distribution of a word sequence can be decomposed into
                 # the product of conditional next word distributions"
                 accumulated_score = fsum([score for _, score in accumulated_tokens])
