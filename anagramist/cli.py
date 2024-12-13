@@ -1,3 +1,4 @@
+import json
 import click
 
 from anagramist.solver import Solver
@@ -149,6 +150,7 @@ def solve(ctx: click.Context, root=("",)):
     solver: Solver = ctx.obj["solver"]
     solver.solve(r)
 
+
 @cli.command()
 @click.option(
     "-n",
@@ -220,10 +222,7 @@ def candidates(
     click.echo(f"'{c}'\n")
 
     solver: Solver = ctx.obj["solver"]
-    stats, top_children, top_descendents = solver.retrieve_candidate(
-        c,
-        limit = number
-    )
+    stats, top_children, top_descendents = solver.retrieve_candidate(c, limit=number)
 
     if len(stats) == 0:
         click.echo("Candidate not yet explored")
@@ -254,13 +253,38 @@ def candidates(
         click.echo(f"{score:.2f}: {entry[0]}")
     click.echo("")
 
+
 @cli.command()
 @click.argument("candidate", nargs=-1)
+@click.option(
+    "--candidate-only",
+    is_flag=True,
+    help="Only output the candidate itself, not the full path to it",
+)
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Format the output as JSON",
+)
+@click.option(
+    "--record",
+    is_flag=True,
+    help="Record the resulting score, and the scores of all the intermediary nodes",
+)
 @click.pass_context
 def check(
     ctx: click.Context,
-    candidate: tuple
+    candidate: tuple,
+    candidate_only: bool,
+    json_output: bool,
+    record: bool,
 ):
+    """Evaluate a candidate string
+
+    Scores a candidate string as if it was the terminal state of the Solvers expansion
+    method. By default, this does not record the resulting score.
+    """
     if candidate == ():
         click.echo("Please provide a candidate to check")
         ctx.exit(1)
@@ -269,10 +293,21 @@ def check(
     solver: Solver = ctx.obj["solver"]
 
     path = solver.assessment(sentence)
-    click.echo("Status | Score | Sentence")
-    click.echo("-------------------------")
-    for s, _remaining, _parent, _, _, score, status in path[::-1]:
-        click.echo(f"   {status}   | {score: =5.1f} | {s}")
+
+    if record:
+        for c in path:
+            ctx["SEARCH_TREE"].push(*c)
+
+    if candidate_only:
+        path = [path[-1]]
+    if json_output:
+        click.echo(json.dumps(path))
+    else:
+        click.echo("Status | Score | Sentence")
+        click.echo("-------------------------")
+        for s, _remaining, _parent, _, _, score, status in path[::-1]:
+            click.echo(f"   {status}   | {score: =5.1f} | {s}")
+
 
 cli.add_command(solve)
 cli.add_command(candidates)
