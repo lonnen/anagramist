@@ -210,6 +210,8 @@ class Solver:
             remaining = self.letter_bank.copy()
             remaining.subtract(sentence)
 
+            next_words = [w for w in self.compute_valid_vocab(remaining)]
+
             # check for a winner
             if self.hard_validate(sentence):
                 # we have a winner
@@ -218,10 +220,10 @@ class Solver:
                     del remaining["!"]
                 logger.critical("WINNER: {}".format(sentence))
                 score = float("inf")
-            elif i == len(scored_tokens):
-                # all candidates here were out of letters, so if it didn't hard_validate
-                # it must be a dud. We need to record that so we don't re-consider it
-                # later
+            elif len(next_words) < 0:
+                # all candidates here have no valid remaining words, so if it didn't
+                # hard_validate it must be a dud. We need to record that so we don't
+                # re-consider it later
                 score = float("-inf")
                 status = 1
 
