@@ -226,7 +226,7 @@ class TestSolver:
         # cannot use words not in the bank, even though the letters are there
         assert not solver.hard_validate("shabba")
 
-    # disable in test suites because its flaky, but leave it for manually running
+    # disable in test suites because it is flaky, but leave for manual runs
     # def test_solve(self, temp_database):
     #     """this depends on the exact seed. In order for it to complete in a reasonable
     #     time it has to be short, which blunts the ability of the oracle to converge
