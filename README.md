@@ -19,13 +19,12 @@ python -m anagramist solve --c1663 "ttttttttttttooooooooooeeeeeeeeaaaaaaalllllln
 ```
 
 ```bash
-python -m anagramist trim I\ cannot # delete all children of "I cannot" and set its status to 7, so it will be ignored in future searches
-python -m anagramist trim -s 0 I\ cannot # delete all chidlren of "I cannot" and set its status to 0 so it will be a candidate for future searches again
-python -m anagramist prune doppleganger\ abce\ tipo # for each word, find all entries containing that word and trim them at the occurance of that word
+python -m anagramist candidates --trim I\ cannot # delete all children of "I cannot" but leave the status untouched
+python -m anagramist candidates --trim -status 7 I\ cannot # delete all children of "I cannot" and set its status to 7 so it will be ignored
 ```
 
 ```bash
-python -m anagramist show I\ cannot # -> 
+python -m anagramist candidates I\ cannot # -> 
 # Showing: 'I cannot'
 # Child node demographics: (6011.0 children)
 # -----------------------
@@ -49,6 +48,28 @@ python -m anagramist show I\ cannot # ->
 # -16.61: I cannot show shall
 # -16.73: I cannot show released
 # -17.01: I cannot show some god
+```
+
+```bash
+python -m anagramist check I cannot know a wrong answer   
+# ...
+# Status | Score | Sentence
+# -------------------------
+#    1   | - inf | I cannot know a wrong answer
+#    1   | - inf | I cannot know a wrong
+#    0   | -40.2 | I cannot know a
+#    0   | -31.7 | I cannot know
+#    0   | -19.2 | I cannot
+#    0   | - 9.1 | I
+
+python -m anagramist check --candidate-only I cannot know a wrong answer
+# Status | Score | Sentence
+# -------------------------
+#    1   | - inf | I cannot know a wrong answer
+
+python -m anagramist check --candidate-only --json I cannot know a wrong answer > output.json
+# less output.json
+# [["I cannot know a wrong answer", 0, 0, 0, 0, -Infinity, 1]]
 ```
 
 ## Development
