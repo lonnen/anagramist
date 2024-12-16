@@ -292,7 +292,16 @@ def check(
     sentence = " ".join(candidate)
     solver: Solver = ctx.obj["solver"]
 
-    path = solver.assessment(sentence)
+    # Items with invalid characters will break oracle assessment, so use 
+    # soft_assessment to filter those out and return a failure.
+    if solver.soft_validate(sentence):
+        path = solver.assessment(sentence)
+    else:
+        # This isn't passed to the oracle to the intermediary path nodes are not free.
+        # As a trade-off we don't calculate them explicitly and simply return the lone
+        # node which may not connect to the root of the tree.
+        click.echo("Candidate does not soft-validate")
+        path = [[sentence, 0, 0, 0, 0, float("-inf"), 1]]
 
     if record:
         for c in path:
