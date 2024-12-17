@@ -67,6 +67,7 @@ python -m anagramist check --candidate-only I cannot know a wrong answer
 # -------------------------
 #    1   | - inf | I cannot know a wrong answer
 
+# output answers for other tools with --json
 python -m anagramist check --candidate-only --json I cannot know a wrong answer > output.json
 # less output.json
 # [["I cannot know a wrong answer", 0, 0, 0, 0, -Infinity, 1]]
