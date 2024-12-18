@@ -75,8 +75,6 @@ python -m anagramist check --candidate-only --json I cannot know a wrong answer 
 # fill in a candidate walk, setting the terminal node artifically to 7 (Manual Intervention)
 python -m anagramist check I merged billion bit national sonnets cares vessel darned tile hold yuo
 python -m anagramist candidated -status 7 I merged billion bit national sonnets cares vessel darned tile hold yuo
-
-
 ```
 
 ## Development
