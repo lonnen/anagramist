@@ -299,7 +299,7 @@ def check(
     while not solver.soft_validate(v):
         i_c += 1
         v = " ".join(candidate[:-i_c]) if i_c > 0 else " ".join(candidate)
-    
+
     path = solver.assessment(v)
 
     # re-pad the path with synthetic failure entries for each word that failed earlier
@@ -307,7 +307,7 @@ def check(
         invalid_candidates = [" ".join(candidate[:-i]) for i in range(1, i_c)][::-1]
         path.extend([[c, 0, 0, 0, 0, float("-inf"), 1] for c in invalid_candidates])
         path.append([" ".join(candidate), 0, 0, 0, 0, float("-inf"), 1])
-    
+
     if record:
         for c in path:
             ctx["SEARCH_TREE"].push(*c)
