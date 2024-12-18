@@ -233,7 +233,7 @@ class TestSolver:
     #     search towards the highest scoring outcome. At best, this is a barely convincing
     #     test of the happy path through the wiring of the solver task.
     #     """
-    #     expected = {"bash bish bosh", "bash bosh bish", "bosh bash bish", 
+    #     expected = {"bash bish bosh", "bash bosh bish", "bosh bash bish",
     #                 "bosh bish bash", "bash bosh bish", "bash bish bosh"}
     #     solver = Solver(
     #         expected,  # the letter bank
