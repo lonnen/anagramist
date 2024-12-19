@@ -126,9 +126,9 @@ class TransformerOracle:
             for token, p in zip(input_sentence, input_probs, strict=True):
                 if token not in self.tokenizer.all_special_ids:
                     text_sequence.append((self.tokenizer.decode(token), p.item()))
-            if self.c1663:
+            if self.puzzle_context_token_count > 0:
                 text_sequence = text_sequence[
-                    self.puzzle_context_token_count :
+                    self.puzzle_context_token_count - 1 :
                 ]  # trim off the puzzle_context
             batch.append(text_sequence)
 
