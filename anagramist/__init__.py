@@ -1,8 +1,5 @@
 import logging
 
-import cProfile
-from pstats import Stats
-
 from .fragment import Fragment as Fragment
 from .oracles import TransformerOracle as TransformerOracle
 from .persistentsearchtree import PersistentSearchTree as PersistentSearchTree
