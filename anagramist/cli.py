@@ -1,4 +1,7 @@
+import cProfile
+import datetime
 import json
+from pstats import Stats
 import click
 
 from anagramist.solver import Solver
@@ -127,8 +130,19 @@ def cli(
 
 @cli.command()
 @click.argument("root", nargs=-1)
+@click.option(
+    "--profile",
+    "do_profiling",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Whether or not to run cProfile on this run",
+)
+@click.option("--max_iterations", is_flag=False, default=10, help="")
 @click.pass_context
-def solve(ctx: click.Context, root=("",)):
+def solve(
+    ctx: click.Context, root=("",), do_profiling: bool = False, max_iterations: int = 10
+):
     """Search for a valid arrangement of letters
 
     Search proceeds from the root, or the empty string if no root is provided, or "I" if
@@ -147,8 +161,29 @@ def solve(ctx: click.Context, root=("",)):
     r = " ".join(root)
     click.echo(f"Assembling anagrams from: {"".join(sorted(ctx.obj["LETTERS"]))}")
     click.echo(f"Searching for solutions starting from: {r}")
-    solver: Solver = ctx.obj["solver"]
-    solver.solve(r)
+
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    profile_filename = f"profile_{now}.txt"
+    stats_filename = f"prof_stats_{now}.txt"
+    if do_profiling:
+        with cProfile.Profile() as pr:
+            s = Solver(
+                ctx.obj["LETTERS"],
+                ctx.obj["SEARCH_TREE"],
+                ctx.obj["ORACLE"],
+                c1663=ctx.obj["C1663"],
+                max_iterations=max_iterations,
+            )
+            s.solve()
+        with open(profile_filename, "w") as stream:
+            stats = Stats(pr, stream=stream)
+            stats.strip_dirs()
+            stats.sort_stats("time")
+            stats.dump_stats(stats_filename)
+            stats.print_stats()
+    else:
+        solver: Solver = ctx.obj["solver"]
+        solver.solve(r)
 
 
 @cli.command()
