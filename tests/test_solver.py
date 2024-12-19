@@ -230,8 +230,8 @@ class TestSolver:
     # def test_solve(self, temp_database):
     #     """this depends on the exact seed. In order for it to complete in a reasonable
     #     time it has to be short, which blunts the ability of the oracle to converge
-    #     search towards the highest scoring outcome. At best, this is a barely convincing
-    #     test of the happy path through the wiring of the solver task.
+    #     search towards the highest scoring outcome. At best, this is a barely
+    #     convincing test of the happy path through the wiring of the solver task.
     #     """
     #     expected = {"bash bish bosh", "bash bosh bish", "bosh bash bish",
     #                 "bosh bish bash", "bash bosh bish", "bash bish bosh"}
