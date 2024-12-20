@@ -226,23 +226,28 @@ class TestSolver:
         # cannot use words not in the bank, even though the letters are there
         assert not solver.hard_validate("shabba")
 
-    # disable in test suites because it is flaky, but leave for manual runs
-    # def test_solve(self, temp_database):
-    #     """this depends on the exact seed. In order for it to complete in a reasonable
-    #     time it has to be short, which blunts the ability of the oracle to converge
-    #     search towards the highest scoring outcome. At best, this is a barely
-    #     convincing test of the happy path through the wiring of the solver task.
-    #     """
-    #     expected = {"bash bish bosh", "bash bosh bish", "bosh bash bish",
-    #                 "bosh bish bash", "bash bosh bish", "bash bish bosh"}
-    #     solver = Solver(
-    #         expected,  # the letter bank
-    #         PersistentSearchTree(db_name=temp_database),
-    #         SHARED_ORACLE,
-    #         vocabulary=["bish", "bash", "bosh"],
-    #         c1663=False,
-    #     )
-    #     assert solver.solve() in expected
+    @pytest.mark.skip(
+        reason="""Impractical to run regularly. Test must be long enough 
+                      to have a unique answer and becomes too expensive for a test."""
+    )
+    def test_solve(self, temp_database):
+        """this depends on the exact seed. In order for it to complete in a reasonable
+        time it has to be short, which blunts the ability of the oracle to converge
+        search towards the highest scoring outcome. At best, this is a barely
+        convincing test of the happy path through the wiring of the solver task.
+        """
+        expected = "DUDE I EVEN CHECKED THE EVIL ALTERNATE UNIVERSES TO MAKE SURE"
+        solver = Solver(
+            expected,  # the letter bank
+            PersistentSearchTree(db_name=temp_database),
+            TransformerOracle(
+                TRANSFOMER_MODEL,
+                TRANSFORMER_SEED,
+                puzzle_context="When you got home, did you check out every room?",
+            ),
+            c1663=False,
+        )
+        assert solver.solve() == expected
 
     def test_retrieve_candidate(self, temp_database):
         pst = PersistentSearchTree(db_name=temp_database)
