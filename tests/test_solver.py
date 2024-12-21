@@ -227,14 +227,17 @@ class TestSolver:
         assert not solver.hard_validate("shabba")
 
     @pytest.mark.skip(
-        reason="""Impractical to run regularly. Test must be long enough 
-                      to have a unique answer and becomes too expensive for a test."""
+        reason="""Impractical to run regularly"""
     )
     def test_solve(self, temp_database):
-        """this depends on the exact seed. In order for it to complete in a reasonable
-        time it has to be short, which blunts the ability of the oracle to converge
-        search towards the highest scoring outcome. At best, this is a barely
-        convincing test of the happy path through the wiring of the solver task.
+        """`solve` is greedy and stochastic. If there is more than 1 valid arrangement 
+        of characters then solve is not guaranteed to return any particular one, 
+        regardless of score. In order for this to have a unique solution the expected
+        value has to bee quite long, and the runtime gets impractical quickly.
+
+        Keeping it around because it is useful to run manually, ocassionally, in order
+        to convince yourself that the solver happy path might work if everything aligns
+        just so.
         """
         expected = "DUDE I EVEN CHECKED THE EVIL ALTERNATE UNIVERSES TO MAKE SURE"
         solver = Solver(
@@ -247,6 +250,7 @@ class TestSolver:
             ),
             c1663=False,
         )
+        # 
         assert solver.solve() == expected
 
     def test_retrieve_candidate(self, temp_database):
