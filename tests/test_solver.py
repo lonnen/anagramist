@@ -226,12 +226,10 @@ class TestSolver:
         # cannot use words not in the bank, even though the letters are there
         assert not solver.hard_validate("shabba")
 
-    @pytest.mark.skip(
-        reason="""Impractical to run regularly"""
-    )
+    @pytest.mark.skip(reason="""Impractical to run regularly""")
     def test_solve(self, temp_database):
-        """`solve` is greedy and stochastic. If there is more than 1 valid arrangement 
-        of characters then solve is not guaranteed to return any particular one, 
+        """`solve` is greedy and stochastic. If there is more than 1 valid arrangement
+        of characters then solve is not guaranteed to return any particular one,
         regardless of score. In order for this to have a unique solution the expected
         value has to bee quite long, and the runtime gets impractical quickly.
 
@@ -250,7 +248,7 @@ class TestSolver:
             ),
             c1663=False,
         )
-        # 
+        #
         assert solver.solve() == expected
 
     def test_retrieve_candidate(self, temp_database):
