@@ -20,7 +20,7 @@ if __name__ == "__main__":
             line_count += 1
     chars["\n"] = 0
     chars[" "] = 0
-    uniq_chars = "".join(sorted(chars.keys()))
+    uniq_chars = "".join(sorted(chars.keys(), key=lambda x: chars[x]))
     print(f"Read {line_count} from {text_file}")
     print(f"{len(uniq_chars)} unique characters: {uniq_chars}")
     print("Character counts:")
