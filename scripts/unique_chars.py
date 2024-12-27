@@ -20,11 +20,13 @@ if __name__ == "__main__":
             line_count += 1
     chars["\n"] = 0
     chars[" "] = 0
-    uniq_chars = "".join(sorted(chars.keys(), key=lambda x: chars[x]))
+    uniq_chars = "".join(sorted(chars.keys(), key=lambda x: ord(x)))
     print(f"Read {line_count} from {text_file}")
+    uniq_chars_ord = sorted(uniq_chars, key=lambda x: ord(x))
+    print(f"Ordinal range: {ord(uniq_chars[0])}, {ord(uniq_chars[-1])}")
     print(f"{len(uniq_chars)} unique characters: {uniq_chars}")
     print("Character counts:")
     for c in uniq_chars:
         if chars[c] == 0:
             continue
-        print(f"{c}: {chars[c]}")
+        print(f"{c}: {ord(c)} {chars[c]}")
