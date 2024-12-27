@@ -82,8 +82,8 @@ def cli(
     """
 
     c1663 = False
-    _c1663_letters = """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""  # noqa: E501
-    if letters == _c1663_letters:
+    _c1663_letters = sorted("""ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""")  # noqa: E501
+    if sorted(letters) == _c1663_letters:
         c1663 = True
         if suppress_c1663:
             c1663 = False
