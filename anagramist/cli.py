@@ -303,6 +303,12 @@ def candidates(
     help="Format the output as JSON",
 )
 @click.option(
+    "--auto-letters",
+    is_flag=True,
+    help="""Override the letter bank so that it contains exactly the letters needed for
+    the provided candidate""",
+)
+@click.option(
     "--record",
     is_flag=True,
     help="Record the resulting score, and the scores of all the intermediary nodes",
@@ -313,6 +319,7 @@ def check(
     candidate: tuple,
     candidate_only: bool,
     json_output: bool,
+    auto_letters: bool,
     record: bool,
 ):
     """Evaluate a candidate string
@@ -325,7 +332,15 @@ def check(
         ctx.exit(1)
 
     sentence = " ".join(candidate)
-    solver: Solver = ctx.obj["solver"]
+    if auto_letters:
+        solver: Solver = Solver(
+        sentence,
+        ctx.obj["SEARCH_TREE"],
+        ctx.obj["ORACLE"],
+        c1663=False,
+    )
+    else:
+        solver: Solver = ctx.obj["solver"]
 
     # Items with invalid characters will break oracle assessment, so use soft_validate
     # to skim those off and replace them with synthetic failures
@@ -350,7 +365,7 @@ def check(
     if candidate_only:
         path = [path[-1]]
     if json_output:
-        click.echo(json.dumps(path))
+        click.echo(json.dumps(path[0]))
     else:
         click.echo("Status | Score | Sentence")
         click.echo("-------------------------")
