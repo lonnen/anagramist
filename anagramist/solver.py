@@ -293,7 +293,7 @@ class Solver:
 
         for w in candidate.words:
             if w.lower() not in self.vocabulary:
-                return False # candidate uses words not in the bank
+                return False  # candidate uses words not in the bank
 
         if remaining_letters.total() > 0:
             for w in self.vocabulary:
