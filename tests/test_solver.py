@@ -4,6 +4,7 @@ import os
 import sqlite3
 
 import pytest
+from anagramist.candidate import Status
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
 from anagramist.solver import Solver
@@ -98,8 +99,8 @@ class TestSolver:
             c1663=False,
         )
         actual = solver.assessment("bish bash bosh")
-        # a hard validating winners score is infinite
-        assert float("inf") == actual[-1][-2]
+        # a hard validating winners have Status.VALID (== 2)
+        assert Status.VALID == actual[-1][-1]
         # one response per word
         assert len(actual) == 3
         # responses should build up towards the provided sentence

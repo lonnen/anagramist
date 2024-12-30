@@ -5,6 +5,7 @@ from random import choices
 import time
 from typing import Dict, Generator, List, Tuple, Union
 
+from anagramist.candidate import Status
 from anagramist.fragment import Fragment
 from anagramist.oracles import TransformerOracle
 from anagramist.persistentsearchtree import PersistentSearchTree
@@ -111,7 +112,7 @@ class Solver:
                 for c in updated_candidates:
                     self.search_tree.push(*c)
                     logging.info(f"recorded simulation ({c[5]:2.2f}, {c[6]}): {c[0]}")
-                    if c[-2] == float("inf"):
+                    if c[-1] == Status.VALID:
                         logging.info(
                             "Found solution after %d seconds, stopping.", self.max_time
                         )
@@ -219,7 +220,7 @@ class Solver:
                     sentence += "!!"
                     del remaining["!"]
                 logger.critical("WINNER: {}".format(sentence))
-                score = float("inf")
+                status = 2 # Valid Solution
             elif len(next_words) < 0:
                 # all candidates here have no valid remaining words, so if it didn't
                 # hard_validate it must be a dud. We need to record that so we don't
@@ -238,7 +239,7 @@ class Solver:
                     status,
                 ]
             )
-            if score == float("inf") or score == float("-inf"):
+            if status == Status.VALID or score == float("-inf"):
                 break  # we don't need to continue, infinity means we can finally rest
         return entries
 

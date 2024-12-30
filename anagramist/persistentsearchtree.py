@@ -3,6 +3,8 @@ import sqlite3
 from contextlib import contextmanager
 from typing import List, Tuple, Union
 
+from anagramist.candidate import Status
+
 from .fragment import Fragment
 
 
@@ -56,7 +58,7 @@ class PersistentSearchTree:
             return con.cursor().execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
     def contains(
-        self, word: str, limit: Union[int, None] = None, status: Union[int, None] = None
+        self, word: str, limit: Union[int, None] = None, status: Union[Status, None] = None
     ):
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
@@ -140,7 +142,7 @@ class PersistentSearchTree:
         score: float | None,
         cumulative_score: float | None,
         mean_score: float | None,
-        status: int | None,
+        status: Status | None,
     ) -> None:
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
@@ -166,12 +168,12 @@ class PersistentSearchTree:
             )
             con.commit()
 
-    def status(self, placed: str, status: int) -> int:
+    def status(self, placed: str, status: Status) -> int:
         """Change the status of entry `placed` to `status`
 
         Args:
             placed (str): The string indicating the node to change
-            status (int): The status code from CANDIDATE_STATUS_CODES in the module
+            status (Status): The status code from the Candidate.Status enum
 
         Returns:
             int - an integer code indicating how many rows have changed. -1 indicates
