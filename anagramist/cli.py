@@ -365,7 +365,8 @@ def check(
     if candidate_only:
         path = [path[-1]]
     if json_output:
-        click.echo(json.dumps(path[0]))
+        s, _remaining, _parent, _, _, score, status = path[0]
+        click.echo(json.dumps({"status": status, "score": score, "sentence": s}))
     else:
         click.echo("Status | Score | Sentence")
         click.echo("-------------------------")
