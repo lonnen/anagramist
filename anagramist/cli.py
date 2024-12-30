@@ -364,6 +364,15 @@ def check(
 
     if candidate_only:
         path = [path[-1]]
+    click.echo(path)
+    if auto_letters and path[-1][-2] == float("-inf"): # auto letters implies c1663 == False
+        click.echo("Error: --auto-letters set but candidate soft failed validation")
+        click.echo("Investigate with a debugger:")
+        click.echo(f"""
+            $ anagramist check --auto-letters --candidate-only --json "{path[-1][0]}"
+        """)
+        ctx.exit(1)
+        
     if json_output:
         s, _remaining, _parent, _, _, score, status = path[0]
         click.echo(json.dumps({"status": status, "score": score, "sentence": s}))
