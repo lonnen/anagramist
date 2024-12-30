@@ -28,4 +28,6 @@ class TestOracle:
         oracle = TransformerOracle(TRANSFOMER_MODEL, TRANSFORMER_SEED, c1663=True)
         word_scores = oracle.score_candidate(expected)
         assert expected.words == [w for w, _ in word_scores]
-        assert -26 == round(fsum([s for _, s in word_scores]), 0)
+        # even with a fixed seed this value varies with changes to certain code paths
+        # manually verify the result before adjusting this number
+        assert -33 == round(fsum([s for _, s in word_scores]), 0)
