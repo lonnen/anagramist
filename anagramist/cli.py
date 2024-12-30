@@ -82,7 +82,9 @@ def cli(
     """
 
     c1663 = False
-    _c1663_letters = sorted("""ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!""")  # noqa: E501
+    _c1663_letters = sorted(
+        """ttttttttttttooooooooooeeeeeeeeaaaaaaallllllnnnnnnuuuuuuiiiiisssssdddddhhhhhyyyyyIIrrrfffbbwwkcmvg:,!!"""
+    )  # noqa: E501
     if sorted(letters) == _c1663_letters:
         c1663 = True
         if suppress_c1663:
@@ -334,11 +336,11 @@ def check(
     sentence = " ".join(candidate)
     if auto_letters:
         solver: Solver = Solver(
-        sentence,
-        ctx.obj["SEARCH_TREE"],
-        ctx.obj["ORACLE"],
-        c1663=False,
-    )
+            sentence,
+            ctx.obj["SEARCH_TREE"],
+            ctx.obj["ORACLE"],
+            c1663=False,
+        )
     else:
         solver: Solver = ctx.obj["solver"]
 
@@ -364,15 +366,16 @@ def check(
 
     if candidate_only:
         path = [path[-1]]
-    click.echo(path)
-    if auto_letters and path[-1][-2] == float("-inf"): # auto letters implies c1663 == False
+    if auto_letters and path[-1][-2] == float(
+        "-inf"
+    ):  # auto letters implies c1663 == False
         click.echo("Error: --auto-letters set but candidate soft failed validation")
         click.echo("Investigate with a debugger:")
-        click.echo(f"""
-            $ anagramist check --auto-letters --candidate-only --json "{path[-1][0]}"
-        """)
+        click.echo(
+            f"""\n    $ anagramist check --auto-letters --candidate-only --json "{path[-1][0]}"\n"""  # noqa: E501
+        )
         ctx.exit(1)
-        
+
     if json_output:
         s, _remaining, _parent, _, _, score, status = path[0]
         click.echo(json.dumps({"status": status, "score": score, "sentence": s}))
