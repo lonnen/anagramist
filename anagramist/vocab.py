@@ -14949,6 +14949,7 @@ vocab_jadrian = {
     ">",
     "?",
     "@",
+    "/",
 }
 
 c1663_disallow = {
@@ -16332,6 +16333,7 @@ c1663_disallow = {
     ">",
     "?",
     "@",
+    "/",
 }
 
 vocab_c1663 = vocab_jadrian - c1663_disallow
