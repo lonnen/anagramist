@@ -77,6 +77,8 @@ python -m anagramist check I merged billion bit national sonnets cares vessel da
 python -m anagramist candidated -status 7 I merged billion bit national sonnets cares vessel darned tile hold yuo
 ```
 
+Note that your scores may vary from the examples. Exact scores should be deterministic within the same version of the program, but may vary slightly between versions, depending on what source code was modified.
+
 ## Development
 
 To contribute to this library, first checkout the code. Then create a new virtual environment:
