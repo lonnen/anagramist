@@ -293,7 +293,7 @@ class Solver:
             return False  # candidate uses letters not in the bank
 
         for w in candidate.words:
-            if w.lower() not in self.vocabulary:
+            if w not in self.vocabulary and w.lower() not in self.vocabulary:
                 return False  # candidate uses words not in the bank
 
         if remaining_letters.total() > 0:
