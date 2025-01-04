@@ -14954,6 +14954,16 @@ vocab_jadrian = {
     "(",
     ")",
     ".",
+    "furniture",
+    "replay",
+    "nailing",
+    "rhymed",
+    "tragical",
+    "maggot",
+    "removal",
+    "grams",
+    "trans",
+    "BACON",
 }
 
 c1663_disallow = {
@@ -16342,6 +16352,16 @@ c1663_disallow = {
     "(",
     ")",
     ".",
+    "furniture",
+    "replay",
+    "nailing",
+    "rhymed",
+    "tragical",
+    "maggot",
+    "removal",
+    "grams",
+    "trans",
+    "BACON",
 }
 
 vocab_c1663 = vocab_jadrian - c1663_disallow
