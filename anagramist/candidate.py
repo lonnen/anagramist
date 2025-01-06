@@ -7,12 +7,14 @@ from anagramist.fragment import Fragment
 
 class Status(IntEnum):
     """Candidate Status Codes"""
+
     OK = 0  # or None
     INVALID = 1
     VALID = 2
     FULLY_EXPLORED = 5
     UNEXPLORED = 6
     MANUAL_INVALIDATION = 7
+
 
 @dataclass()
 class Candidate:

@@ -220,7 +220,7 @@ class Solver:
                     sentence += "!!"
                     del remaining["!"]
                 logger.critical("WINNER: {}".format(sentence))
-                status = 2 # Valid Solution
+                status = 2  # Valid Solution
             elif len(next_words) < 0:
                 # all candidates here have no valid remaining words, so if it didn't
                 # hard_validate it must be a dud. We need to record that so we don't

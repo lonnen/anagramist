@@ -58,7 +58,10 @@ class PersistentSearchTree:
             return con.cursor().execute("SELECT COUNT(*) FROM visited").fetchone()[0]
 
     def contains(
-        self, word: str, limit: Union[int, None] = None, status: Union[Status, None] = None
+        self,
+        word: str,
+        limit: Union[int, None] = None,
+        status: Union[Status, None] = None,
     ):
         with db_connection_manager(self.__db_name) as con:
             cursor = con.cursor()
