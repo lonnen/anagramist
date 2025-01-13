@@ -374,7 +374,7 @@ def check(
         click.echo(
             f"""\n    $ anagramist check --auto-letters --candidate-only --json "{path[-1][0]}"\n"""  # noqa: E501
         )
-        ctx.exit(1)
+        # ctx.exit(1)
 
     if json_output:
         s, _remaining, _parent, _, _, score, status = path[0]
