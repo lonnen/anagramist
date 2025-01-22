@@ -133,7 +133,7 @@ These intermediate results and annotations are not yet stored in this repository
 Ryan North has given several constraints in the news post accompanying [Comic 1665](http://qwantz.com/index.php?comic=1665):
 
 - All words in the solution are dictionary words.
-- What's more, all words in the solution are in the Jadrian's awesome [Qwantz Corpus](http://cs.brown.edu/~jadrian/docs/etc/qwantzcorpus>)!
+- What's more, all words in the solution are in the Jadrian's awesome [Qwantz Corpus](http://cs.brown.edu/~jadrian/docs/etc/qwantzcorpus)[link has been 404 since at least 2020]!
 - The solution is natural-sounding, reasonably-grammatical dialogue that T-Rex would say, using phrasing that T-Rex would use.
 - The punctuation :,!! is in the solution, in that order!
 - The longest word in the solution is 11 characters long.
