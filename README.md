@@ -96,37 +96,48 @@ To run the tests:
 pytest
 ```
 
-## General approach
+## How to (try) to solve a Cryptoanagram
 
-In [Dinocomics 1663](https://qwantz.com/index.php?comic=1663), [Ryan North](https://www.ryannorth.ca/about/) describes a puzzle that asks you to reconstruct some original text given the characters and punctuation by arranging them and adding whitespace as needed. We call this kind of problem an anacryptogram and the specific problem set forth in Comic 1663 we call c1663 or the Qwantzle. Ryan has also provided a dictionary of valid words and several other constraining hints to make the Qwantzle, specifically, more tractable. 
+In [Dinocomics 1663](https://qwantz.com/index.php?comic=1663), [Ryan North](https://www.ryannorth.ca/about/) describes a puzzle by presenting a bag of letters and asking the player to reconstruct some original text by arranging the letters and adding spaces as needed.
 
-In order to find the original sentence, we define a tree with the following properties:
+We call this kind of probelm an anacryptogram. We call the specific anacryptogram defined in Comic 1663 "c1663" or the "Qwantzle". In addition to the letters, Ryan North confirmed all words in the solution are in [Jadrian's Qwantz Corpus](http://www.afifthofnothing.com/qwantzstuff/qwantzcorpus), among other useful constraining hints.
 
-* Every node is addressed by the string containing the arrangement of characters and spaces up to that point
-* Every node has a child node for each word that can be spelled from the remaining pool of characters at that point
-* The root of the tree is an empty sentence
-* Apostraphes are part of the containing word
+This tool searches for the original sentence by constructing a tree with the following properties:
+
+* Every node is an arrangement of some of the characters into words from the corpus separated by spaces
+* The tree is rooted in an empty sentence
+* Every node has a child node for each word in the corpus that can be spelled with the remaining letters in the pool
+* Apostraphes are considered part of the containing word
 * All other punctuation is considered a word itself (e.g. "I can't, you must!" is the node `["I", "can't", ",", "you", "must", "!"]`).
 
-With this definition the majority of the branches will be nonsensical, and the size of the tree will grow super-linearly with longer sentences and the larger pools of letters that come with them. To constrain exploration towards more fruitful branches, this program exploys two different heuristics:
+This greatly reduces the search space versus arranging individual letters, but it's still quite inefficient. The majority of the branches will be nonsensical, and the size of the tree grows rapidly with larger pools of letters derived from longer chunks of text.
 
-First, the placed string is sent to an `Oracle` that returns a float. Second, a set of easily computable constraints are evaluated with violations reducing the score of a candidate (generally to 0).
+To constrain the search space further and focus on more fruitful branches, this program explores this tree using two heuristics:
 
-In earlier versions of this approach `Oracle` scores were or be based on word length, letter frequency, or other attributes and multiple could be applied and combied together. `anagramist` simplifies this architecture to a single TransformerOracle wrapping an LLM model. Microsoft's Phi-1.5 LLM, by default, but any `transformers.py`compatible model could work. This model is interrogated to get score that has useful properties similar to, but which is wholly distinct from, the probability that the LLM would generate that specific sequence of tokens using beam search. These token level probabilities are consolidated into word-level probabilities and then combined to create a single candidate score.
+1. Placed letters are sent `Oracle` that outputs a score between 0 and 1 indicating, roughly, is it a valid english sentence that someone might write.
+2. A set of easily computable constraints are evaluated, and violations reducing the score of a candidate to 0.
 
-Generally the algorithm proceeds in three steps:
+In earlier versions of this program there were many `Oracle`s that used word length, letter frequency, or other attributes. The current version of `anagramist` has replaced all these with a single `TransformerOracle` wrapping a locally-runable LLM. Candidates are fed to the model, and the model is interrogated to get a score that has useful properties similar to, but which is wholly distinct from, the probability that the LLM would generate that specific sequence of tokens using BEAM search. These token level probabilities are consolidated into word-level probabilities and then combined to create a single candidate score.
 
-1. Selection - randomly sample the tree, weighted by oracle score, to select a node that is both already explored and the parent of unexplored child nodes
-2. Expansion - starting from the selected node, take a deep uniform random walk down the descendent nodes until a node fails soft validation, indicating that no placement of additional letters could produce the solution
-3. Backpropogation - if the candidate meets all the criteria that can be computationally verified (called hard validation) record the answer and halt. If not, score each node along the explored path. Record the scores and start over.
+The tree, including candidate scores, are stored in a SQL lite database for local persistence between runs.
 
-This algorithm was inspired by the Monte Carlo Tree Search algoirhtm and loosly adapted from the Upper Confidence Bounds Applied to Trees algorithm for use in a non-game context, with the TransformerOracle heuristic and the more boolean hard constraint checks standing in for the ratio of wins and losses.
+The program searches in three steps:
 
-Solving Comic 1663 is the main goal, but it is interesting to have a generic method that can be evaluated against other sentences.
+1. Selection - sample from the stored tree (weighted by oracle score) to select a node that is both already explored and the parent of unexplored child nodes
+2. Expansion - starting from the selected node, take a deep uniform random walk by adding words until a node fails soft validation, indicating that no placement of additional letters could produce a valid solution
+3. Backpropogation - hard validate the candidate and, if it meets all the criteria that can be computationally verified, record the answer as a solution and halt. If not, score each node along the explored path. Record the scores. Repeat starting from 1.
 
-A note on the specifics of Comic 1663. It has 97 letters and 4 characters of punctuation, and given some summary stats of the size of words in the vocabulary it's not unreasonable that a valid answer could have between 16 and 24 words. Jadrian's corpus is known to contain all the words in the original sentence, and has more than 15,000 words. This puts a conservative upper bound of 1.6e100 on things. By applying hints given by the puzzle creator for c1663 we can reduce the vocabulary to some ~13,500 unique words, which is modest improvement on this loose upper bound. Since the first word is known to be "I" a manual inspection and annotation of all 13,500 possible second words has restricted the space of possible second words to 1,422 possible entries. 
+This algorithm was inspired by the Monte Carlo Tree Search algorithm and Upper Confidence Bounds Applied to Trees algorithm. In practice it could also be said to resemble a version of stochastic beam search that stores all states in a database. 
+
+Solving Comic 1663 is the main goal, but it is interesting to have a generic method that can be evaluated against other texts.
+
+A note on the specifics of Comic 1663. It has 97 letters and 4 characters of punctuation. Given the size of words in the corpus it's not unreasonable that a valid answer could have between 16 and 24 words. Jadrian's corpus is known to contain all the words in the original sentence, and has more than 15,000 words. This puts a naive upper bound of 1.6e100 candidates to check. By applying hints given by the puzzle creator we can reduce the vocabulary to some ~13,500 unique words, which is only a modest improvement on this loose upper bound. Since the first word is known to be "I" a manual inspection and annotation of all 13,500 possible second words has restricted the space of possible second words to 1,422 possible entries.
 
 These intermediate results and annotations are not yet stored in this repository.
+
+# Data Sources
+
+Because this has been going on a long time, some of the original data sources have decayed and fallen off the internet. Backup copies have been archived in the [Cryptoanagram](https://github.com/lonnen/cryptoanagram/) repo, along with any tools that were used to clean those data sets.
 
 ## Hints and Clues
 
@@ -150,8 +161,8 @@ Ryan North followed up with additional clues accompanying [Comic 1666](http://qw
 - Ryan [released the Dinosaur Comics text as XML](http://www.qwantz.com/everywordindinosaurcomicsOHGOD.xml) which is redundant with Paul's work (above)
 - The longest word is 11 characters long, the second longest is 8 characters long, and they're side-by-side in the solution
 
-Additionally at TCAF in 2012 Ryan said to me personally that the solution would make a good epitaph.
+Additionally at TCAF in 2012 Ryan said to me personally that the solution would make a good epitaph. He also told me that several people had come up with valid sentences that passed all the hints and constraints but which were not the original sentence and so did not win the prize.
 
-In 2023 Ryan provided [one more Qwantzle clue](https://www.qwantz.com/index.php?comic=4005#blogpost): The final letter is "w"
+In 2023 Ryan provided [one more Qwantzle clue](https://www.qwantz.com/index.php?comic=4005#blogpost): The final letter is "w".
 
 Combined with earlier clues this means the sentence ends in "w!!". Presumably this will rule out all the current false-positives that have been submitted.
